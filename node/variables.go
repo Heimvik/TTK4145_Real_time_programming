@@ -2,57 +2,57 @@ package node
 
 var FLOORS int = 4
 
-type Node struct {
+type T_Node struct {
 	Priority       int
-	Role           NodeRole
-	ConnectedNodes []Node
-	NodeElevator   Elevator
+	Role           T_NodeRole
+	ConnectedNodes []*T_Node
+	Elevator       *T_Elevator
 }
 
-type NodeRole struct {
-	Master MasterNode
-	Slave  SlaveNode
+type T_NodeRole struct {
+	Master T_MasterNode
+	Slave  T_SlaveNode
 }
 
-type MasterNode struct {
-	GlobalQueue GlobalQueue
+type T_MasterNode struct {
+	GlobalQueue *T_GlobalQueue
 }
 
-type SlaveNode struct {
-	LocalQueue LocalQueue //NB, takes only one order
+type T_SlaveNode struct {
+	LocalQueue *T_LocalQueue //NB, takes only one order
 }
 
-type GlobalQueue struct {
-	Request Request
+type T_GlobalQueue struct {
+	Request T_Request
 }
 
-type LocalQueue struct {
+type T_LocalQueue struct {
 }
 
-type Elevator struct {
-	RequestsToDistribution chan Request
-	RequestsToService      chan Request
-	Floor                  int
-	Direction              Direction
-	Avalibale              bool //Thoggled whenever disconnected/unavalebale/door sensor
-}
-
-type Request struct {
-	Calltype  Call
-	Elevator  int
+type T_Elevator struct {
+	//RequestsToDistribution chan *T_Request
+	//RequestsToService      chan *T_Request
 	Floor     int
-	Direction Direction
+	Direction T_Direction
+	Avalibale bool //Thoggled whenever disconnected/unavalebale/door sensor
 }
 
-type Call int
-type Direction int
+type T_Request struct {
+	Calltype   T_Call
+	P_Elevator *T_Elevator
+	Floor      int
+	Direction  T_Direction
+}
+
+type T_Call int
+type T_Direction int
 
 const (
-	down Direction = 0
-	up   Direction = 1
+	Down T_Direction = 0
+	Up   T_Direction = 1
 )
 
 const (
-	cab  Call = 0
-	hall Call = 1
+	Cab  T_Call = 0
+	Hall T_Call = 1
 )
