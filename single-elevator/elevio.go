@@ -1,45 +1,45 @@
-package elevio
+package singleelevator
 
-import "time"
-import "sync"
-import "net"
-import "fmt"
+import (
+	"fmt"
+	"net"
+	"sync"
+	"time"
+)
 
 /*
 
-*/
-
+ */
 
 const _pollRate = 20 * time.Millisecond
 
-var _initialized    bool = false
-var _numFloors      int = 4
-var _numButtons		int = 3
-var _mtx            sync.Mutex
-var _conn           net.Conn
+var _initialized bool = false
+var _numFloors int = 4
+
+// var _numButtons		int = 3
+var _mtx sync.Mutex
+var _conn net.Conn
 
 type MotorDirection int
 
 const (
 	MD_Up   MotorDirection = 1
-	MD_Down                = -1
-	MD_Stop                = 0
+	MD_Down MotorDirection = -1
+	MD_Stop MotorDirection = 0
 )
 
 type ButtonType int
 
 const (
 	BT_HallUp   ButtonType = 0
-	BT_HallDown            = 1
-	BT_Cab                 = 2
+	BT_HallDown ButtonType = 1
+	BT_Cab      ButtonType = 2
 )
 
 type ButtonEvent struct {
 	Floor  int
 	Button ButtonType
 }
-
-
 
 func Init(addr string, numFloors int) {
 	if _initialized {
@@ -55,8 +55,6 @@ func Init(addr string, numFloors int) {
 	}
 	_initialized = true
 }
-
-
 
 func SetMotorDirection(dir MotorDirection) {
 	write([4]byte{1, byte(dir), 0, 0})
@@ -78,8 +76,6 @@ func SetStopLamp(value bool) {
 	write([4]byte{5, toByte(value), 0, 0})
 }
 
-
-
 func PollButtons(receiver chan<- ButtonEvent) {
 	prev := make([][3]bool, _numFloors)
 	for {
@@ -87,7 +83,7 @@ func PollButtons(receiver chan<- ButtonEvent) {
 		for f := 0; f < _numFloors; f++ {
 			for b := ButtonType(0); b < 3; b++ {
 				v := GetButton(b, f)
-				if v != prev[f][b] && v != false {
+				if v != prev[f][b] && v {
 					receiver <- ButtonEvent{f, ButtonType(b)}
 				}
 				prev[f][b] = v
@@ -132,9 +128,6 @@ func PollObstructionSwitch(receiver chan<- bool) {
 	}
 }
 
-
-
-
 func GetButton(button ButtonType, floor int) bool {
 	a := read([4]byte{6, byte(button), byte(floor), 0})
 	return toBool(a[1])
@@ -159,32 +152,33 @@ func GetObstruction() bool {
 	return toBool(a[1])
 }
 
-
-
-
-
 func read(in [4]byte) [4]byte {
 	_mtx.Lock()
 	defer _mtx.Unlock()
-	
+
 	_, err := _conn.Write(in[:])
-	if err != nil { panic("Lost connection to Elevator Server") }
-	
+	if err != nil {
+		panic("Lost connection to Elevator Server")
+	}
+
 	var out [4]byte
 	_, err = _conn.Read(out[:])
-	if err != nil { panic("Lost connection to Elevator Server") }
-	
+	if err != nil {
+		panic("Lost connection to Elevator Server")
+	}
+
 	return out
 }
 
 func write(in [4]byte) {
 	_mtx.Lock()
 	defer _mtx.Unlock()
-	
-	_, err := _conn.Write(in[:])
-	if err != nil { panic("Lost connection to Elevator Server") }
-}
 
+	_, err := _conn.Write(in[:])
+	if err != nil {
+		panic("Lost connection to Elevator Server")
+	}
+}
 
 func toByte(a bool) byte {
 	var b byte = 0

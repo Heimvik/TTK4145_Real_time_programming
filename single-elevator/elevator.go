@@ -1,37 +1,33 @@
-package elevator
-
-import "elevio"
-import "fmt"
-
-/*
-
-*/
+package singleelevator
 
 
-const ElevatorBehaviour int
+// import "fmt"
+
+const NUMFLOORS int = 4
+const NUMBUTTONS int = 3
+
+type t_ElevatorBehaviour int
 
 const (
-	EB_Idle ElevatorBehaviour = iota
-	EB_DoorOpen ElevatorBehaviour = iota
-	EB_Moving ElevatorBehaviour = iota
+	EB_Idle t_ElevatorBehaviour = iota
+	EB_DoorOpen t_ElevatorBehaviour = iota
+	EB_Moving t_ElevatorBehaviour = iota
 )
 
-const ClearRequestVariant int
+type t_ClearRequestVariant int
 
 const (
-	CV_All ClearRequestVariant = iota
-	CV_InDirn ClearRequestVariant = iota
+	CV_All t_ClearRequestVariant = iota
+	CV_InDirn t_ClearRequestVariant = iota
 )
 
 type Elevator struct {
-    floor     		int
-    motorDirection	MotorDirection
-    requests  		[_numFloors][_numButtons]int
-    rehaviour 		ElevatorBehaviour
-    config    struct {
-        clearRequestVariant ClearRequestVariant
+    Floor     		int
+    MotorDirection	MotorDirection
+    Requests        [NUMFLOORS][NUMBUTTONS]int
+    Behaviour 		t_ElevatorBehaviour
+    Config          struct {
+        clearRequestVariant t_ClearRequestVariant
         doorOpenDuration_s  float64
     }
 }
-
-
