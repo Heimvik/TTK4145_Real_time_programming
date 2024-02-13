@@ -54,7 +54,7 @@ func Receiver(port int, peerUpdateCh chan<- PeerUpdate) {
 		p.New = ""
 		if id != "" {
 			if _, idExists := lastSeen[id]; !idExists {
-				p.New = idcheckArgs(chans...)
+				p.New = id
 				updated = true
 			}
 

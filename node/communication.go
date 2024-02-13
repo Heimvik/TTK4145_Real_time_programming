@@ -78,6 +78,17 @@ func F_ReceiveMessages(c_verifiedMessage chan T_Message, oldConnectedNodes []*T_
 	}
 }
 
+// requires that it receives its own messages
+func F_ReceiveMessages(c_verifiedMessage chan T_Message, c_connectedNodes chan []int ,port int) {
+	c_currentConnectedNodes := make(chan int)
+	c_receive := make(chan T_Message)
+
+	go bcast.Receiver(port, c_receive)
+	go f_VerifyReceive(c_receive, c_verifiedMessage, c_currentConnectedNodes)
+	go f_updateConnectedNodes(c_connectedNodes, c_currentConnectedNodes)
+
+}
+
 //
 
 /*What do the studasser tenker om å ha en hel FMS som løsning?
