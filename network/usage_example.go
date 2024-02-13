@@ -1,12 +1,12 @@
 package main
 
 import (
-	"Network-go/network/bcast"
-	"Network-go/network/localip"
-	"Network-go/network/peers"
 	"flag"
 	"fmt"
 	"os"
+	"the-elevator/network/network_libraries/bcast"
+	"the-elevator/network/network_libraries/localip"
+	"the-elevator/network/network_libraries/peers"
 	"time"
 )
 

@@ -1,6 +1,6 @@
 {
-  "ip": "",
-  "port": 16569,
+  "ip": "ip",
+  "port": 16568,
   "priority": 1,
   "nodes": 3,
   "floors": 4

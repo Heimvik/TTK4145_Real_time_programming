@@ -1,0 +1,12 @@
+2024/02/13 22:11:51 run_node.go:117: Received message: says 0
+2024/02/13 22:11:51 run_node.go:117: Connected nodes updated:
+2024/02/13 22:11:51 run_node.go:117: Node: 1 as 0
+2024/02/13 22:11:52 run_node.go:117: Received message: says 1
+2024/02/13 22:11:52 run_node.go:117: Connected nodes updated:
+2024/02/13 22:11:52 run_node.go:117: Node: 1 as 0
+2024/02/13 22:11:53 run_node.go:117: Received message: says 2
+2024/02/13 22:11:53 run_node.go:117: Connected nodes updated:
+2024/02/13 22:11:53 run_node.go:117: Node: 1 as 0
+2024/02/13 22:11:54 run_node.go:117: Received message: says 3
+2024/02/13 22:11:54 run_node.go:117: Connected nodes updated:
+2024/02/13 22:11:54 run_node.go:117: Node: 1 as 0

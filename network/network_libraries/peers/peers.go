@@ -1,7 +1,7 @@
 package peers
 
 import (
-	"Network-go/network/conn"
+	"the-elevator/network/network_libraries/conn"
 	"fmt"
 	"net"
 	"sort"

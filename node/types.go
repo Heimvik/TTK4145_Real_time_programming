@@ -1,5 +1,9 @@
 package node
 
+import (
+	"the-elevator/elevator"
+)
+
 //common include packages:
 
 var FLOORS int
@@ -7,25 +11,26 @@ var IP string
 var PORT int
 
 type T_Node struct {
-	PRIORITY       int //decides role of node based on other alive nodes
-	Role           T_NodeRole //role of node
-	GlobalQueue    *T_GlobalQueue 
-	LocalQueue     *T_LocalQueue
-	ConnectedNodes []*T_Node 
-	ELEVATOR       *T_Elevator
+	Info *T_NodeInfo //role of node
+	//GlobalQueue    *T_GlobalQueue
+	ConnectedNodes []*T_NodeInfo
+	//ELEVATOR *elevator.T_Elevator
+}
+type T_NodeInfo struct {
+	PRIORITY int
+	Role     T_NodeRole
 }
 
 type T_NodeRole int
 
 type T_GlobalQueue struct {
-	Request T_Request
+	Request elevator.T_Request
 }
 type T_LocalQueue struct {
 }
 
-
 type T_Message struct {
-	Transmitter T_Node
+	Transmitter T_NodeInfo
 	TestStr     string
 	//Receiver T_Node //In case of FSM
 	//MasterMessage T_MasterMessage
@@ -38,13 +43,12 @@ type T_MasterMessage struct {
 	GlobalQueue T_GlobalQueue
 }
 type T_SlaveMessage struct {
-	exist bool
 }
 
 type T_Config struct {
-	Ip       string `json:"host"`
+	Ip       string `json:"ip"`
 	Port     int    `json:"port"`
-	Priority int    `json:"debug"`
+	Priority int    `json:"priority"`
 	Nodes    int    `json:"nodes"`
 	Floors   int    `json:"floors"`
 }
