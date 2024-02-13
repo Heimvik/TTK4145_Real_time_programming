@@ -23,24 +23,6 @@ type T_GlobalQueue struct {
 type T_LocalQueue struct {
 }
 
-type T_Elevator struct {
-	//Priority int
-	//RequestsToDistribution chan *T_Request
-	//RequestsToService      chan *T_Request
-	Floor     int
-	Direction T_Direction
-	State     T_ElevatorState
-	Avalibale bool //Thoggled whenever disconnected/unavalebale/door sensor
-}
-
-type T_ElevatorState int
-
-type T_Request struct {
-	Calltype   T_Call
-	P_Elevator *T_Elevator
-	Floor      int
-	Direction  T_Direction
-}
 
 type T_Message struct {
 	Transmitter T_Node
@@ -67,27 +49,7 @@ type T_Config struct {
 	Floors   int    `json:"floors"`
 }
 
-type T_Call int
-type T_Direction int
-
-const (
-	Idle     T_ElevatorState = 0
-	Running  T_ElevatorState = 1
-	DoorOpen T_ElevatorState = 2
-)
-
-const (
-	Down T_Direction = 0
-	Up   T_Direction = 1
-	None T_Direction = 2
-)
-
 const (
 	Master T_NodeRole = 0
 	Slave  T_NodeRole = 1
-)
-
-const (
-	Cab  T_Call = 0
-	Hall T_Call = 1
 )

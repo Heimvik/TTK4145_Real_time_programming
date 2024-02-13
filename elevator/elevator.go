@@ -1,19 +1,23 @@
 package elevator
 
-type t_ElevatorBehaviour int
+type t_ElevatorState int
 
 const (
-	EB_Idle t_ElevatorBehaviour = iota
-	EB_DoorOpen t_ElevatorBehaviour = iota
-	EB_Moving t_ElevatorBehaviour = iota
+	EB_Idle t_ElevatorState = iota
+	EB_DoorOpen t_ElevatorState = iota
+	EB_Moving t_ElevatorState = iota
 )
 
 //Keeping this in case of future improvements regarding secondary requirements,
 //see single-elevator/elevator.go for inspiration
 
-type Elevator struct {
+type T_Elevator struct {
     Floor     		int
     MotorDirection	MotorDirection
-    //Requests        [NUMFLOORS][NUMBUTTONS]int
-    Behaviour 		t_ElevatorBehaviour
+    Request			T_Request
+	// Requests        [NUMFLOORS][NUMBUTTONS]int
+    State 		t_ElevatorState
 }
+
+//func for adding request, or create chan which sends to 
+
