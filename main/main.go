@@ -7,7 +7,10 @@ import (
 // Main file of a node
 func main() {
 	node.F_Init("default")
-	node.F_Run()
+	for{
+		node.F_Run()
+	}
+	
 }
 
 //Spørsmål til studasser:

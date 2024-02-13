@@ -20,7 +20,7 @@ func f_AcceptancetestReceive(message T_Message) bool {
 // - Object of T_Message
 // - Array of connected nodes (any unconnected nodes)
 
-func f_VerifyReceive(c_received chan T_Message, c_verifiedReceived chan T_Message, c_currentConnectedNodes chan T_Node) {
+func f_VerifyReceive(c_received chan T_Message, c_verifiedReceived chan T_Message, c_currentConnectedNodes chan int) {
 	receivedMessage := <-c_received
 	if f_AcceptancetestReceive(receivedMessage) && true {
 		c_verifiedReceived <- receivedMessage
@@ -30,7 +30,7 @@ func f_VerifyReceive(c_received chan T_Message, c_verifiedReceived chan T_Messag
 	}
 }
 
-func f_RemoveNode(nodes []*T_Node, nodeToRemove *T_Node) []*T_Node {
+func f_RemoveNode(nodes []int, nodeToRemove int) []int {
 	for i, p_node := range nodes {
 		if p_node == nodeToRemove {
 			return append(nodes[:i], nodes[i+1:]...)
@@ -39,28 +39,22 @@ func f_RemoveNode(nodes []*T_Node, nodeToRemove *T_Node) []*T_Node {
 	return nodes
 }
 
-func f_AppendNode(nodes []*T_Node, nodeToRemove *T_Node) []*T_Node {
+func f_AppendNode(nodes []int, nodeToRemove int) []int {
 	return append(nodes, nodeToRemove)
 }
 
-func F_TransmitMessages(c_transmitMessage chan T_Message, port int) {
+func F_TransmitMessages(c_transmitMessage chan T_Message, port int){
 	go bcast.Transmitter(port, c_transmitMessage)
 }
 
-// requires that it receives its own messages
-func F_ReceiveMessages(c_verifiedMessage chan T_Message, c_connectedNodes chan []*T_Node, port int) {
-	c_currentConnectedNodes := make(chan T_Node)
-	c_receive := make(chan T_Message)
-
-	//go bcast.Receiver(port, c_receive) //Fatal error here
-	go f_VerifyReceive(c_receive, c_verifiedMessage, c_currentConnectedNodes)
-
+func f_updateConnectedNodes(c_connectedNodes chan []int, c_currentConnectedNodes chan int){
+	
 	for {
 		currentConnectedNode := <-c_currentConnectedNodes
 		connectedNodes := <-c_connectedNodes
 		foundNode := true
 		for _, p_oldConnectedNode := range connectedNodes {
-			if &currentConnectedNode != p_oldConnectedNode {
+			if currentConnectedNode != p_oldConnectedNode {
 				foundNode = false
 			} else {
 				foundNode = true
@@ -68,13 +62,24 @@ func F_ReceiveMessages(c_verifiedMessage chan T_Message, c_connectedNodes chan [
 			}
 		}
 		if foundNode {
-			connectedNodes = f_AppendNode(connectedNodes, &currentConnectedNode)
+			connectedNodes = f_AppendNode(connectedNodes, currentConnectedNode)
 			c_connectedNodes <- connectedNodes
 		} else {
-			connectedNodes = f_RemoveNode(connectedNodes, &currentConnectedNode)
+			connectedNodes = f_RemoveNode(connectedNodes, currentConnectedNode)
 			c_connectedNodes <- connectedNodes
 		}
 	}
+}
+
+// requires that it receives its own messages
+func F_ReceiveMessages(c_verifiedMessage chan T_Message, c_connectedNodes chan []int ,port int) {
+	c_currentConnectedNodes := make(chan int)
+	c_receive := make(chan T_Message)
+
+	go bcast.Receiver(port, c_receive)
+	go f_VerifyReceive(c_receive, c_verifiedMessage, c_currentConnectedNodes)
+	go f_updateConnectedNodes(c_connectedNodes, c_currentConnectedNodes)
+
 }
 
 //

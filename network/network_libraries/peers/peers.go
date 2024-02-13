@@ -1,7 +1,7 @@
 package peers
 
 import (
-	"Network-go/network/conn"
+	"the-elevator/network/network_libraries/conn"
 	"fmt"
 	"net"
 	"sort"
@@ -54,7 +54,7 @@ func Receiver(port int, peerUpdateCh chan<- PeerUpdate) {
 		p.New = ""
 		if id != "" {
 			if _, idExists := lastSeen[id]; !idExists {
-				p.New = idcheckArgs(chans...)
+				p.New = id
 				updated = true
 			}
 
