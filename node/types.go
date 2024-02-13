@@ -7,11 +7,11 @@ var IP string
 var PORT int
 
 type T_Node struct {
-	PRIORITY       int
-	Role           T_NodeRole
-	GlobalQueue    *T_GlobalQueue
+	PRIORITY       int //decides role of node based on other alive nodes
+	Role           T_NodeRole //role of node
+	GlobalQueue    *T_GlobalQueue 
 	LocalQueue     *T_LocalQueue
-	ConnectedNodes []*T_Node
+	ConnectedNodes []*T_Node 
 	ELEVATOR       *T_Elevator
 }
 
@@ -24,7 +24,7 @@ type T_LocalQueue struct {
 }
 
 type T_Elevator struct {
-	Priority int
+	//Priority int
 	//RequestsToDistribution chan *T_Request
 	//RequestsToService      chan *T_Request
 	Floor     int
