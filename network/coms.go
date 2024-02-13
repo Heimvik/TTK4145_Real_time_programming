@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Network-go/network/bcast"
-	"Network-go/network/peers"
+	"the-elevator/network/network_libraries/bcast"
+	"the-elevator/network/network_libraries/peers"
 	//"fmt"
 	//"os"
 	//"time"

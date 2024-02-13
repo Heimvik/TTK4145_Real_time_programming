@@ -11,7 +11,7 @@ type T_Node struct {
 	Role           T_NodeRole
 	GlobalQueue    *T_GlobalQueue
 	LocalQueue     *T_LocalQueue
-	ConnectedNodes []*T_Node
+	ConnectedNodes []int
 	ELEVATOR       *T_Elevator
 }
 
@@ -43,7 +43,7 @@ type T_Request struct {
 }
 
 type T_Message struct {
-	Transmitter T_Node
+	Transmitter int
 	TestStr     string
 	//Receiver T_Node //In case of FSM
 	//MasterMessage T_MasterMessage

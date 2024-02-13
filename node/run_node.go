@@ -36,13 +36,13 @@ func f_TestCommunication(port int) {
 	// Setup
 	c_transmitMessage := make(chan T_Message)
 	c_receivedMessage := make(chan T_Message)
-	c_connectedNodes := make(chan []*T_Node)
+	c_connectedNodes := make(chan []int)
 
-	F_ReceiveMessages(c_receivedMessage, c_connectedNodes, port)
 	F_TransmitMessages(c_transmitMessage, port)
+	F_ReceiveMessages(c_receivedMessage, c_connectedNodes, port)
 
 	go func() {
-		helloMsg := T_Message{thisNode, "Hello from " + strconv.Itoa(thisNode.PRIORITY)}
+		helloMsg := T_Message{thisNode.PRIORITY, "Hello from " + strconv.Itoa(thisNode.PRIORITY)}
 		for {
 			c_transmitMessage <- helloMsg
 			time.Sleep(1 * time.Second)
@@ -54,7 +54,7 @@ func f_TestCommunication(port int) {
 		fmt.Println(received.TestStr)
 		connectedNodes := <-c_connectedNodes
 		for _, node := range connectedNodes {
-			fmt.Println("Connected nodes: " + strconv.Itoa(node.PRIORITY))
+			fmt.Println("Connected nodes: " + strconv.Itoa(node))
 		}
 		time.Sleep(1 * time.Second)
 	}()
