@@ -2,6 +2,7 @@ package node
 
 import (
 	"the-elevator/elevator"
+	"time"
 )
 
 //common include packages:
@@ -11,10 +12,10 @@ var IP string
 var PORT int
 
 type T_Node struct {
-	Info *T_NodeInfo //role of node
-	//GlobalQueue    *T_GlobalQueue
+	P_info           *T_NodeInfo //role of node
+	GlobalQueue    []*T_GlobalQueueEntry
 	ConnectedNodes []*T_NodeInfo
-	//ELEVATOR *elevator.T_Elevator
+	P_ELEVATOR       *elevator.T_Elevator
 }
 type T_NodeInfo struct {
 	PRIORITY int
@@ -23,26 +24,25 @@ type T_NodeInfo struct {
 
 type T_NodeRole int
 
-type T_GlobalQueue struct {
-	Request elevator.T_Request
-}
-type T_LocalQueue struct {
-}
-
-type T_Message struct {
-	Transmitter T_NodeInfo
-	TestStr     string
-	//Receiver T_Node //In case of FSM
-	//MasterMessage T_MasterMessage
-	//SlaveMessage  T_SlaveMessage
-	//checksum int
+type T_GlobalQueueEntry struct {
+	Request           elevator.T_Request
+	RequestedNode     T_NodeInfo //The elevator that got the request
+	AssignedNode      T_NodeInfo
+	TimeUntilReassign time.Timer
 }
 
 type T_MasterMessage struct {
-	Exist       bool
-	GlobalQueue T_GlobalQueue
+	Transmitter T_NodeInfo
+	Receiver    T_NodeInfo //For checking
+	GlobalQueue []T_GlobalQueueEntry
+	//Checksum int
 }
 type T_SlaveMessage struct {
+	Transmitter  T_NodeInfo
+	Receiver     T_NodeInfo //For checking
+	RequestInfo  T_GlobalQueueEntry
+	ElevatorInfo elevator.T_ElevatorInfo
+	//Checksum int
 }
 
 type T_Config struct {
