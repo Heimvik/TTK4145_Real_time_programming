@@ -27,10 +27,10 @@ func F_FloorArrival(newFloor int) {
 
 func F_sendRequest(button ButtonEvent, requestOut chan T_Request) {
 	if button.Button == BT_Cab {
-		requestOut <- T_Request{Calltype: Cab, Floor: button.Floor}
+		requestOut <- T_Request{Calltype: CAB, Floor: button.Floor}
 		return
 	} else {
-		requestOut <- T_Request{Calltype: Hall, Floor: button.Floor}
+		requestOut <- T_Request{Calltype: HALL, Floor: button.Floor}
 		return
 	}
 }
