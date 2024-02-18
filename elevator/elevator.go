@@ -4,15 +4,15 @@ type T_ElevatorState int
 type T_ElevatorDirection int
 
 const (
-	Idle     T_ElevatorState = iota
-	DoorOpen T_ElevatorState = iota
-	Moving   T_ElevatorState = iota
+	StateIdle     T_ElevatorState = iota
+	StateDoorOpen T_ElevatorState = iota
+	StateMoving   T_ElevatorState = iota
 )
 
 const (
-	Up   T_ElevatorDirection = iota
-	Down T_ElevatorDirection = iota
-	None T_ElevatorDirection = iota
+	DirectionUp   T_ElevatorDirection = iota
+	DirectionDown T_ElevatorDirection = iota
+	DirectionNone T_ElevatorDirection = iota
 )
 
 //Keeping this in case of future improvements regarding secondary requirements,
