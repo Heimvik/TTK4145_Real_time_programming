@@ -1,31 +1,36 @@
 package elevator
 
-func F_fsmFloorArrival(newFloor int) {
+import (
+	"time"
+)
+func F_FloorArrival(newFloor int) {
 
-	Elevator.Floor = newFloor
+	Elevator.P_info.Floor = newFloor
 	// SetFloorIndicator(newFloor)
 
-	switch Elevator.State {
-	case EB_Moving:
+	switch Elevator.P_info.State {
+	case MOVING:
 		if F_shouldStop(Elevator){
 			SetMotorDirection(MD_Stop)
-			Elevator.State = EB_DoorOpen
+			Elevator.P_info.State = DOOROPEN
 			//make timer logic so door stays open for as long as it should
+			time.Sleep(3 * time.Second) //placeholder
 			F_clearRequest(Elevator)
 		}
+	case DOOROPEN:
+		//make timer logic so door stays open for as long as it should
 
-	case EB_DoorOpen:
-		SetMotorDirection(MD_Stop)
-		//again, start a timer
-		F_clearRequest(Elevator)
 	}
 
 }
 
-//under will be func when Door is closing, this will either make the elevator start moving again if there is a new request, or set the elevators state to idle
-//func F_fsmDoorClosing()
 
-func F_fsmButtonPress(ButtonEvent) {
-	
-
+func F_sendRequest(button ButtonEvent, requestOut chan T_Request) {
+	if button.Button == BT_Cab {
+		requestOut <- T_Request{Calltype: Cab, Floor: button.Floor}
+		return
+	} else {
+		requestOut <- T_Request{Calltype: Hall, Floor: button.Floor}
+		return
+	}
 }

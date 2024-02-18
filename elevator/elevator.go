@@ -10,9 +10,9 @@ const (
 )
 
 const (
-	UP   T_ElevatorDirection = iota
-	DOWN T_ElevatorDirection = iota
-	NONE T_ElevatorDirection = iota
+	UP   T_ElevatorDirection = 1
+	DOWN T_ElevatorDirection = -1
+	NONE T_ElevatorDirection = 0
 )
 
 //Keeping this in case of future improvements regarding secondary requirements,
@@ -28,9 +28,42 @@ type T_Elevator struct {
 	//on comilation of one request: redistribute it on D
 }
 type T_ElevatorInfo struct {
-	Direction T_Direction
+	Direction T_ElevatorDirection
 	Floor     int
 	State     T_ElevatorState
 }
 
 //func for adding request, or create chan which sends to
+
+func Init_Elevator(requestIn chan T_Request, requestOut chan T_Request) T_Elevator {
+	return T_Elevator{
+		P_info:              &T_ElevatorInfo{Direction: NONE, Floor: 0, State: IDLE},
+		P_serveRequest:      nil,
+		C_receiveRequest:    requestIn,
+		C_distributeRequest: requestOut,
+		C_distributeInfo:    make(chan T_ElevatorInfo),
+	}
+}
+
+func F_shouldStop(elevator T_Elevator) bool {
+	if elevator.P_info.State == MOVING {
+		if elevator.P_info.Floor == elevator.P_serveRequest.Floor {
+			return true
+		}
+	}
+	return false
+}
+
+func F_clearRequest(elevator T_Elevator) {
+	elevator.P_serveRequest = nil
+}
+
+func F_chooseDirection(elevator T_Elevator) {
+	
+		if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
+			elevator.P_info.Direction = UP
+		} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+			elevator.P_info.Direction = DOWN
+		}
+	
+}

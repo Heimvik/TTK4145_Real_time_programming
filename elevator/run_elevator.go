@@ -7,7 +7,7 @@ var Elevator T_Elevator
 func F_runElevator(requestIn chan T_Request, requestOut chan T_Request){
 
     Init("localhost:15657")
-	Elevator = Init_Elevator()
+	Elevator = Init_Elevator(requestIn, requestOut)
 
     SetMotorDirection(MD_Up)
     
@@ -26,20 +26,27 @@ func F_runElevator(requestIn chan T_Request, requestOut chan T_Request){
     for {
         select {
         case a := <- drv_buttons: 
-            // generate a new request based on buttonpress, and send to master
-            fmt.Printf("%v+\n",a.Floor)
+            F_sendRequest(a, Elevator.C_distributeRequest)
 
         case a := <- drv_floors:
-            F_fsmFloorArrival(a)
+            F_FloorArrival(a)
 			
-        case a := <- drv_obstr:
-            fmt.Printf("%v+\n",a)
+        case a := <- drv_obstr: //tipper dette er nok til å kun teste funksjonalitet
+            if a {
+                SetMotorDirection(MD_Stop)
+            } else {
+                F_chooseDirection(Elevator)
+                SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
+            }
             
-        case a := <- drv_stop:
+        case a := <- drv_stop: //vet egt ikke hva denne gjør, men lar den stå for nå
             fmt.Printf("%v+\n",a)
 
-		// case a := <- requestOut:
-			// when receiving new request, add to Elevator.Request array, and call F_chooseDirection(Elevator)
+		case a := <- Elevator.C_receiveRequest:
+            Elevator.P_serveRequest = &a
+            F_chooseDirection(Elevator)
+            SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
+
 		}
     }    
 }
