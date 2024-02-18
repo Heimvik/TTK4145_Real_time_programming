@@ -1,12 +1,18 @@
 package elevator
 
 type T_ElevatorState int
-type T_MotorDirection int
+type T_ElevatorDirection int
 
 const (
-	EB_Idle     T_ElevatorState = iota
-	EB_DoorOpen T_ElevatorState = iota
-	EB_Moving   T_ElevatorState = iota
+	Idle     T_ElevatorState = iota
+	DoorOpen T_ElevatorState = iota
+	Moving   T_ElevatorState = iota
+)
+
+const (
+	Up   T_ElevatorDirection = iota
+	Down T_ElevatorDirection = iota
+	None T_ElevatorDirection = iota
 )
 
 //Keeping this in case of future improvements regarding secondary requirements,
