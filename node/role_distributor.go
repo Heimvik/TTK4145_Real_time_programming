@@ -11,13 +11,13 @@ package node
 
 //should also handle the establishment of new master on reconnection
 
-func F_ChooseRole(thisNode *T_Node, connectedNodes []*T_Node)T_NodeRole{
+func F_ChooseRole(thisNode *T_Node, connectedNodes []*T_NodeInfo) T_NodeRole {
 	var returnRole T_NodeRole
-	for _, node := range connectedNodes {
-		if node.PRIORITY > thisNode.PRIORITY {
-			returnRole = Slave;
-		}else{
-			returnRole = Master;
+	for _, nodeInfo := range connectedNodes {
+		if nodeInfo.PRIORITY > thisNode.Info.PRIORITY {
+			returnRole = Slave
+		} else {
+			returnRole = Master
 		}
 	}
 	return returnRole

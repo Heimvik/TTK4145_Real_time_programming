@@ -1,6 +1,7 @@
 package node
 
 import (
+	//"fmt"
 	"the-elevator/network/network_libraries/bcast"
 )
 
@@ -20,17 +21,19 @@ func f_AcceptancetestReceive(message T_Message) bool {
 // - Object of T_Message
 // - Array of connected nodes (any unconnected nodes)
 
-func f_VerifyReceive(c_received chan T_Message, c_verifiedReceived chan T_Message, c_currentConnectedNodes chan int) {
-	receivedMessage := <-c_received
-	if f_AcceptancetestReceive(receivedMessage) && true {
-		c_verifiedReceived <- receivedMessage
-		c_currentConnectedNodes <- receivedMessage.Transmitter
-	} else {
-		return
+func f_VerifyReceive(c_received chan T_Message, c_verifiedReceived chan T_Message, c_currentConnectedNodes chan T_NodeInfo) {
+	for {
+		receivedMessage := <-c_received
+		if f_AcceptancetestReceive(receivedMessage) && true {
+			c_verifiedReceived <- receivedMessage
+			c_currentConnectedNodes <- receivedMessage.Transmitter
+		} else {
+			return
+		}
 	}
 }
 
-func f_RemoveNode(nodes []int, nodeToRemove int) []int {
+func f_RemoveNode(nodes []*T_NodeInfo, nodeToRemove *T_NodeInfo) []*T_NodeInfo {
 	for i, p_node := range nodes {
 		if p_node == nodeToRemove {
 			return append(nodes[:i], nodes[i+1:]...)
@@ -39,22 +42,26 @@ func f_RemoveNode(nodes []int, nodeToRemove int) []int {
 	return nodes
 }
 
-func f_AppendNode(nodes []int, nodeToRemove int) []int {
+func f_AppendNode(nodes []*T_NodeInfo, nodeToRemove *T_NodeInfo) []*T_NodeInfo {
 	return append(nodes, nodeToRemove)
 }
 
-func F_TransmitMessages(c_transmitMessage chan T_Message, port int){
-	go bcast.Transmitter(port, c_transmitMessage)
+func F_TransmitMessages(c_transmitMessage chan T_Message, port int) {
+	bcast.Transmitter(port, c_transmitMessage)
 }
 
-func f_updateConnectedNodes(c_connectedNodes chan []int, c_currentConnectedNodes chan int){
-	
+// requires that it receives its own messages
+func F_ReceiveMessages(c_verifiedMessage chan T_Message, oldConnectedNodes []*T_NodeInfo, newConnectedNodes chan []*T_NodeInfo, port int) {
+	c_currentNode := make(chan T_NodeInfo)
+	c_receive := make(chan T_Message)
+
+	go bcast.Receiver(port, c_receive)
+	go f_VerifyReceive(c_receive, c_verifiedMessage, c_currentNode)
 	for {
-		currentConnectedNode := <-c_currentConnectedNodes
-		connectedNodes := <-c_connectedNodes
+		currentNode := <-c_currentNode
 		foundNode := true
-		for _, p_oldConnectedNode := range connectedNodes {
-			if currentConnectedNode != p_oldConnectedNode {
+		for _, p_oldConnectedNode := range oldConnectedNodes {
+			if currentNode.PRIORITY != p_oldConnectedNode.PRIORITY {
 				foundNode = false
 			} else {
 				foundNode = true
@@ -62,24 +69,13 @@ func f_updateConnectedNodes(c_connectedNodes chan []int, c_currentConnectedNodes
 			}
 		}
 		if foundNode {
-			connectedNodes = f_AppendNode(connectedNodes, currentConnectedNode)
-			c_connectedNodes <- connectedNodes
+			connectedNodes := f_AppendNode(oldConnectedNodes, &currentNode)
+			newConnectedNodes <- connectedNodes
 		} else {
-			connectedNodes = f_RemoveNode(connectedNodes, currentConnectedNode)
-			c_connectedNodes <- connectedNodes
+			connectedNodes := f_RemoveNode(oldConnectedNodes, &currentNode)
+			newConnectedNodes <- connectedNodes
 		}
 	}
-}
-
-// requires that it receives its own messages
-func F_ReceiveMessages(c_verifiedMessage chan T_Message, c_connectedNodes chan []int ,port int) {
-	c_currentConnectedNodes := make(chan int)
-	c_receive := make(chan T_Message)
-
-	go bcast.Receiver(port, c_receive)
-	go f_VerifyReceive(c_receive, c_verifiedMessage, c_currentConnectedNodes)
-	go f_updateConnectedNodes(c_connectedNodes, c_currentConnectedNodes)
-
 }
 
 //

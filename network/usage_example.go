@@ -1,14 +1,14 @@
 // package main
 
-// import (
-// 	"the-elevator/network/network_libraries/bcast"
-// 	"the-elevator/network/network_libraries/localip"
-// 	"the-elevator/network/network_libraries/peers"
-// 	"flag"
-// 	"fmt"
-// 	"os"
-// 	"time"
-// )
+import (
+	"flag"
+	"fmt"
+	"os"
+	"the-elevator/network/network_libraries/bcast"
+	"the-elevator/network/network_libraries/localip"
+	"the-elevator/network/network_libraries/peers"
+	"time"
+)
 
 // // We define some custom struct to send over the network.
 // // Note that all members we want to transmit must be public. Any private members

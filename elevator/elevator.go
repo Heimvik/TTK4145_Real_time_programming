@@ -1,94 +1,36 @@
 package elevator
 
 type T_ElevatorState int
+type T_ElevatorDirection int
 
 const (
-	EB_Idle     T_ElevatorState = iota
-	EB_DoorOpen T_ElevatorState = iota
-	EB_Moving   T_ElevatorState = iota
+	IDLE     T_ElevatorState = iota
+	DOOROPEN T_ElevatorState = iota
+	MOVING   T_ElevatorState = iota
+)
+
+const (
+	UP   T_ElevatorDirection = iota
+	DOWN T_ElevatorDirection = iota
+	NONE T_ElevatorDirection = iota
 )
 
 //Keeping this in case of future improvements regarding secondary requirements,
 //see single-elevator/elevator.go for inspiration
 
 type T_Elevator struct {
-	Floor          int
-	MotorDirection MotorDirection
-	Request        []T_Request
-	// Requests        [NUMFLOORS][NUMBUTTONS]int
-	State T_ElevatorState
+	P_info              *T_ElevatorInfo     //Poitner to the info of this elevator
+	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
+	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
+	C_distributeRequest chan T_Request      //Requests to distriburte to node, you shoud provide this to node
+	C_distributeInfo    chan T_ElevatorInfo //Info on elevator whereabouts, you should provide this to node
+	//three last ones has to be channels as elevator and node has seperate goroutines, has to be like this
+	//on comilation of one request: redistribute it on D
 }
-
-func Init_Elevator() T_Elevator {
-	return T_Elevator{-1, MD_Stop, make([]T_Request,0), EB_Idle}
+type T_ElevatorInfo struct {
+	Direction T_Direction
+	Floor     int
+	State     T_ElevatorState
 }
 
 //func for adding request, or create chan which sends to
-
-// choose direction, based on current request of elevator
-func F_chooseDirection(e T_Elevator) {
-	switch e.MotorDirection {
-	case MD_Up:
-		if f_requestOver(e) {
-			e.MotorDirection = MD_Up
-			e.State = EB_Moving
-		} else if f_requestHere(e) {
-			e.MotorDirection = MD_Down
-			e.State = EB_DoorOpen
-		} else if f_requestUnder(e) {
-			e.MotorDirection = MD_Down
-			e.State = EB_Moving
-		}
-	case MD_Down:
-		if f_requestUnder(e) {
-			e.MotorDirection = MD_Down
-			e.State = EB_Moving
-		} else if f_requestHere(e) {
-			e.MotorDirection = MD_Up
-			e.State = EB_DoorOpen
-		} else if f_requestOver(e) {
-			e.MotorDirection = MD_Up
-			e.State = EB_Moving
-		}
-	case MD_Stop:
-		if f_requestHere(e) {
-			e.MotorDirection = MD_Stop
-			e.State = EB_DoorOpen
-		} else if f_requestOver(e) {
-			e.MotorDirection = MD_Up
-			e.State = EB_Moving
-		} else if f_requestUnder(e) {
-			e.MotorDirection = MD_Down
-			e.State = EB_Moving
-		}
-	}
-}
-
-//might need updating when improving functionality
-func F_shouldStop(e T_Elevator) bool {
-	if len(e.Request) > 0{
-		if e.Floor == e.Request[0].Floor{
-			return true
-		} else {
-			return false
-		}
-	}
-	return true
-}
-
-func F_clearRequest(e T_Elevator) {
-	e.Request = e.Request[1:]
-}
-
-func f_requestUnder(e T_Elevator) bool {
-	return e.Request[0].Floor < e.Floor
-}
-
-func f_requestOver(e T_Elevator) bool {
-	return e.Request[0].Floor > e.Floor
-}
-
-func f_requestHere(e T_Elevator) bool {
-	return e.Request[0].Floor == e.Floor
-}
-
