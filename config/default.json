@@ -3,5 +3,6 @@
   "port": 16568,
   "priority": 1,
   "nodes": 3,
-  "floors": 4
+  "floors": 4,
+  "reassigntime":15
 }

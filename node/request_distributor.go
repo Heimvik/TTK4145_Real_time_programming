@@ -2,6 +2,7 @@ package node
 
 import (
 	"the-elevator/elevator"
+	"time"
 )
 
 //Should take in:
@@ -25,41 +26,45 @@ func f_AbsInt(x int) int {
 	return x
 }
 
-func f_FindClosestElevator(floor int, elevators []*elevator.T_Elevator) *elevator.T_Elevator {
-	var closestElevator *elevator.T_Elevator
+func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
+	var closestNode T_NodeInfo
 	closestFloor := FLOORS
-	for _, p_elevator := range elevators {
-		currentDifference := f_AbsInt(p_elevator.Floor - floor)
+	for _, nodeInfo := range nodes {
+		currentDifference := f_AbsInt(nodeInfo.ElevatorInfo.Floor - floor)
 		if currentDifference < closestFloor {
-			closestFloor = p_elevator.Floor
-			closestElevator = p_elevator
+			closestFloor = nodeInfo.ElevatorInfo.Floor
+			closestNode = nodeInfo
 		}
 	}
-	return closestElevator
+	return closestNode
 }
 
-func F_AssignRequest(request *elevator.T_Request, connectedElevators []*elevator.T_Elevator) *elevator.T_Elevator {
-	//Hall and Cab requests are assigned differently:
-	//Hall: assigned to a new connected elevator no matter what
-	//Cab: redistribution in event of a door sensor, are on the layer outside this function
-	//The only this function should do is to assign the request to the best avalebale elevators in connectedElevators
-	var avalibaleElevators []*elevator.T_Elevator
-	for _, p_elevator := range connectedElevators {
-		if p_elevator.State == elevator.EB_Idle {
-			avalibaleElevators = append(avalibaleElevators, p_elevator)
+func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, connectedNodes []T_NodeInfo) T_GlobalQueueEntry {
+	var avalibaleNodes []T_NodeInfo
+	for _, nodeInfo := range connectedNodes {
+		if nodeInfo.ElevatorInfo.State == elevator.IDLE {
+			avalibaleNodes = append(avalibaleNodes, nodeInfo)
 		}
 	}
 
-	var returnElevator *elevator.T_Elevator
-	switch request.Calltype {
-	case elevator.Hall:
-		returnElevator = f_FindClosestElevator(request.Floor, avalibaleElevators)
-	case elevator.Cab:
-		if request.P_Elevator.State == elevator.EB_Idle {
-			returnElevator = request.P_Elevator
+	var distributedRequest T_GlobalQueueEntry
+	var chosenNode T_NodeInfo
+	switch undistributedRequest.Request.Calltype {
+	case elevator.HALL:
+		chosenNode = f_ClosestElevatorNode(undistributedRequest.Request.Floor, avalibaleNodes)
+	case elevator.CAB:
+		if undistributedRequest.RequestedNode.ElevatorInfo.State == elevator.IDLE {
+			chosenNode = undistributedRequest.RequestedNode
 		} else {
-			returnElevator = f_FindClosestElevator(request.Floor, avalibaleElevators)
+			chosenNode = f_ClosestElevatorNode(undistributedRequest.Request.Floor, avalibaleNodes)
 		}
 	}
-	return returnElevator
+	distributedRequest = T_GlobalQueueEntry{
+		Id:                undistributedRequest.Id,
+		Request:           undistributedRequest.Request,
+		RequestedNode:     undistributedRequest.RequestedNode,
+		AssignedNode:      chosenNode,
+		TimeUntilReassign: *time.NewTimer(time.Duration(REASSIGNTIME) * time.Second),
+	}
+	return distributedRequest
 }

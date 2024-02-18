@@ -6,9 +6,9 @@ import (
 
 // Main file of a node
 func main() {
-	node.F_Init("default")
+	
 	for{
-		node.F_Run()
+		node.F_RunNode()
 	}
 	
 }

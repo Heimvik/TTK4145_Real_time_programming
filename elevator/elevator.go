@@ -28,7 +28,7 @@ type T_Elevator struct {
 	//on comilation of one request: redistribute it on D
 }
 type T_ElevatorInfo struct {
-	Direction T_Direction
+	Direction T_ElevatorDirection
 	Floor     int
 	State     T_ElevatorState
 }
