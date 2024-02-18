@@ -1,8 +1,10 @@
 {
   "ip": "ip",
-  "port": 16568,
+  "slaveport": 16568,
+  "masterport": 16569,
   "priority": 1,
   "nodes": 3,
   "floors": 4,
-  "reassigntime":15
+  "reassigntime":15,
+  "mmmills":50
 }

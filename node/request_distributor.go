@@ -2,7 +2,6 @@ package node
 
 import (
 	"the-elevator/elevator"
-	"time"
 )
 
 //Should take in:
@@ -39,13 +38,7 @@ func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
 	return closestNode
 }
 
-func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, connectedNodes []T_NodeInfo) T_GlobalQueueEntry {
-	var avalibaleNodes []T_NodeInfo
-	for _, nodeInfo := range connectedNodes {
-		if nodeInfo.ElevatorInfo.State == elevator.IDLE {
-			avalibaleNodes = append(avalibaleNodes, nodeInfo)
-		}
-	}
+func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
 
 	var distributedRequest T_GlobalQueueEntry
 	var chosenNode T_NodeInfo
@@ -59,12 +52,14 @@ func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, connectedNodes []T
 			chosenNode = f_ClosestElevatorNode(undistributedRequest.Request.Floor, avalibaleNodes)
 		}
 	}
+
 	distributedRequest = T_GlobalQueueEntry{
 		Id:                undistributedRequest.Id,
+		State:             ASSIGNED,
 		Request:           undistributedRequest.Request,
 		RequestedNode:     undistributedRequest.RequestedNode,
 		AssignedNode:      chosenNode,
-		TimeUntilReassign: *time.NewTimer(time.Duration(REASSIGNTIME) * time.Second),
+		TimeUntilReassign: REASSIGNTIME,
 	}
 	return distributedRequest
 }

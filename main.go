@@ -6,11 +6,7 @@ import (
 
 // Main file of a node
 func main() {
-	
-	for{
-		node.F_RunNode()
-	}
-	
+	node.F_RunNode()
 }
 
 //Spørsmål til studasser:
