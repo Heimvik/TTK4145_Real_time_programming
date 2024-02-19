@@ -62,25 +62,16 @@ const (
 	DONE       T_EntryState = 2
 )
 
-// Operations on node
-type T_NodeOperation int
-
-const (
-	ReadNodeInfo T_NodeOperation = iota
-	WriteNodeInfo
-	ReadGlobalQueue
-	WriteGlobalQueue
-	ReadConnectedNodes
-	WriteConnectedNodes
-	ReadElevator
-	// Add other operation types as needed
-)
-
 // NodeOperation represents an operation to be performed on T_Node
-type T_NodeOperationMessage struct {
-	Type   T_NodeOperation
-	Data   interface{}      // Generic data for the operation (could be anything)
-	Result chan interface{} // Channel for sending back results
+type T_NodeOperations struct {
+	c_readNodeInfo        chan chan T_NodeInfo
+	c_writeNodeInfo       chan T_NodeInfo
+	c_readGlobalQueue     chan chan []T_GlobalQueueEntry
+	c_writeGlobalQueue    chan []T_GlobalQueueEntry
+	c_readConnectedNodes  chan chan []T_NodeInfo
+	c_writeConnectedNodes chan []T_NodeInfo
+	c_readElevator        chan chan *elevator.T_Elevator
+	// Add more channels for other operations as needed
 }
 
 // Global Variables

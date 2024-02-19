@@ -153,6 +153,17 @@ func f_WriteLogSlaveMessage(slaveMessage T_SlaveMessage) {
 	}
 	F_WriteLog(logStr)
 }
+func f_WriteLogMasterMessage(masterMessage T_MasterMessage) {
+	logStr := "MasterMessage from: " + strconv.Itoa(masterMessage.Transmitter.PRIORITY) + "\t as "
+	if masterMessage.Transmitter.Role == MASTER {
+		logStr += "MASTER\t"
+	} else {
+		logStr += "SLAVE\t"
+	}
+	//add more about GQ
+	F_WriteLog(logStr)
+}
+
 func f_ChooseRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeRole {
 	var returnRole T_NodeRole
 	for _, remoteNodeInfo := range connectedNodes {
@@ -166,8 +177,8 @@ func f_ChooseRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeRo
 }
 
 // increments all timers in GQ and checks for any that has run out
-func f_TimerWatchdog(c_nodeOpMsg chan T_NodeOperationMessage, c_reassignEntry chan T_GlobalQueueEntry) {
-	globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
+func f_TimerWatchdog(ops T_NodeOperations, c_reassignEntry chan T_GlobalQueueEntry) {
+	globalQueue := f_GetGlobalQueue(ops)
 	for _, element := range globalQueue {
 		element.TimeUntilReassign -= 1
 		if element.TimeUntilReassign == 0 && element.State != DONE {
@@ -177,54 +188,63 @@ func f_TimerWatchdog(c_nodeOpMsg chan T_NodeOperationMessage, c_reassignEntry ch
 	}
 }
 
-func f_NodeOperationManager(node *T_Node, c_nodeReadMsg chan T_NodeOperationMessage, c_nodeWriteMsg chan T_NodeOperationMessage) {
-	//IMPORTANT: ONLY IN THIS GOROUTINE CAN GLOBAL NODE VARIABLES BE USED, rest has do be channel dependent
+func f_NodeOperationManager(node *T_Node, ops T_NodeOperations) {
 	for {
 		select {
-		case readOperation := <-c_nodeReadMsg:
-			switch readOperation.Type {
-			case ReadNodeInfo:
-				readOperation.Result <- node.Info
-			case ReadGlobalQueue:
-				readOperation.Result <- node.GlobalQueue
-			case ReadConnectedNodes:
-				readOperation.Result <- node.ConnectedNodes
-			case ReadElevator:
-				readOperation.Result <- node.P_ELEVATOR
-			}
-		case writeOperation := <-c_nodeWriteMsg:
-			switch writeOperation.Type {
-			case WriteNodeInfo:
-				node.Info = writeOperation.Data.(T_NodeInfo)
-			case WriteGlobalQueue:
-				node.GlobalQueue = writeOperation.Data.([]T_GlobalQueueEntry)
-			case WriteConnectedNodes:
-				node.ConnectedNodes = writeOperation.Data.([]T_NodeInfo)
-			}
+		case responseChan := <-ops.c_readNodeInfo:
+			responseChan <- node.Info
+
+		case newNodeInfo := <-ops.c_writeNodeInfo:
+			node.Info = newNodeInfo
+
+		case responseChan := <-ops.c_readGlobalQueue:
+			responseChan <- node.GlobalQueue
+
+		case newGlobalQueue := <-ops.c_writeGlobalQueue:
+			node.GlobalQueue = newGlobalQueue
+
+		case responseChan := <-ops.c_readConnectedNodes:
+			responseChan <- node.ConnectedNodes
+
+		case newConnectedNodes := <-ops.c_writeConnectedNodes:
+			node.ConnectedNodes = newConnectedNodes
+
+		case responseChan := <-ops.c_readElevator:
+			responseChan <- node.P_ELEVATOR
 		}
 	}
 }
+func f_GetNodeInfo(ops T_NodeOperations) T_NodeInfo {
+	responseChan := make(chan T_NodeInfo)
+	ops.c_readNodeInfo <- responseChan // Send the response channel to the NodeOperationManager
+	nodeInfo := <-responseChan         // Receive the node info from the response channel
+	return nodeInfo
+}
 
-func f_GetNodeInfo(c_nodeOpMsg chan T_NodeOperationMessage) T_NodeInfo {
-	c_nodeInfo := make(chan interface{})
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: ReadNodeInfo, Result: c_nodeInfo}
-	nodeInfo := <-c_nodeInfo
-	return nodeInfo.(T_NodeInfo)
+func f_SetNodeInfo(ops T_NodeOperations, nodeInfo T_NodeInfo) {
+	ops.c_writeNodeInfo <- nodeInfo // Send the nodeInfo directly to be written
 }
-func f_SetNodeInfo(c_nodeOpMsg chan T_NodeOperationMessage, thisNodeInfo T_NodeInfo) {
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: WriteNodeInfo, Data: thisNodeInfo}
+
+func f_GetGlobalQueue(ops T_NodeOperations) []T_GlobalQueueEntry {
+	responseChan := make(chan []T_GlobalQueueEntry)
+	ops.c_readGlobalQueue <- responseChan // Send the response channel to the NodeOperationManager
+	globalQueue := <-responseChan         // Receive the global queue from the response channel
+	return globalQueue
 }
-func f_GetGlobalQueue(c_nodeOpMsg chan T_NodeOperationMessage) []T_GlobalQueueEntry {
-	c_globalQueue := make(chan interface{})
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: ReadGlobalQueue, Result: c_globalQueue}
-	globalQueueResult := <-c_globalQueue
-	return globalQueueResult.([]T_GlobalQueueEntry)
+func f_SetGlobalQueue(ops T_NodeOperations, globalQueue []T_GlobalQueueEntry) {
+	ops.c_writeGlobalQueue <- globalQueue // Send the globalQueue directly to be written
 }
-func f_SetGlobalQueue(c_nodeOpMsg chan T_NodeOperationMessage, globalQueue []T_GlobalQueueEntry) {
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: WriteGlobalQueue, Data: globalQueue}
+func f_GetConnectedNodes(ops T_NodeOperations) []T_NodeInfo {
+	responseChan := make(chan []T_NodeInfo)
+	ops.c_readConnectedNodes <- responseChan // Send the response channel to the NodeOperationManager
+	connectedNodes := <-responseChan         // Receive the connected nodes from the response channel
+	return connectedNodes
 }
-func f_AddEntryGlobalQueue(c_nodeReadMsg chan T_NodeOperationMessage, c_nodeWriteMsg chan T_NodeOperationMessage, entryToAdd T_GlobalQueueEntry) {
-	thisGlobalQueue := f_GetGlobalQueue(c_nodeReadMsg)
+func f_SetConnectedNodes(ops T_NodeOperations, connectedNodes []T_NodeInfo) {
+	ops.c_writeConnectedNodes <- connectedNodes // Send the connectedNodes directly to be written
+}
+func f_AddEntryGlobalQueue(operations T_NodeOperations, entryToAdd T_GlobalQueueEntry) {
+	thisGlobalQueue := f_GetGlobalQueue(operations)
 	entryIsUnique := true
 	for _, entry := range thisGlobalQueue {
 		if entryToAdd.Id == entry.Id { //random id generated to each entry
@@ -235,78 +255,76 @@ func f_AddEntryGlobalQueue(c_nodeReadMsg chan T_NodeOperationMessage, c_nodeWrit
 		entryToAdd.AssignedNode.PRIORITY = 0
 		entryToAdd.State = UNASSIGNED
 		thisGlobalQueue = append(thisGlobalQueue, entryToAdd)
-		f_SetGlobalQueue(c_nodeWriteMsg, thisGlobalQueue)
+		f_SetGlobalQueue(operations, thisGlobalQueue)
 	} else {
 		F_WriteLog("Discarded request " + strconv.Itoa(entryToAdd.Id))
 	}
-}
-func f_GetConnectedNodes(c_nodeOpMsg chan T_NodeOperationMessage) []T_NodeInfo {
-	c_connectedNodes := make(chan interface{})
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: ReadConnectedNodes, Result: c_connectedNodes}
-	connectedNodesResult := <-c_connectedNodes
-	return connectedNodesResult.([]T_NodeInfo)
-}
-func f_SetConnectedNodes(c_nodeOpMsg chan T_NodeOperationMessage, connectedNodes []T_NodeInfo) {
-	c_nodeOpMsg <- T_NodeOperationMessage{Type: WriteConnectedNodes, Data: connectedNodes}
 }
 
 // should contain the main master/slave fsm in Run() function, to be called from main
 func F_RunNode() {
 	//to run the main FSM
-	c_nodeReadMsg := make(chan T_NodeOperationMessage)
-	c_nodeWriteMsg := make(chan T_NodeOperationMessage)
-	go f_NodeOperationManager(&ThisNode, c_nodeReadMsg, c_nodeWriteMsg) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
+	c_nodeOpMsg := T_NodeOperations{
+		c_readNodeInfo:        make(chan chan T_NodeInfo),
+		c_writeNodeInfo:       make(chan T_NodeInfo),
+		c_readGlobalQueue:     make(chan chan []T_GlobalQueueEntry),
+		c_writeGlobalQueue:    make(chan []T_GlobalQueueEntry),
+		c_readConnectedNodes:  make(chan chan []T_NodeInfo),
+		c_writeConnectedNodes: make(chan []T_NodeInfo),
+		c_readElevator:        make(chan chan *elevator.T_Elevator),
+	}
+	go f_NodeOperationManager(&ThisNode, c_nodeOpMsg) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
 	for {
-		nodeRole := f_GetNodeInfo(c_nodeReadMsg).Role
+		nodeRole := f_GetNodeInfo(c_nodeOpMsg).Role
 		switch nodeRole {
 		case MASTER:
 
-			go F_TransmitMasterMessage(c_nodeReadMsg, MASTERPORT)
+			go F_TransmitMasterMessage(c_nodeOpMsg, MASTERPORT)
 
 			//Receive messages
 			c_slaveMessages := make(chan T_SlaveMessage)
 			c_masterMessages := make(chan T_MasterMessage)
 
 			c_newConnectedNodes := make(chan []T_NodeInfo)
-			c_oldConnectedNodes := make(chan []T_NodeInfo)
 
 			c_reassignEntry := make(chan T_GlobalQueueEntry)
 
-			go F_ReceiveSlaveMessage(c_slaveMessages, c_oldConnectedNodes, c_newConnectedNodes, SLAVEPORT)
-			go F_ReceiveMasterMessage(c_masterMessages, c_oldConnectedNodes, c_newConnectedNodes, MASTERPORT)
-			go f_TimerWatchdog(c_nodeReadMsg, c_reassignEntry)
+			go F_ReceiveSlaveMessage(c_slaveMessages, c_nodeOpMsg, c_newConnectedNodes, SLAVEPORT)
+			go F_ReceiveMasterMessage(c_masterMessages, c_nodeOpMsg, c_newConnectedNodes, MASTERPORT)
+			go f_TimerWatchdog(c_nodeOpMsg, c_reassignEntry)
 			go func() {
 				for {
-					c_oldConnectedNodes <- f_GetConnectedNodes(c_nodeReadMsg)
 					select {
 					case newConnectedNodes := <-c_newConnectedNodes:
-						f_SetConnectedNodes(c_nodeWriteMsg, newConnectedNodes)
-						f_WriteLogConnectedNodes(f_GetConnectedNodes(c_nodeReadMsg))
+						f_SetConnectedNodes(c_nodeOpMsg, newConnectedNodes)
+						f_WriteLogConnectedNodes(f_GetConnectedNodes(c_nodeOpMsg))
 
 					case masterMessage := <-c_masterMessages:
+						f_WriteLogMasterMessage(masterMessage)
 						for _, remoteEntry := range masterMessage.GlobalQueue {
-							f_AddEntryGlobalQueue(c_nodeReadMsg, c_nodeWriteMsg, remoteEntry)
+							f_AddEntryGlobalQueue(c_nodeOpMsg, remoteEntry)
 						}
 						//IMPORTANT: cannot really propagate to slave until it knows that the other master has received its GQ
 
-						connectedNodes := f_GetConnectedNodes(c_nodeReadMsg)
-						thisNodeInfo := f_GetNodeInfo(c_nodeReadMsg)
+						connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
+						thisNodeInfo := f_GetNodeInfo(c_nodeOpMsg)
 						thisNodeInfo.Role = f_ChooseRole(thisNodeInfo, connectedNodes)
-						f_SetNodeInfo(c_nodeWriteMsg, thisNodeInfo)
+						f_SetNodeInfo(c_nodeOpMsg, thisNodeInfo)
 
 					case slaveMessage := <-c_slaveMessages:
-						f_AddEntryGlobalQueue(c_nodeReadMsg, c_nodeWriteMsg, slaveMessage.Entry)
+						f_WriteLogSlaveMessage(slaveMessage)
+						f_AddEntryGlobalQueue(c_nodeOpMsg, slaveMessage.Entry)
 
 						//Update elevator whereabout of the slave
-						connectedNodes := f_GetConnectedNodes(c_nodeReadMsg)
+						connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
 						for i, nodeInfo := range connectedNodes {
 							if slaveMessage.Transmitter.PRIORITY == nodeInfo.PRIORITY {
 								connectedNodes[i] = slaveMessage.Transmitter
-								f_SetConnectedNodes(c_nodeWriteMsg, connectedNodes)
+								f_SetConnectedNodes(c_nodeOpMsg, connectedNodes)
 							}
 						}
 					case reassignEntry := <-c_reassignEntry:
-						f_AddEntryGlobalQueue(c_nodeReadMsg, c_nodeWriteMsg, reassignEntry) //Demands that the old one is removed
+						f_AddEntryGlobalQueue(c_nodeOpMsg, reassignEntry) //Demands that the old one is removed
 					}
 				}
 			}()
@@ -316,7 +334,7 @@ func F_RunNode() {
 				for {
 					//check for avalibale nodes
 					var avalibaleNodes []T_NodeInfo
-					connectedNodes := f_GetConnectedNodes(c_nodeReadMsg)
+					connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
 					for _, nodeInfo := range connectedNodes {
 						if nodeInfo.ElevatorInfo.State == elevator.IDLE {
 							avalibaleNodes = append(avalibaleNodes, nodeInfo)
@@ -324,13 +342,13 @@ func F_RunNode() {
 					}
 
 					//check for first entry that is unassigned
-					globalQueue := f_GetGlobalQueue(c_nodeReadMsg)
+					globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
 					for i, entry := range globalQueue {
 						if (entry.State == UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
 							assignedEntry := F_AssignRequest(entry, avalibaleNodes)
-							globalQueue := f_GetGlobalQueue(c_nodeReadMsg)
+							globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
 							globalQueue[i] = assignedEntry
-							f_SetGlobalQueue(c_nodeWriteMsg, globalQueue)
+							f_SetGlobalQueue(c_nodeOpMsg, globalQueue)
 							break
 						}
 					}
@@ -349,15 +367,20 @@ func F_RunNode() {
 
 			for {
 				//Update own elevator information
-				connectedNodes := f_GetConnectedNodes(c_nodeReadMsg)
-				thisNodeInfo := f_GetNodeInfo(c_nodeReadMsg)
+				connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
+				thisNodeInfo := f_GetNodeInfo(c_nodeOpMsg)
+				//logStr := "Connected nodes: "
 				for i, nodeInfo := range connectedNodes {
+					//logStr += strconv.Itoa(connectedNodes[i].PRIORITY)
 					if thisNodeInfo.PRIORITY == nodeInfo.PRIORITY {
 						connectedNodes[i] = thisNodeInfo
-						f_SetConnectedNodes(c_nodeWriteMsg, connectedNodes)
+						f_SetConnectedNodes(c_nodeOpMsg, connectedNodes)
 						break
 					}
 				}
+				//F_WriteLog(logStr)
+				time.Sleep(1 * time.Second)
+
 			}
 
 		case SLAVE:
