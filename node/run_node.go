@@ -261,6 +261,10 @@ func f_AddEntryGlobalQueue(operations T_NodeOperations, entryToAdd T_GlobalQueue
 	}
 }
 
+//IMPORTANT:
+//-global variables should ALWAYS be handled by server to operate onn good data
+//-all receive from channles should be organized in for-select!!! -> walk trough code and do
+
 // should contain the main master/slave fsm in Run() function, to be called from main
 func F_RunNode() {
 	//to run the main FSM
