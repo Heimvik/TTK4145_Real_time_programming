@@ -20,8 +20,6 @@ type T_NodeInfo struct {
 }
 
 type T_GlobalQueueEntry struct {
-	Id                int
-	State             elevator.T_RequestState
 	Request           elevator.T_Request
 	RequestedNode     T_NodeInfo //The elevator that got the request
 	AssignedNode      T_NodeInfo
@@ -45,6 +43,7 @@ type T_Config struct {
 	Ip           string `json:"ip"`
 	SlavePort    int    `json:"slaveport"`
 	MasterPort   int    `json:"masterport"`
+	ElevatorPort int    `json:"elevatorport"`
 	Priority     int    `json:"priority"`
 	Nodes        int    `json:"nodes"`
 	Floors       int    `json:"floors"`
@@ -65,7 +64,8 @@ type T_NodeOperations struct {
 	c_writeGlobalQueue    chan []T_GlobalQueueEntry
 	c_readConnectedNodes  chan chan []T_NodeInfo
 	c_writeConnectedNodes chan []T_NodeInfo
-	c_readElevator        chan chan *elevator.T_Elevator
+	c_readElevator        chan chan elevator.T_Elevator
+	c_writeElevator       chan elevator.T_Elevator
 	// Add more channels for other operations as needed
 }
 
@@ -78,3 +78,4 @@ var REASSIGNTIME int
 var MMMILLS int
 var SLAVEPORT int
 var MASTERPORT int
+var ELEVATORPORT int

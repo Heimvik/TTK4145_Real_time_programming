@@ -1,6 +1,9 @@
 package node
 
-import "the-elevator/elevator"
+import (
+	"strconv"
+	"the-elevator/elevator"
+)
 
 //"the-elevator/elevator"
 
@@ -38,7 +41,7 @@ func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
 	return closestNode
 }
 
-func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
+func F_AssignUnassignedRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
 
 	var distributedRequest T_GlobalQueueEntry
 	var chosenNode T_NodeInfo
@@ -54,12 +57,23 @@ func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T
 	}
 
 	distributedRequest = T_GlobalQueueEntry{
-		Id:                undistributedRequest.Id,
-		State:             elevator.ASSIGNED,
 		Request:           undistributedRequest.Request,
 		RequestedNode:     undistributedRequest.RequestedNode,
 		AssignedNode:      chosenNode,
 		TimeUntilReassign: REASSIGNTIME,
 	}
 	return distributedRequest
+}
+
+func F_FindAssignedRequest(globalQueue []T_GlobalQueueEntry, thisNodeInfo T_NodeInfo) elevator.T_Request {
+	var returnRequest elevator.T_Request
+	for _, entry := range globalQueue {
+		if entry.AssignedNode.PRIORITY == thisNodeInfo.PRIORITY && entry.Request.State == elevator.ASSIGNED {
+			F_WriteLog("Entry with ID: " + strconv.Itoa(entry.Request.Id) + " from " + strconv.Itoa(entry.RequestedNode.PRIORITY))
+			returnRequest = entry.Request
+		} else {
+			returnRequest = elevator.T_Request{}
+		}
+	}
+	return returnRequest
 }

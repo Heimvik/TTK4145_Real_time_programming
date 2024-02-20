@@ -16,23 +16,11 @@ import (
 // - Object of T_Message
 // - Array of connected nodes (any unconnected nodes)
 
-func f_VerifyMasterMessage(c_received chan T_MasterMessage, c_verifiedReceived chan T_MasterMessage, c_currentConnectedNode chan T_NodeInfo) {
-	for {
-		receivedMessage := <-c_received
-		if true {
-			c_verifiedReceived <- receivedMessage
-			c_currentConnectedNode <- receivedMessage.Transmitter
-		}
-	}
+func f_AcceptancetestSM() bool {
+	return true
 }
-func f_VerifySlaveMessage(c_received chan T_SlaveMessage, c_verifiedReceived chan T_SlaveMessage, c_currentConnectedNode chan T_NodeInfo) {
-	for {
-		receivedMessage := <-c_received
-		if true && true {
-			c_verifiedReceived <- receivedMessage
-			c_currentConnectedNode <- receivedMessage.Transmitter
-		}
-	}
+func f_AcceptancetestMM() bool {
+	return true
 }
 
 func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
@@ -48,25 +36,22 @@ func f_AppendNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
 	return append(nodes, nodeToRemove)
 }
 
-func f_UpdateNodes(c_currentNode chan T_NodeInfo, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo) {
-	for {
-		currentNode := <-c_currentNode
-		oldConnectedNodes := f_GetConnectedNodes(ops)
-		newNode := true
-		for _, oldConnectedNode := range oldConnectedNodes {
-			if currentNode.PRIORITY == oldConnectedNode.PRIORITY {
-				newNode = false
-				break
-			}
+func f_UpdateNodes(currentNode T_NodeInfo, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo) {
+	oldConnectedNodes := f_GetConnectedNodes(ops)
+	newNode := true
+	for _, oldConnectedNode := range oldConnectedNodes {
+		if currentNode.PRIORITY == oldConnectedNode.PRIORITY {
+			newNode = false
+			break
 		}
-		if newNode {
-			connectedNodes := f_AppendNode(oldConnectedNodes, currentNode)
-			c_newConnectedNodes <- connectedNodes
-		} else {
-			//IMPORTANT: IMPLEMENTATION TO REMOVE UNCONNECTED NODE HERE!
-			//connectedNodes := f_RemoveNode(oldConnectedNodes, currentNode)
-			//c_newConnectedNodes <- connectedNodes
-		}
+	}
+	if newNode {
+		connectedNodes := f_AppendNode(oldConnectedNodes, currentNode)
+		c_newConnectedNodes <- connectedNodes
+	} else {
+		//IMPORTANT: IMPLEMENTATION TO REMOVE UNCONNECTED NODE HERE!
+		//connectedNodes := f_RemoveNode(oldConnectedNodes, currentNode)
+		//c_newConnectedNodes <- connectedNodes
 	}
 }
 
@@ -74,26 +59,37 @@ func F_TransmitSlaveMessage(c_transmitMessage chan T_SlaveMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
 func F_TransmitMasterMessage(c_transmitMessage chan T_MasterMessage, port int) {
-	c_masterMessage := make(chan T_MasterMessage)
-	go bcast.Transmitter(port, c_masterMessage)
+	go bcast.Transmitter(port, c_transmitMessage)
 }
 
 func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo, port int) {
-	c_currentNode := make(chan T_NodeInfo)
 	c_receive := make(chan T_SlaveMessage)
 
 	go bcast.Receiver(port, c_receive)
-	go f_VerifySlaveMessage(c_receive, c_verifiedMessage, c_currentNode)
-	go f_UpdateNodes(c_currentNode, ops, c_newConnectedNodes)
+	for {
+		select {
+		case receivedMessage := <-c_receive:
+			if f_AcceptancetestSM() { //FUTURE ACCEPTANCETEST
+				c_verifiedMessage <- receivedMessage
+				f_UpdateNodes(receivedMessage.Transmitter, ops, c_newConnectedNodes)
+			}
+		}
+	}
 }
 
 func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo, port int) {
-	c_currentNode := make(chan T_NodeInfo)
-	c_receivedMessage := make(chan T_MasterMessage)
+	c_receive := make(chan T_MasterMessage)
 
-	go bcast.Receiver(port, c_receivedMessage)
-	go f_VerifyMasterMessage(c_receivedMessage, c_verifiedMessage, c_currentNode)
-	go f_UpdateNodes(c_currentNode, ops, c_newConnectedNodes)
+	go bcast.Receiver(port, c_receive)
+	for {
+		select {
+		case receivedMessage := <-c_receive:
+			if f_AcceptancetestMM() { //FUTURE ACCEPTANCETEST
+				c_verifiedMessage <- receivedMessage
+				f_UpdateNodes(receivedMessage.Transmitter, ops, c_newConnectedNodes)
+			}
+		}
+	}
 }
 
 //
