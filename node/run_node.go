@@ -181,7 +181,7 @@ func f_TimerWatchdog(ops T_NodeOperations, c_reassignEntry chan T_GlobalQueueEnt
 	globalQueue := f_GetGlobalQueue(ops)
 	for _, element := range globalQueue {
 		element.TimeUntilReassign -= 1
-		if element.TimeUntilReassign == 0 && element.State != DONE {
+		if element.TimeUntilReassign == 0 && element.State != elevator.DONE {
 			c_reassignEntry <- element
 		}
 		time.Sleep(1 * time.Second)
@@ -247,13 +247,13 @@ func f_AddEntryGlobalQueue(operations T_NodeOperations, entryToAdd T_GlobalQueue
 	thisGlobalQueue := f_GetGlobalQueue(operations)
 	entryIsUnique := true
 	for _, entry := range thisGlobalQueue {
-		if entryToAdd.Id == entry.Id { //random id generated to each entry
+		if entryToAdd.Id == entry.Id && entryToAdd.RequestedNode == entry.RequestedNode { //random id generated to each entry
 			entryIsUnique = false
 		}
 	}
 	if entryIsUnique {
 		entryToAdd.AssignedNode.PRIORITY = 0
-		entryToAdd.State = UNASSIGNED
+		entryToAdd.State = elevator.UNASSIGNED
 		thisGlobalQueue = append(thisGlobalQueue, entryToAdd)
 		f_SetGlobalQueue(operations, thisGlobalQueue)
 	} else {
@@ -282,19 +282,17 @@ func F_RunNode() {
 		nodeRole := f_GetNodeInfo(c_nodeOpMsg).Role
 		switch nodeRole {
 		case MASTER:
-
-			go F_TransmitMasterMessage(c_nodeOpMsg, MASTERPORT)
-
 			//Receive messages
-			c_slaveMessages := make(chan T_SlaveMessage)
-			c_masterMessages := make(chan T_MasterMessage)
+			c_receiveSlaveMessage := make(chan T_SlaveMessage)
+			c_receiveMasterMessage := make(chan T_MasterMessage)
+			c_transmitMasterMessage := make(chan T_MasterMessage)
 
 			c_newConnectedNodes := make(chan []T_NodeInfo)
 
 			c_reassignEntry := make(chan T_GlobalQueueEntry)
 
-			go F_ReceiveSlaveMessage(c_slaveMessages, c_nodeOpMsg, c_newConnectedNodes, SLAVEPORT)
-			go F_ReceiveMasterMessage(c_masterMessages, c_nodeOpMsg, c_newConnectedNodes, MASTERPORT)
+			go F_ReceiveSlaveMessage(c_receiveSlaveMessage, c_nodeOpMsg, c_newConnectedNodes, SLAVEPORT)
+			go F_ReceiveMasterMessage(c_receiveMasterMessage, c_nodeOpMsg, c_newConnectedNodes, MASTERPORT)
 			go f_TimerWatchdog(c_nodeOpMsg, c_reassignEntry)
 			go func() {
 				for {
@@ -303,7 +301,7 @@ func F_RunNode() {
 						f_SetConnectedNodes(c_nodeOpMsg, newConnectedNodes)
 						f_WriteLogConnectedNodes(f_GetConnectedNodes(c_nodeOpMsg))
 
-					case masterMessage := <-c_masterMessages:
+					case masterMessage := <-c_receiveMasterMessage:
 						f_WriteLogMasterMessage(masterMessage)
 						for _, remoteEntry := range masterMessage.GlobalQueue {
 							f_AddEntryGlobalQueue(c_nodeOpMsg, remoteEntry)
@@ -315,7 +313,7 @@ func F_RunNode() {
 						thisNodeInfo.Role = f_ChooseRole(thisNodeInfo, connectedNodes)
 						f_SetNodeInfo(c_nodeOpMsg, thisNodeInfo)
 
-					case slaveMessage := <-c_slaveMessages:
+					case slaveMessage := <-c_receiveSlaveMessage:
 						f_WriteLogSlaveMessage(slaveMessage)
 						f_AddEntryGlobalQueue(c_nodeOpMsg, slaveMessage.Entry)
 
@@ -348,7 +346,7 @@ func F_RunNode() {
 					//check for first entry that is unassigned
 					globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
 					for i, entry := range globalQueue {
-						if (entry.State == UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
+						if (entry.State == elevator.UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
 							assignedEntry := F_AssignRequest(entry, avalibaleNodes)
 							globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
 							globalQueue[i] = assignedEntry
@@ -363,11 +361,20 @@ func F_RunNode() {
 			}()
 
 			//Send MasterMessages
+			go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
 			go func() {
 				for {
-					break
+					masterMessage := T_MasterMessage{
+						Transmitter: f_GetNodeInfo(c_nodeOpMsg),
+						GlobalQueue: f_GetGlobalQueue(c_nodeOpMsg),
+					}
+					c_transmitMasterMessage <- masterMessage
+					F_WriteLog("MasterMessage sent on port: " + strconv.Itoa(MASTERPORT))
+					time.Sleep(time.Duration(MMMILLS) * time.Millisecond)
 				}
 			}()
+
+			go elevator.F_RunElevator()
 
 			for {
 				//Update own elevator information
@@ -388,6 +395,7 @@ func F_RunNode() {
 			}
 
 		case SLAVE:
+			//c_transmitSlaveMessage := make(chan T_SlaveMessage)
 			//receive MasterMessage
 
 		}

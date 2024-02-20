@@ -18,10 +18,10 @@ type T_NodeInfo struct {
 	Role         T_NodeRole
 	ElevatorInfo elevator.T_ElevatorInfo
 }
-type T_EntryState int
+
 type T_GlobalQueueEntry struct {
 	Id                int
-	State             T_EntryState
+	State             elevator.T_RequestState
 	Request           elevator.T_Request
 	RequestedNode     T_NodeInfo //The elevator that got the request
 	AssignedNode      T_NodeInfo
@@ -55,11 +55,6 @@ type T_Config struct {
 const (
 	MASTER T_NodeRole = 0
 	SLAVE  T_NodeRole = 1
-)
-const (
-	UNASSIGNED T_EntryState = 0
-	ASSIGNED   T_EntryState = 1
-	DONE       T_EntryState = 2
 )
 
 // NodeOperation represents an operation to be performed on T_Node

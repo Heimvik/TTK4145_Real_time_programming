@@ -1,8 +1,8 @@
 package node
 
-import (
-	"the-elevator/elevator"
-)
+import "the-elevator/elevator"
+
+//"the-elevator/elevator"
 
 //Should take in:
 //The request struct containing:
@@ -55,7 +55,7 @@ func F_AssignRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T
 
 	distributedRequest = T_GlobalQueueEntry{
 		Id:                undistributedRequest.Id,
-		State:             ASSIGNED,
+		State:             elevator.ASSIGNED,
 		Request:           undistributedRequest.Request,
 		RequestedNode:     undistributedRequest.RequestedNode,
 		AssignedNode:      chosenNode,

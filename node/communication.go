@@ -3,9 +3,7 @@ package node
 import (
 	//"fmt"
 
-	"strconv"
 	"the-elevator/network/network_libraries/bcast"
-	"time"
 )
 
 // KILDE:
@@ -75,26 +73,9 @@ func f_UpdateNodes(c_currentNode chan T_NodeInfo, ops T_NodeOperations, c_newCon
 func F_TransmitSlaveMessage(c_transmitMessage chan T_SlaveMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
-func F_TransmitMasterMessage(ops T_NodeOperations, port int) {
+func F_TransmitMasterMessage(c_transmitMessage chan T_MasterMessage, port int) {
 	c_masterMessage := make(chan T_MasterMessage)
 	go bcast.Transmitter(port, c_masterMessage)
-	for {
-		c_nodeInfoResponse := make(chan T_NodeInfo)
-		ops.c_readNodeInfo <- c_nodeInfoResponse // Send the response channel to the NodeOperationManager
-		nodeInfo := <-c_nodeInfoResponse
-
-		c_globalQueueResponse := make(chan []T_GlobalQueueEntry)
-		ops.c_readGlobalQueue <- c_globalQueueResponse // Send the response channel to the NodeOperationManager
-		globalQueue := <-c_globalQueueResponse
-
-		masterMessage := T_MasterMessage{
-			Transmitter: nodeInfo,
-			GlobalQueue: globalQueue,
-		}
-		c_masterMessage <- masterMessage
-		F_WriteLog("MasterMessage sent on port: " + strconv.Itoa(port))
-		time.Sleep(time.Duration(MMMILLS) * time.Millisecond)
-	}
 }
 
 func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo, port int) {
