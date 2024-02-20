@@ -9,7 +9,7 @@ func F_RunElevator(c_requestIn chan T_Request, c_requestOut chan T_Request) {
 	Init("localhost:15657")
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
 
-	SetMotorDirection(MD_Up)
+	SetMotorDirection(MD_Down)
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)
@@ -36,7 +36,7 @@ func F_RunElevator(c_requestIn chan T_Request, c_requestOut chan T_Request) {
 				SetMotorDirection(MD_Stop)
 			} else {
 				F_chooseDirection(Elevator)
-				SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
+				// SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
 			}
 
 		case a := <-drv_stop: //vet egt ikke hva denne gjør, men lar den stå for nå
@@ -46,7 +46,7 @@ func F_RunElevator(c_requestIn chan T_Request, c_requestOut chan T_Request) {
             fmt.Printf("Elevator: Mottok request fra node\n")
 			Elevator.P_serveRequest = &a
 			F_chooseDirection(Elevator)
-			SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
+			// SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
 
 		}
 	}
