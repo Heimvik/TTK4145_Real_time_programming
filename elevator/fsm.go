@@ -6,6 +6,7 @@ import (
 )
 func F_FloorArrival(newFloor int) {
 
+	
 	Elevator.P_info.Floor = newFloor
 	SetFloorIndicator(newFloor)
 
