@@ -4,10 +4,10 @@ import "fmt"
 
 var Elevator T_Elevator
 
-func F_RunElevator(requestIn chan T_Request, requestOut chan T_Request) {
+func F_RunElevator(c_requestIn chan T_Request, c_requestOut chan T_Request) {
 
 	Init("localhost:15657")
-	Elevator = Init_Elevator(requestIn, requestOut)
+	Elevator = Init_Elevator(c_requestIn, c_requestOut)
 
 	SetMotorDirection(MD_Up)
 
@@ -21,7 +21,7 @@ func F_RunElevator(requestIn chan T_Request, requestOut chan T_Request) {
 	go PollFloorSensor(drv_floors)
 	go PollObstructionSwitch(drv_obstr)
 	go PollStopButton(drv_stop)
-	//go PollNewRequest(requestOut)
+	//go PollNewRequest(c_requestOut)
 
 	for {
 		select {

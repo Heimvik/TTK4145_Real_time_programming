@@ -6,13 +6,13 @@ import (
 )
 
 func F_Test_elevator() {
-	receiveRequest := make(chan T_Request)
-	sendRequest := make(chan T_Request)
-	go F_RunElevator(receiveRequest, sendRequest)
+	c_receiveRequest := make(chan T_Request)
+	c_sendRequest := make(chan T_Request)
+	go F_RunElevator(c_receiveRequest, c_sendRequest)
 
 	for {
 		select {
-		case a := <-sendRequest:
+		case a := <-c_sendRequest:
 			if a.Calltype == CAB {
 				fmt.Printf("Dummynode: Mottok cabrequest fra floor %v+\n", a.Floor)
 			} else {
@@ -20,7 +20,7 @@ func F_Test_elevator() {
 			}
 			time.Sleep(3 * time.Second)
 			fmt.Printf("Dummynode: Sender request til heis\n")
-			receiveRequest <- a
+			c_receiveRequest <- a
 		}
 	}
 }
