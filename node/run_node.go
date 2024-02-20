@@ -175,24 +175,40 @@ func f_ChooseRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeRo
 	}
 	return returnRole
 }
+func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
+	for i, nodeInfo := range nodes {
+		if nodeInfo.PRIORITY == nodeToRemove.PRIORITY {
+			return append(nodes[:i], nodes[i+1:]...)
+		}
+	}
+	return nodes
+}
 
-// increments all timers in GQ and checks for any that has run out
-func f_TimerWatchdog(ops T_NodeOperations, c_reassignEntry chan T_GlobalQueueEntry, c_quit chan bool) {
+// decrements all timers in GQ and checks for any that has run out, will always try to reassign/remove GQ elements/connectednodes
+func f_TimerWatchdog(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		globalQueue := f_GetGlobalQueue(ops)
 		for _, element := range globalQueue {
 			element.TimeUntilReassign -= 1
 			if element.TimeUntilReassign == 0 && element.Request.State != elevator.DONE {
-				c_reassignEntry <- element
+				f_AddEntryGlobalQueue(ops, element)
 			}
-			time.Sleep(1 * time.Second)
+		}
+
+		oldConnectedNodes := f_GetConnectedNodes(ops)
+		for _, element := range oldConnectedNodes {
+			element.TimeUntilDisconnect -= 1
+			if element.TimeUntilDisconnect == 0 {
+				newConnectedNodes := f_RemoveNode(oldConnectedNodes, element)
+				f_SetConnectedNodes(ops, newConnectedNodes)
+			}
 		}
 		select {
 		case <-c_quit:
 			F_WriteLog("Closed Watchdog goroutine in master")
 			return
 		default:
-			continue
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
@@ -261,23 +277,47 @@ func f_GetElevator(ops T_NodeOperations) elevator.T_Elevator {
 func f_SetElevator(ops T_NodeOperations, elevator elevator.T_Elevator) {
 	ops.c_writeElevator <- elevator // Send the connectedNodes directly to be written
 }
+func f_UpdateConnectedNodes(ops T_NodeOperations, currentNode T_NodeInfo) {
+	oldConnectedNodes := f_GetConnectedNodes(ops)
+	nodeIsUnique := true
+	nodeIndex := 0
+	for i, oldConnectedNode := range oldConnectedNodes {
+		if currentNode.PRIORITY == oldConnectedNode.PRIORITY {
+			nodeIsUnique = false
+			nodeIndex = i
+			break
+		}
+	}
+	if nodeIsUnique {
+		currentNode.TimeUntilDisconnect = CONNECTIONTIME
+		connectedNodes := append(oldConnectedNodes, currentNode)
+		f_SetConnectedNodes(ops, connectedNodes)
+	} else {
+		currentNode.TimeUntilDisconnect = CONNECTIONTIME
+		oldConnectedNodes[nodeIndex] = currentNode
+		f_SetConnectedNodes(ops, oldConnectedNodes)
+	}
+}
 
-func f_AddEntryGlobalQueue(operations T_NodeOperations, entryToAdd T_GlobalQueueEntry) {
-	thisGlobalQueue := f_GetGlobalQueue(operations)
+func f_AddEntryGlobalQueue(ops T_NodeOperations, entryToAdd T_GlobalQueueEntry) {
+	thisGlobalQueue := f_GetGlobalQueue(ops)
 	entryIsUnique := true
-	var entryIndex int
+	entryIndex := 0
 	for i, entry := range thisGlobalQueue {
 		if entryToAdd.Request.Id == entry.Request.Id && entryToAdd.RequestedNode == entry.RequestedNode { //random id generated to each entry
 			entryIsUnique = false
 			entryIndex = i
+			break
 		}
 	}
 	if entryIsUnique {
 		entryToAdd.AssignedNode.PRIORITY = 0
+		//entryToAdd.TimeUntilReassign = REASSIGNTIME //Should be set by slave
 		thisGlobalQueue = append(thisGlobalQueue, entryToAdd)
-		f_SetGlobalQueue(operations, thisGlobalQueue)
+		f_SetGlobalQueue(ops, thisGlobalQueue)
 	} else { //should update the existing entry
 		thisGlobalQueue[entryIndex] = entryToAdd
+		f_SetGlobalQueue(ops, thisGlobalQueue)
 	}
 }
 func f_HandleElevator(ops T_NodeOperations, c_requestFromElevator chan elevator.T_Request, c_requestToElevator chan elevator.T_Request, c_quit chan bool) {
@@ -330,6 +370,8 @@ func F_RunNode() {
 	c_newConnectedNodes := make(chan []T_NodeInfo)
 	c_quit := make(chan bool)
 
+	//Watchdog goroutine
+	go f_TimerWatchdog(c_nodeOpMsg, c_quit)
 	go f_NodeOperationManager(&ThisNode, c_nodeOpMsg) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
 	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, c_nodeOpMsg, c_newConnectedNodes, SLAVEPORT)
 	go F_ReceiveMasterMessage(c_receiveMasterMessage, c_nodeOpMsg, c_newConnectedNodes, MASTERPORT)
@@ -339,11 +381,6 @@ func F_RunNode() {
 		nodeRole := f_GetNodeInfo(c_nodeOpMsg).Role
 		switch nodeRole {
 		case MASTER:
-			//Receive messages
-
-			c_reassignEntry := make(chan T_GlobalQueueEntry)
-			//Watchdog goroutine
-			go f_TimerWatchdog(c_nodeOpMsg, c_reassignEntry, c_quit)
 			//Message goroutine
 			go func() {
 				for {
@@ -354,6 +391,7 @@ func F_RunNode() {
 
 					case masterMessage := <-c_receiveMasterMessage:
 						f_WriteLogMasterMessage(masterMessage)
+						f_UpdateConnectedNodes(c_nodeOpMsg, masterMessage.Transmitter)
 						for _, remoteEntry := range masterMessage.GlobalQueue {
 							f_AddEntryGlobalQueue(c_nodeOpMsg, remoteEntry)
 						}
@@ -369,18 +407,9 @@ func F_RunNode() {
 
 					case slaveMessage := <-c_receiveSlaveMessage:
 						f_WriteLogSlaveMessage(slaveMessage)
+						f_UpdateConnectedNodes(c_nodeOpMsg, slaveMessage.Transmitter)
 						f_AddEntryGlobalQueue(c_nodeOpMsg, slaveMessage.Entry)
 
-						//Update elevator whereabout of the slave
-						connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
-						for i, nodeInfo := range connectedNodes {
-							if slaveMessage.Transmitter.PRIORITY == nodeInfo.PRIORITY {
-								connectedNodes[i] = slaveMessage.Transmitter
-								f_SetConnectedNodes(c_nodeOpMsg, connectedNodes)
-							}
-						}
-					case reassignEntry := <-c_reassignEntry:
-						f_AddEntryGlobalQueue(c_nodeOpMsg, reassignEntry) //Demands that the old one is removed
 					case <-c_quit:
 						F_WriteLog("Closed Receive Message goroutine in master")
 						return
@@ -445,7 +474,7 @@ func F_RunNode() {
 			c_receiveElevatorRequest := make(chan elevator.T_Request)
 
 			//go elevator.F_RunElevator(c_transmitElevatorRequest, c_receiveElevatorRequest)
-			go f_HandleElevator(c_nodeOpMsg, c_receiveElevatorRequest, c_transmitElevatorRequest,c_quit) //MAKE ABLE TO QUIT
+			go f_HandleElevator(c_nodeOpMsg, c_receiveElevatorRequest, c_transmitElevatorRequest, c_quit) //MAKE ABLE TO QUIT
 
 			for { //MAKE ABLE TO QUIT
 
@@ -473,9 +502,22 @@ func F_RunNode() {
 
 		case SLAVE:
 
-			//receive MasterMessage
+			//receive Messages
 			go func() { //MAKE ABLE TO QUIT
 				for {
+					select {
+					case masterMessage := <-c_receiveMasterMessage:
+						f_WriteLogMasterMessage(masterMessage)
+						for _, remoteEntry := range masterMessage.GlobalQueue {
+							f_AddEntryGlobalQueue(c_nodeOpMsg, remoteEntry)
+						}
+						f_UpdateConnectedNodes(c_nodeOpMsg, masterMessage.Transmitter)
+					case slaveMessage := <-c_receiveSlaveMessage:
+						f_UpdateConnectedNodes(c_nodeOpMsg, slaveMessage.Transmitter)
+					case <-c_quit:
+						F_WriteLog("Closed Receive Message goroutine in slave")
+						return
+					}
 
 				}
 			}()

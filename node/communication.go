@@ -23,38 +23,6 @@ func f_AcceptancetestMM() bool {
 	return true
 }
 
-func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
-	for i, p_node := range nodes {
-		if p_node == nodeToRemove {
-			return append(nodes[:i], nodes[i+1:]...)
-		}
-	}
-	return nodes
-}
-
-func f_AppendNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
-	return append(nodes, nodeToRemove)
-}
-
-func f_UpdateNodes(currentNode T_NodeInfo, ops T_NodeOperations, c_newConnectedNodes chan []T_NodeInfo) {
-	oldConnectedNodes := f_GetConnectedNodes(ops)
-	newNode := true
-	for _, oldConnectedNode := range oldConnectedNodes {
-		if currentNode.PRIORITY == oldConnectedNode.PRIORITY {
-			newNode = false
-			break
-		}
-	}
-	if newNode {
-		connectedNodes := f_AppendNode(oldConnectedNodes, currentNode)
-		c_newConnectedNodes <- connectedNodes
-	} else {
-		//IMPORTANT: IMPLEMENTATION TO REMOVE UNCONNECTED NODE HERE!
-		//connectedNodes := f_RemoveNode(oldConnectedNodes, currentNode)
-		//c_newConnectedNodes <- connectedNodes
-	}
-}
-
 func F_TransmitSlaveMessage(c_transmitMessage chan T_SlaveMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
@@ -71,7 +39,6 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOper
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestSM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage
-				f_UpdateNodes(receivedMessage.Transmitter, ops, c_newConnectedNodes)
 			}
 		}
 	}
@@ -86,7 +53,6 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOp
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestMM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage
-				f_UpdateNodes(receivedMessage.Transmitter, ops, c_newConnectedNodes)
 			}
 		}
 	}

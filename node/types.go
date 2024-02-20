@@ -14,16 +14,17 @@ type T_Node struct {
 }
 type T_NodeRole int
 type T_NodeInfo struct {
-	PRIORITY     int
-	Role         T_NodeRole
-	ElevatorInfo elevator.T_ElevatorInfo
+	PRIORITY            int
+	Role                T_NodeRole
+	ElevatorInfo        elevator.T_ElevatorInfo
+	TimeUntilDisconnect float32
 }
 
 type T_GlobalQueueEntry struct {
 	Request           elevator.T_Request
 	RequestedNode     T_NodeInfo //The elevator that got the request
 	AssignedNode      T_NodeInfo
-	TimeUntilReassign int
+	TimeUntilReassign float32
 }
 
 type T_MasterMessage struct {
@@ -40,15 +41,16 @@ type T_SlaveMessage struct {
 }
 
 type T_Config struct {
-	Ip           string `json:"ip"`
-	SlavePort    int    `json:"slaveport"`
-	MasterPort   int    `json:"masterport"`
-	ElevatorPort int    `json:"elevatorport"`
-	Priority     int    `json:"priority"`
-	Nodes        int    `json:"nodes"`
-	Floors       int    `json:"floors"`
-	ReassignTime int    `json:"reassigntime"`
-	MMMills      int    `json:"mmmills"`
+	Ip             string  `json:"ip"`
+	SlavePort      int     `json:"slaveport"`
+	MasterPort     int     `json:"masterport"`
+	ElevatorPort   int     `json:"elevatorport"`
+	Priority       int     `json:"priority"`
+	Nodes          int     `json:"nodes"`
+	Floors         int     `json:"floors"`
+	ReassignTime   float32 `json:"reassigntime"`
+	ConnectionTime float32 `json:"connectiontime"`
+	MMMills        int     `json:"mmmills"`
 }
 
 const (
@@ -74,7 +76,8 @@ var ThisNode T_Node
 
 var FLOORS int
 var IP string
-var REASSIGNTIME int
+var REASSIGNTIME float32
+var CONNECTIONTIME float32
 var MMMILLS int
 var SLAVEPORT int
 var MASTERPORT int
