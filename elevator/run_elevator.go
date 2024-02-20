@@ -43,6 +43,7 @@ func F_RunElevator(requestIn chan T_Request, requestOut chan T_Request) {
 			fmt.Printf("%v+\n", a)
 
 		case a := <-Elevator.C_receiveRequest:
+            fmt.Printf("Elevator: Mottok request fra node\n")
 			Elevator.P_serveRequest = &a
 			F_chooseDirection(Elevator)
 			SetMotorDirection(MotorDirection(Elevator.P_info.Direction))
