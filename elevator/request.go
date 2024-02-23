@@ -14,8 +14,9 @@ type T_Request struct {
 type T_Call int
 
 const (
-	CAB  T_Call = 0
-	HALL T_Call = 1
+	NONECALL T_Call = 0
+	CAB      T_Call = 1
+	HALL     T_Call = 2
 )
 const (
 	UNASSIGNED T_RequestState = 0

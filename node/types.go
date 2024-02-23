@@ -50,7 +50,7 @@ type T_Config struct {
 	Floors         int     `json:"floors"`
 	ReassignTime   float32 `json:"reassigntime"`
 	ConnectionTime float32 `json:"connectiontime"`
-	MMMills        int     `json:"mmmills"`
+	SendPeriod     int     `json:"sendperiod"`
 }
 
 const (
@@ -78,7 +78,7 @@ var FLOORS int
 var IP string
 var REASSIGNTIME float32
 var CONNECTIONTIME float32
-var MMMILLS int
+var SENDPERIOD int
 var SLAVEPORT int
 var MASTERPORT int
 var ELEVATORPORT int

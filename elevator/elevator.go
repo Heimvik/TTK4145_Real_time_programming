@@ -2,16 +2,15 @@ package elevator
 
 import (
 	"time"
-
 )
 
 type T_ElevatorState int
 type T_ElevatorDirection int
 
 const (
-	IDLE     T_ElevatorState = iota
-	DOOROPEN T_ElevatorState = iota
-	MOVING   T_ElevatorState = iota
+	IDLE     T_ElevatorState = 0
+	DOOROPEN T_ElevatorState = 1
+	MOVING   T_ElevatorState = 2
 )
 
 const (
@@ -73,7 +72,7 @@ func F_clearRequest(elevator T_Elevator) {
 	elevator.P_serveRequest.State = DONE
 	// elevator.C_distributeRequest <- *elevator.P_serveRequest
 	SetMotorDirection(MD_Stop)
-	Elevator.P_info.State = DOOROPEN 
+	Elevator.P_info.State = DOOROPEN
 	SetDoorOpenLamp(true)
 	time.Sleep(3 * time.Second) //placeholder
 	SetDoorOpenLamp(false)
@@ -82,19 +81,19 @@ func F_clearRequest(elevator T_Elevator) {
 }
 
 func F_chooseDirection(elevator T_Elevator) {
-		if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
-			elevator.P_info.Direction = UP
-			elevator.P_info.State = MOVING
-			SetMotorDirection(MD_Up)
+	if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
+		elevator.P_info.Direction = UP
+		elevator.P_info.State = MOVING
+		SetMotorDirection(MD_Up)
 
-		} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
-			elevator.P_info.Direction = DOWN
-			elevator.P_info.State = MOVING
-			SetMotorDirection(MD_Down)
-		} else {
-			elevator.P_info.Direction = NONE
-			F_clearRequest(elevator)
-			
-		}
-	
+	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+		elevator.P_info.Direction = DOWN
+		elevator.P_info.State = MOVING
+		SetMotorDirection(MD_Down)
+	} else {
+		elevator.P_info.Direction = NONE
+		F_clearRequest(elevator)
+
+	}
+
 }
