@@ -8,5 +8,6 @@
   "floors": 4,
   "reassigntime":15,
   "connectiontime":4,
-  "sendperiod":1000
+  "sendperiod":1000,
+  "getsetperiod":5
 }

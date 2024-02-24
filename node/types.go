@@ -51,6 +51,7 @@ type T_Config struct {
 	ReassignTime   float32 `json:"reassigntime"`
 	ConnectionTime float32 `json:"connectiontime"`
 	SendPeriod     int     `json:"sendperiod"`
+	GetSetPeriod   int     `json:"getsetperiod"`
 }
 
 const (
@@ -60,14 +61,21 @@ const (
 
 // NodeOperation represents an operation to be performed on T_Node
 type T_NodeOperations struct {
-	c_readNodeInfo        chan chan T_NodeInfo
-	c_writeNodeInfo       chan T_NodeInfo
-	c_readGlobalQueue     chan chan []T_GlobalQueueEntry
-	c_writeGlobalQueue    chan []T_GlobalQueueEntry
-	c_readConnectedNodes  chan chan []T_NodeInfo
-	c_writeConnectedNodes chan []T_NodeInfo
-	c_readElevator        chan chan elevator.T_Elevator
-	c_writeElevator       chan elevator.T_Elevator
+	c_readNodeInfo         chan chan T_NodeInfo
+	c_writeNodeInfo        chan T_NodeInfo
+	c_readAndWriteNodeInfo chan chan T_NodeInfo
+
+	c_readGlobalQueue         chan chan []T_GlobalQueueEntry
+	c_writeGlobalQueue        chan []T_GlobalQueueEntry
+	c_readAndWriteGlobalQueue chan chan []T_GlobalQueueEntry
+
+	c_readConnectedNodes         chan chan []T_NodeInfo
+	c_writeConnectedNodes        chan []T_NodeInfo
+	c_readAndWriteConnectedNodes chan chan []T_NodeInfo
+
+	c_readElevator         chan chan elevator.T_Elevator
+	c_writeElevator        chan elevator.T_Elevator
+	c_readAndWriteElevator chan chan elevator.T_Elevator
 	// Add more channels for other operations as needed
 }
 
@@ -79,6 +87,7 @@ var IP string
 var REASSIGNTIME float32
 var CONNECTIONTIME float32
 var SENDPERIOD int
+var GETSETPERIOD int
 var SLAVEPORT int
 var MASTERPORT int
 var ELEVATORPORT int
