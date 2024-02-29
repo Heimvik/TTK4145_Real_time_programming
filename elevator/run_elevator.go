@@ -16,6 +16,7 @@ TODO:
    hvis den er obstructed, så den kommer ikke til å motta nye requests. Så dette punktet er kanskje ikke nødvendig. Snakk med Heimvik om dette.)
 - Legge til elevatormusic
 - SKjønne seg på ops greia til Heimert
+- Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode.
 */
 
 var Elevator T_Elevator
