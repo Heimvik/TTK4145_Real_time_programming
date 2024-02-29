@@ -83,6 +83,11 @@ func F_clearRequest(elevator T_Elevator) {
 func F_chooseDirection(elevator T_Elevator) {
 	if elevator.P_serveRequest == nil {
 		return
+	} else if C_stop{
+		SetMotorDirection(MD_Stop)
+		elevator.P_info.State = IDLE
+		elevator.P_info.Direction = NONE
+		
 	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
 		elevator.P_info.Direction = UP
 		elevator.P_info.State = MOVING

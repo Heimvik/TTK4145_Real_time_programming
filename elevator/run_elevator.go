@@ -5,6 +5,19 @@ import (
 	"the-elevator/node"
 )
 
+/*
+29.02.2024
+TODO:
+- Ferdigutvikle timer.go, legge til channels som sier når timer skal starte. Opprette global variabel som sier hvor lenge døra skal være åpen.
+  På denne måten kan man i fsmObstructionSwitch se om tiden døra skal være åpen har gått ut, og lukke døra hvis det ikke er noen hindring. Istedetfor å lukke døra når det ikke lenger er en hindring.
+- Endre F_sendRequest slik at den sender request av riktig type, nå inneholder requesten for lite informasjon.
+- Legge til at hvis heisen er obstructed, og har mottatt ny request, så skal den sende sin nåværende request tilbake til noden, slik at en annen heis fullfører requesten.
+  (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett. Og den kommer ikke til å bli satt i IDLE 
+   hvis den er obstructed, så den kommer ikke til å motta nye requests. Så dette punktet er kanskje ikke nødvendig. Snakk med Heimvik om dette.)
+- Legge til elevatormusic
+- SKjønne seg på ops greia til Heimert
+*/
+
 var Elevator T_Elevator
 var C_stop bool
 var C_obstruction bool
@@ -38,11 +51,12 @@ func F_RunElevator(ops node.T_NodeOperation, c_requestIn chan T_Request, c_reque
 			F_sendRequest(a, Elevator.C_distributeRequest)
 
 		case a := <-drv_floors:
-			F_FloorArrival(a)
+			F_fsmFloorArrival(a)
 
 		case a := <-drv_obstr: //tipper dette er nok til å kun teste funksjonalitet
 			C_obstruction = a
-            //legg til F_fsmObstructionSwitch(a)
+            F_fsmObstructionSwitch(a)
+			//legg til F_fsmObstructionSwitch(a)
             //den skal ikke gjøre noe hvis heisen ikke er i DOOROPEN
             //hvis heisen er i DOOROPEN, skal den sette heisen i IDLE og lukke døra hvis C_obstruction er false, hvis ikke skal den ikke gjøre noe
 

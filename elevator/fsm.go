@@ -25,6 +25,16 @@ func F_fsmFloorArrival(newFloor int) {
 	}
 }
 
+func F_fsmObstructionSwitch(obstructed bool){
+	switch Elevator.P_info.State {
+	case DOOROPEN:
+		if obstructed == false {
+			Elevator.P_info.State = IDLE
+			SetDoorOpenLamp(false)
+		}
+	}
+}
+
 func F_fsmDoorTimeout() {
 	switch Elevator.P_info.State {
 	case DOOROPEN:
