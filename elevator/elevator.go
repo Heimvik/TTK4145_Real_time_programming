@@ -23,6 +23,7 @@ const (
 //see single-elevator/elevator.go for inspiration
 
 type T_Elevator struct {
+	currentID 		    int
 	P_info              *T_ElevatorInfo     //Poitner to the info of this elevator
 	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
 	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
@@ -84,6 +85,7 @@ func F_chooseDirection(elevator T_Elevator) {
 	if elevator.P_serveRequest == nil {
 		return
 	} else if C_stop{
+		
 		SetMotorDirection(MD_Stop)
 		elevator.P_info.State = IDLE
 		elevator.P_info.Direction = NONE

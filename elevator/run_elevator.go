@@ -12,8 +12,9 @@ TODO:
   På denne måten kan man i fsmObstructionSwitch se om tiden døra skal være åpen har gått ut, og lukke døra hvis det ikke er noen hindring. Istedetfor å lukke døra når det ikke lenger er en hindring.
 - Endre F_sendRequest slik at den sender request av riktig type, nå inneholder requesten for lite informasjon.
 - Legge til at hvis heisen er obstructed, og har mottatt ny request, så skal den sende sin nåværende request tilbake til noden, slik at en annen heis fullfører requesten.
-  (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett. Og den kommer ikke til å bli satt i IDLE 
-   hvis den er obstructed, så den kommer ikke til å motta nye requests. Så dette punktet er kanskje ikke nødvendig. Snakk med Heimvik om dette.)
+  (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett. 
+   Og den kommer ikke til å bli satt i IDLE hvis den er obstructed, så den kommer ikke til å motta nye requests. 
+   Så dette punktet er kanskje ikke nødvendig. Snakk med Heimvik om dette.)
 - Legge til elevatormusic
 - SKjønne seg på ops greia til Heimert
 - Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode.
@@ -22,8 +23,10 @@ TODO:
 var Elevator T_Elevator
 var C_stop bool
 var C_obstruction bool
+var ID int //temp, spør arbo om flytting
 
-func F_RunElevator(ops node.T_NodeOperation, c_requestIn chan T_Request, c_requestOut chan T_Request) {
+
+func F_RunElevator(ops T_NodeOperation, c_requestIn chan T_Request, c_requestOut chan T_Request) {
 
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
