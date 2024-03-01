@@ -12,8 +12,8 @@ TODO:
   På denne måten kan man i fsmObstructionSwitch se om tiden døra skal være åpen har gått ut, og lukke døra hvis det ikke er noen hindring. Istedetfor å lukke døra når det ikke lenger er en hindring.
 - Endre F_sendRequest slik at den sender request av riktig type, nå inneholder requesten for lite informasjon.
 - Legge til at hvis heisen er obstructed, og har mottatt ny request, så skal den sende sin nåværende request tilbake til noden, slik at en annen heis fullfører requesten.
-  (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett. 
-   Og den kommer ikke til å bli satt i IDLE hvis den er obstructed, så den kommer ikke til å motta nye requests. 
+  (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett.
+   Og den kommer ikke til å bli satt i IDLE hvis den er obstructed, så den kommer ikke til å motta nye requests.
    Så dette punktet er kanskje ikke nødvendig. Snakk med Heimvik om dette.)
 - Legge til elevatormusic
 - SKjønne seg på ops greia til Heimert
@@ -25,7 +25,6 @@ var C_stop bool
 var C_obstruction bool
 var ID int //temp, spør arbo om flytting
 
-
 func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requestOut chan T_Request) {
 
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
@@ -33,14 +32,14 @@ func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requ
 
 	SetMotorDirection(MD_Down)
 
-    C_stop = false
-    C_obstruction = false
+	C_stop = false
+	C_obstruction = false
 
-	c_readElevatorInfo := make(chan T_ElevatorInfo)
-	c_writeElevatorInfo := make(chan T_ElevatorInfo)
+	c_readElevatorInfo := make(chan T_Elevator)
+	c_writeElevatorInfo := make(chan T_Elevator)
 	c_quitGetSet := make(chan bool)
 
-	go node.F_GetAndSetElevator( c_readElevatorInfo, c_writeElevatorInfo, c_quitGetSet)
+	go node.F_GetAndSetElevator(node.C_nodeOpMsg, c_readElevatorInfo, c_writeElevatorInfo, c_quitGetSet)
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)
@@ -65,14 +64,14 @@ func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requ
 
 		case a := <-drv_obstr: //tipper dette er nok til å kun teste funksjonalitet
 			C_obstruction = a
-            F_fsmObstructionSwitch(a)
+			F_fsmObstructionSwitch(a)
 			//legg til F_fsmObstructionSwitch(a)
-            //den skal ikke gjøre noe hvis heisen ikke er i DOOROPEN
-            //hvis heisen er i DOOROPEN, skal den sette heisen i IDLE og lukke døra hvis C_obstruction er false, hvis ikke skal den ikke gjøre noe
+			//den skal ikke gjøre noe hvis heisen ikke er i DOOROPEN
+			//hvis heisen er i DOOROPEN, skal den sette heisen i IDLE og lukke døra hvis C_obstruction er false, hvis ikke skal den ikke gjøre noe
 
 		case a := <-drv_stop:
 			C_stop = a //legg til i F_chooseDirection at hvis C_stop er true, så skal den stoppe
-            F_chooseDirection(Elevator)
+			F_chooseDirection(Elevator)
 
 		case a := <-Elevator.C_receiveRequest:
 			fmt.Printf("Elevator: Mottok request fra node\n")
