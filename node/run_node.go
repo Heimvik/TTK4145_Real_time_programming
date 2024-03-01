@@ -220,7 +220,7 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 	//add more about GQ
 	F_WriteLog(logStr)
 }
-func f_ChooseRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeRole {
+func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeInfo {
 	var returnRole T_NodeRole
 	for _, remoteNodeInfo := range connectedNodes {
 		if remoteNodeInfo.PRIORITY < thisNodeInfo.PRIORITY {
@@ -229,7 +229,38 @@ func f_ChooseRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeRo
 			returnRole = MASTER
 		}
 	}
-	return returnRole
+	newNodeInfo := T_NodeInfo{
+		PRIORITY:            thisNodeInfo.PRIORITY,
+		Role:                returnRole,
+		ElevatorInfo:        thisNodeInfo.ElevatorInfo,
+		TimeUntilDisconnect: thisNodeInfo.TimeUntilDisconnect,
+	}
+	return newNodeInfo
+}
+func f_AssignNewRequest(ops T_NodeOperations) {
+	var avalibaleNodes []T_NodeInfo
+	connectedNodes := f_GetConnectedNodes(ops)
+	for _, nodeInfo := range connectedNodes {
+		if nodeInfo.ElevatorInfo.State == elevator.IDLE {
+			avalibaleNodes = append(avalibaleNodes, nodeInfo)
+		}
+	}
+
+	c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
+	c_writeGlobalQueue := make(chan []T_GlobalQueueEntry)
+	c_quit := make(chan bool)
+	go f_GetAndSetGlobalQueue(ops, c_readGlobalQueue, c_writeGlobalQueue, c_quit)
+	globalQueue := <- c_readGlobalQueue
+	for i, entry := range globalQueue {
+		if (entry.Request.State == elevator.UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
+			assignedEntry := F_AssignUnassignedRequest(entry, avalibaleNodes)
+			globalQueue := f_GetGlobalQueue(ops)
+			globalQueue[i] = assignedEntry
+			f_SetGlobalQueue(ops, globalQueue)
+			break
+		}
+	}
+
 }
 func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
 	for i, nodeInfo := range nodes {
@@ -295,7 +326,6 @@ func f_TimeManager(ops T_NodeOperations, c_send chan bool) {
 		time.Sleep(1 * time.Second)
 	}
 }
-
 func f_UpdateConnectedNodes(ops T_NodeOperations, currentNode T_NodeInfo) {
 	c_readConnectedNodes := make(chan []T_NodeInfo)
 	c_writeConnectedNodes := make(chan []T_NodeInfo)
@@ -387,7 +417,7 @@ func f_ElevatorManager(ops T_NodeOperations, c_entryFromElevator chan T_GlobalQu
 // should contain the main master/slave fsm in Run() function, to be called from main
 func F_RunNode() {
 	//to run the main FSM
-	c_nodeOpMsg := T_NodeOperations{
+	c_nodeOpMsg := T_NodeOperations{ //Make global for jonas
 		c_readNodeInfo:         make(chan chan T_NodeInfo),
 		c_writeNodeInfo:        make(chan T_NodeInfo),
 		c_readAndWriteNodeInfo: make(chan chan T_NodeInfo),
@@ -424,7 +454,7 @@ func F_RunNode() {
 		nodeRole := f_GetNodeInfo(c_nodeOpMsg).Role
 		switch nodeRole {
 		case MASTER:
-			c_quit := make(chan bool)
+			c_quitMasterRoutines := make(chan bool)
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_WriteLogMasterMessage(c_nodeOpMsg, masterMessage)
@@ -456,50 +486,29 @@ func F_RunNode() {
 				//F_WriteLog("MasterMessage sent on port: " + strconv.Itoa(MASTERPORT))
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 			default:
-				connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
-				thisNodeInfo := f_GetNodeInfo(c_nodeOpMsg)
-				thisNodeInfo.Role = f_ChooseRole(thisNodeInfo, connectedNodes)
+				c_readNodeInfo := make(chan T_NodeInfo)
+				c_writeNodeInfo := make(chan T_NodeInfo)
+				c_quitGetSet := make(chan bool)
+
+				go f_GetAndSetNodeInfo(c_nodeOpMsg, c_readNodeInfo, c_writeNodeInfo, c_quitGetSet)
+				oldConnectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
+
+				oldNodeInfo := <-c_readNodeInfo
+				newNodeInfo := f_AssignNewRole(oldNodeInfo, oldConnectedNodes)
+				c_writeNodeInfo <- newNodeInfo
+				c_quitGetSet <- true
+
+				f_UpdateConnectedNodes(c_nodeOpMsg, newNodeInfo) //Update connected nodes with newnodeinfo
+
+				f_AssignNewRequest()
+				
 				if thisNodeInfo.Role == SLAVE {
-					close(c_quit)
-				}
-				f_SetNodeInfo(c_nodeOpMsg, thisNodeInfo)
-
-				f_UpdateConnectedNodes(c_nodeOpMsg, f_GetNodeInfo(c_nodeOpMsg))
-
-				//check for avalibale nodes
-				var avalibaleNodes []T_NodeInfo
-				updatedThisNode := false
-				for i, nodeInfo := range connectedNodes {
-					if nodeInfo.ElevatorInfo.State == elevator.IDLE {
-						avalibaleNodes = append(avalibaleNodes, nodeInfo)
-					}
-					if thisNodeInfo.PRIORITY == nodeInfo.PRIORITY {
-						if !updatedThisNode {
-							connectedNodes[i] = thisNodeInfo
-							f_SetConnectedNodes(c_nodeOpMsg, connectedNodes)
-							updatedThisNode = true
-						} else {
-							F_WriteLog("Error, thisNode appended to CN more than one")
-						}
-						continue
-					}
-				}
-
-				//check for first entry that is unassigned
-				globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
-				for i, entry := range globalQueue {
-					if (entry.Request.State == elevator.UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
-						assignedEntry := F_AssignUnassignedRequest(entry, avalibaleNodes)
-						globalQueue := f_GetGlobalQueue(c_nodeOpMsg)
-						globalQueue[i] = assignedEntry
-						f_SetGlobalQueue(c_nodeOpMsg, globalQueue)
-						break
-					}
+					close(c_quitMasterRoutines)
 				}
 			}
 
 		case SLAVE:
-			c_quit := make(chan bool)
+			c_quitSlaveRoutines := make(chan bool)
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_WriteLogMasterMessage(c_nodeOpMsg, masterMessage)
@@ -527,14 +536,15 @@ func F_RunNode() {
 			default:
 				connectedNodes := f_GetConnectedNodes(c_nodeOpMsg)
 				thisNodeInfo := f_GetNodeInfo(c_nodeOpMsg)
-				thisNodeInfo.Role = f_ChooseRole(thisNodeInfo, connectedNodes)
-				if thisNodeInfo.Role == MASTER {
-					close(c_quit)
-				}
+				thisNodeInfo.Role = f_AssignNewRole(thisNodeInfo, connectedNodes)
+
 				f_SetNodeInfo(c_nodeOpMsg, thisNodeInfo)
 
 				f_UpdateConnectedNodes(c_nodeOpMsg, f_GetNodeInfo(c_nodeOpMsg))
 
+				if thisNodeInfo.Role == MASTER {
+					close(c_quitSlaveRoutines)
+				}
 			}
 		}
 	}
