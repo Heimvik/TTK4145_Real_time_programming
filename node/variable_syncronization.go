@@ -126,16 +126,16 @@ func f_GetAndSetConnectedNodes(ops T_NodeOperations, c_readConnectedNodes chan [
 		}
 	}
 }
-func f_GetElevator(ops T_NodeOperations) elevator.T_Elevator {
+func F_GetElevator(ops T_NodeOperations) elevator.T_Elevator {
 	c_responseChan := make(chan elevator.T_Elevator)
 	ops.c_readElevator <- c_responseChan // Send the response channel to the NodeOperationManager
 	elevator := <-c_responseChan         // Receive the connected nodes from the response channel
 	return elevator
 }
-func f_SetElevator(ops T_NodeOperations, elevator elevator.T_Elevator) {
+func F_SetElevator(ops T_NodeOperations, elevator elevator.T_Elevator) {
 	ops.c_writeElevator <- elevator // Send the connectedNodes directly to be written
 }
-func f_GetAndSetElevator(ops T_NodeOperations, c_readElevator chan elevator.T_Elevator, c_writeElevator chan elevator.T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
+func F_GetAndSetElevator(ops T_NodeOperations, c_readElevator chan elevator.T_Elevator, c_writeElevator chan elevator.T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
 	getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
 	c_responsChan := make(chan elevator.T_Elevator)
 
