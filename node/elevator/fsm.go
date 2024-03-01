@@ -48,12 +48,12 @@ func F_ReceiveRequest(req T_Request) {
 }
 
 func F_sendRequest(button ButtonEvent, requestOut chan T_Request) {
-	Elevator.currentID++
+	Elevator.CurrentID++
 	if button.Button == BT_Cab {
-		requestOut <- T_Request{Id: Elevator.currentID, State: 0, Calltype: CAB, Floor: button.Floor}
+		requestOut <- T_Request{Id: Elevator.CurrentID, State: 0, Calltype: CAB, Floor: button.Floor}
 		return
 	} else {
-		requestOut <- T_Request{Id: Elevator.currentID, State: 0, Calltype: HALL, Floor: button.Floor}
+		requestOut <- T_Request{Id: Elevator.CurrentID, State: 0, Calltype: HALL, Floor: button.Floor}
 		return
 	}
 }

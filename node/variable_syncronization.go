@@ -1,47 +1,47 @@
 package node
 
 import (
-	"the-elevator/elevator"
+	"the-elevator/node/elevator"
 	"time"
 )
 
-func f_NodeOperationManager(node *T_Node, ops T_NodeOperations) {
+func f_NodeOperationManager(node *T_Node, nodeOps T_NodeOperations, elevatorOps elevator.T_ElevatorOperations) {
 	for {
 		select {
-		case responseChan := <-ops.c_readNodeInfo:
+		case responseChan := <-nodeOps.c_readNodeInfo:
 			responseChan <- node.Info
-		case newNodeInfo := <-ops.c_writeNodeInfo:
+		case newNodeInfo := <-nodeOps.c_writeNodeInfo:
 			node.Info = newNodeInfo
-		case responseChan := <-ops.c_readAndWriteNodeInfo:
+		case responseChan := <-nodeOps.c_readAndWriteNodeInfo:
 			responseChan <- node.Info
 			node.Info = <-responseChan
 
-		case responseChan := <-ops.c_readGlobalQueue:
+		case responseChan := <-nodeOps.c_readGlobalQueue:
 			responseChan <- node.GlobalQueue
-		case newGlobalQueue := <-ops.c_writeGlobalQueue:
+		case newGlobalQueue := <-nodeOps.c_writeGlobalQueue:
 			node.GlobalQueue = newGlobalQueue
-		case responseChan := <-ops.c_readAndWriteGlobalQueue:
+		case responseChan := <-nodeOps.c_readAndWriteGlobalQueue:
 			responseChan <- node.GlobalQueue
 			node.GlobalQueue = <-responseChan
 
-		case responseChan := <-ops.c_readConnectedNodes:
+		case responseChan := <-nodeOps.c_readConnectedNodes:
 			responseChan <- node.ConnectedNodes
-		case newConnectedNodes := <-ops.c_writeConnectedNodes:
+		case newConnectedNodes := <-nodeOps.c_writeConnectedNodes:
 			node.ConnectedNodes = newConnectedNodes
-		case responseChan := <-ops.c_readAndWriteConnectedNodes:
+		case responseChan := <-nodeOps.c_readAndWriteConnectedNodes:
 			responseChan <- node.ConnectedNodes
 			node.ConnectedNodes = <-responseChan
 
-		case responseChan := <-ops.c_readElevator:
+		case responseChan := <-elevatorOps.C_readElevator:
 			responseChan <- *node.P_ELEVATOR
-		case newElevator := <-ops.c_writeElevator:
+		case newElevator := <-elevatorOps.C_writeElevator:
 			*node.P_ELEVATOR = newElevator
-		case responseChan := <-ops.c_readAndWriteElevator:
+		case responseChan := <-elevatorOps.C_readAndWriteElevator:
 			responseChan <- *node.P_ELEVATOR
 			*node.P_ELEVATOR = <-responseChan
 
 		default:
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 		}
 	}
 }
@@ -68,7 +68,7 @@ func f_GetAndSetNodeInfo(ops T_NodeOperations, c_readConnectedNodes chan T_NodeI
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
+			F_WriteLog("Ended GetSet goroutine of NI because of deadlock")
 		}
 	}
 }
@@ -95,7 +95,7 @@ func f_GetAndSetGlobalQueue(ops T_NodeOperations, c_readGlobalQueue chan []T_Glo
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
+			F_WriteLog("Ended GetSet goroutine of GQ because of deadlock")
 		}
 	}
 }
@@ -119,33 +119,6 @@ func f_GetAndSetConnectedNodes(ops T_NodeOperations, c_readConnectedNodes chan [
 			c_readConnectedNodes <- oldConnectedNodes
 		case newConnectedNodes := <-c_writeConnectedNodes:
 			c_responsChan <- newConnectedNodes
-		case <-c_quit:
-			return
-		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
-		}
-	}
-}
-func F_GetElevator(ops T_NodeOperations) elevator.T_Elevator {
-	c_responseChan := make(chan elevator.T_Elevator)
-	ops.c_readElevator <- c_responseChan // Send the response channel to the NodeOperationManager
-	elevator := <-c_responseChan         // Receive the connected nodes from the response channel
-	return elevator
-}
-func F_SetElevator(ops T_NodeOperations, elevator elevator.T_Elevator) {
-	ops.c_writeElevator <- elevator // Send the connectedNodes directly to be written
-}
-func F_GetAndSetElevator(ops T_NodeOperations, c_readElevator chan elevator.T_Elevator, c_writeElevator chan elevator.T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
-	getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
-	c_responsChan := make(chan elevator.T_Elevator)
-
-	ops.c_readAndWriteElevator <- c_responsChan
-	for {
-		select {
-		case oldElevator := <-c_responsChan:
-			c_readElevator <- oldElevator
-		case newElevator := <-c_writeElevator:
-			c_responsChan <- newElevator
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:

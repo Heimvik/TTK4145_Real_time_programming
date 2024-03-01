@@ -1,34 +1,10 @@
-2024/02/24 22:20:38 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:38 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:38 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:39 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:39 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:39 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:40 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:40 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:40 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:41 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:41 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:41 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:42 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:42 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:43 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:43 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:43 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:44 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:44 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:44 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:45 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:45 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:45 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:46 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:46 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:46 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:47 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:47 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:47 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:48 run_node.go:132: Node 1 disconnected
-2024/02/24 22:20:48 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:48 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
-2024/02/24 22:20:49 run_node.go:132: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
-2024/02/24 22:20:49 run_node.go:132: Node: | 1 | MASTER| has connected nodes | 1 | 
+2024/03/01 18:16:39 run_node.go:70: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
+2024/03/01 18:16:39 run_node.go:70: Node: | 1 | MASTER| has connected nodes | 1 | 
+2024/03/01 18:16:40 run_node.go:70: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
+2024/03/01 18:16:40 run_node.go:70: Node: | 1 | MASTER| has connected nodes | 1 | 
+2024/03/01 18:16:41 run_node.go:70: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
+2024/03/01 18:16:41 run_node.go:70: Node: | 1 | MASTER| has connected nodes | 1 | 
+2024/03/01 18:16:42 run_node.go:70: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
+2024/03/01 18:16:42 run_node.go:70: Node: | 1 | MASTER| has connected nodes | 1 | 
+2024/03/01 18:16:44 run_node.go:70: Node: | 1 | MASTER | received MM from | 1 | MASTER | 
+2024/03/01 18:16:44 run_node.go:70: Node: | 1 | MASTER| has connected nodes | 1 | 

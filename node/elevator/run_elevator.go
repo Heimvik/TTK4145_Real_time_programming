@@ -2,7 +2,6 @@ package elevator
 
 import (
 	"fmt"
-	"the-elevator/node"
 )
 
 /*
@@ -20,12 +19,33 @@ TODO:
 - Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode.
 */
 
+/*
+Brukseksempel f_getAndSetElevator():
+
+1. Definer opp input/output channels og quit channel:
+c_readElevator := make(chan T_Elevator)
+c_writeElevator := make(chan T_Elevator)
+c_quitGetSetElevator := make(chan bool)
+
+2. Kall den i egen goroutine og les fra c_readElevator:
+func f_GetAndSetElevator(ops, c_readElevator,c_writeElevator,c_quitGetSetElevator)
+oldElevator <- c_readElevator
+
+3. *modifikasjoner på oldElevator* (Mellom her og pkt. 4 må det ikke være noen kall til f_GetElevator() eller f_SetElevator() da dette fører til deadlock)
+newElevator := oldElevator
+
+4. Skriv til global variabel og avslutt getSet goroutine
+c_writeElevator <- newElevator
+c_quitGetSetGlobalQueue <- true
+
+*/
+
 var Elevator T_Elevator
 var C_stop bool
 var C_obstruction bool
 var ID int //temp, spør arbo om flytting
 
-func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requestOut chan T_Request) {
+func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requestIn chan T_Request) {
 
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
@@ -35,11 +55,11 @@ func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requ
 	C_stop = false
 	C_obstruction = false
 
-	c_readElevatorInfo := make(chan T_Elevator)
-	c_writeElevatorInfo := make(chan T_Elevator)
-	c_quitGetSet := make(chan bool)
+	//c_readElevatorInfo := make(chan T_ElevatorInfo)
+	//c_writeElevatorInfo := make(chan T_ElevatorInfo)
+	//c_quitGetSet := make(chan bool)
 
-	go node.F_GetAndSetElevator(node.C_nodeOpMsg, c_readElevatorInfo, c_writeElevatorInfo, c_quitGetSet)
+	//go node.f_Get
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)

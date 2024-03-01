@@ -23,7 +23,7 @@ const (
 //see single-elevator/elevator.go for inspiration
 
 type T_Elevator struct {
-	currentID 		    int
+	CurrentID           int
 	P_info              *T_ElevatorInfo     //Poitner to the info of this elevator
 	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
 	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
@@ -37,6 +37,56 @@ type T_ElevatorInfo struct {
 	Floor     int
 	State     T_ElevatorState
 }
+
+type T_ElevatorOperations struct{
+	C_readElevator         chan chan T_Elevator
+	C_writeElevator        chan T_Elevator
+	C_readAndWriteElevator chan chan T_Elevator
+}
+
+func F_GetElevator(ops T_ElevatorOperations) T_Elevator {
+	c_responseChan := make(chan T_Elevator)
+	ops.C_readElevator <- c_responseChan // Send the response channel to the NodeOperationManager
+	elevator := <-c_responseChan         // Receive the connected nodes from the response channel
+	return elevator
+}
+func f_SetElevator(ops T_ElevatorOperations, elevator T_Elevator) {
+	ops.C_writeElevator <- elevator // Send the connectedNodes directly to be written
+}
+func f_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevator, c_writeElevator chan T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
+	getSetTimer := time.NewTicker(time.Duration(2) * time.Second) //Hardkode 2 inntil videre, sync med initfil
+	c_responsChan := make(chan T_Elevator)
+
+	ops.C_readAndWriteElevator <- c_responsChan
+	for {
+		select {
+		case oldElevator := <-c_responsChan:
+			c_readElevator <- oldElevator
+		case newElevator := <-c_writeElevator:
+			c_responsChan <- newElevator
+		case <-c_quit:
+			return
+		case <-getSetTimer.C:
+			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
+		}
+	}
+}
+
+/*
+type T_GetAndSetElevator struct{
+	getElevator chan T_Elevator
+	setElevator chan T_Elevator
+}
+
+type T_ElevatorInterface struct {
+	C_requestFromElevator chan T_Request
+	C_requestToElevator   chan T_Request
+	C_getElevator         chan chan T_Elevator
+	C_setElevator         chan T_Elevator
+	C_getAndSetElevator   chan T_GetAndSetElevator
+}
+*/
+// Add more channels for other operations as needed
 
 //func for adding request, or create chan which sends to
 
@@ -72,9 +122,9 @@ func F_clearRequest(elevator T_Elevator) {
 	//set request til done
 	elevator.P_serveRequest.State = DONE
 	// elevator.C_distributeRequest <- *elevator.P_serveRequest
-	SetMotorDirection(MD_Stop) 
-	Elevator.P_info.State = DOOROPEN 
-	SetDoorOpenLamp(true) 
+	SetMotorDirection(MD_Stop)
+	Elevator.P_info.State = DOOROPEN
+	SetDoorOpenLamp(true)
 	time.Sleep(3 * time.Second) //placeholder
 	SetDoorOpenLamp(false)
 	Elevator.P_info.State = IDLE
@@ -84,12 +134,12 @@ func F_clearRequest(elevator T_Elevator) {
 func F_chooseDirection(elevator T_Elevator) {
 	if elevator.P_serveRequest == nil {
 		return
-	} else if C_stop{
-		
+	} else if C_stop {
+
 		SetMotorDirection(MD_Stop)
 		elevator.P_info.State = IDLE
 		elevator.P_info.Direction = NONE
-		
+
 	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
 		elevator.P_info.Direction = UP
 		elevator.P_info.State = MOVING

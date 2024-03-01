@@ -8,7 +8,7 @@ import (
 func F_Test_elevator() {
 	c_receiveRequest := make(chan T_Request)
 	c_sendRequest := make(chan T_Request)
-	go F_RunElevator(c_receiveRequest, c_sendRequest)
+	//go F_RunElevator(c_receiveRequest, c_sendRequest)
 
 	for {
 		select {

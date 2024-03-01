@@ -1,7 +1,7 @@
 package node
 
 import (
-	"the-elevator/elevator"
+	"the-elevator/node/elevator"
 )
 
 //common include packages:
@@ -72,14 +72,8 @@ type T_NodeOperations struct {
 	c_readConnectedNodes         chan chan []T_NodeInfo
 	c_writeConnectedNodes        chan []T_NodeInfo
 	c_readAndWriteConnectedNodes chan chan []T_NodeInfo
-
-	c_readElevator         chan chan elevator.T_Elevator
-	c_writeElevator        chan elevator.T_Elevator
-	c_readAndWriteElevator chan chan elevator.T_Elevator
 	// Add more channels for other operations as needed
 }
-
-var C_nodeOpMsg T_NodeOperations
 
 // Global Variables
 var ThisNode T_Node

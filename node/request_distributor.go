@@ -2,7 +2,7 @@ package node
 
 import (
 	"strconv"
-	"the-elevator/elevator"
+	"the-elevator/node/elevator"
 )
 
 //"the-elevator/elevator"
