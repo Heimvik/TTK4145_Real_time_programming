@@ -1,44 +1,59 @@
 package elevator
 
-import (
-	"fmt"
-	"time"
-)
-func F_FloorArrival(newFloor int) {
-
-	
+func F_fsmFloorArrival(newFloor int) {
 	Elevator.P_info.Floor = newFloor
 	SetFloorIndicator(newFloor)
 
 	switch Elevator.P_info.State {
 	case MOVING:
-		if F_shouldStop(Elevator){
+		if F_shouldStop(Elevator) {
 			//make timer logic so door stays open for as long as it should
 			F_clearRequest(Elevator)
 		}
-	case DOOROPEN:
-		//make timer logic so door stays open for as long as it should
-		time.Sleep(3 * time.Second) //placeholder
-		Elevator.P_info.State = IDLE
-		F_clearRequest(Elevator)
+	// case DOOROPEN:
+	// 	//make timer logic so door stays open for as long as it should
+	// 	time.Sleep(3 * time.Second) //placeholder
+	// 	Elevator.P_info.State = IDLE
+	// 	F_clearRequest(Elevator)
 
 	case IDLE:
 		SetMotorDirection(MD_Stop)
 	}
 }
 
+func F_fsmObstructionSwitch(obstructed bool) {
+	switch Elevator.P_info.State {
+	case DOOROPEN:
+		if obstructed == false {
+			Elevator.P_info.State = IDLE
+		}
+	}
+}
+
+func F_fsmDoorTimeout() {
+	switch Elevator.P_info.State {
+	case DOOROPEN:
+		if C_obstruction == false {
+			Elevator.P_info.State = IDLE
+		}
+	}
+}
+
+func F_ReceiveRequest(req T_Request) {
+	switch Elevator.P_info.State {
+	case IDLE:
+		Elevator.P_serveRequest = &req
+		F_chooseDirection(Elevator)
+	}
+}
 
 func F_sendRequest(button ButtonEvent, requestOut chan T_Request) {
-	SetButtonLamp(button.Button, button.Floor, true)
+	Elevator.currentID++
 	if button.Button == BT_Cab {
-		fmt.Printf("Heis: Mottok og sender cabrequest fra floor %v+\n", button.Floor)
-		time.Sleep(3 * time.Second)
-		requestOut <- T_Request{Calltype: CAB, Floor: button.Floor}
+		requestOut <- T_Request{Id: Elevator.currentID, State: 0, Calltype: CAB, Floor: button.Floor}
 		return
 	} else {
-		fmt.Printf("Heis: Mottok og sender hallrequest fra floor %v+\n", button.Floor)
-		time.Sleep(3 * time.Second)
-		requestOut <- T_Request{Calltype: HALL, Floor: button.Floor}
+		requestOut <- T_Request{Id: Elevator.currentID, State: 0, Calltype: HALL, Floor: button.Floor}
 		return
 	}
 }

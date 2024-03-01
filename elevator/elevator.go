@@ -23,6 +23,7 @@ const (
 //see single-elevator/elevator.go for inspiration
 
 type T_Elevator struct {
+	currentID 		    int
 	P_info              *T_ElevatorInfo     //Poitner to the info of this elevator
 	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
 	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
@@ -71,9 +72,9 @@ func F_clearRequest(elevator T_Elevator) {
 	//set request til done
 	elevator.P_serveRequest.State = DONE
 	// elevator.C_distributeRequest <- *elevator.P_serveRequest
-	SetMotorDirection(MD_Stop)
-	Elevator.P_info.State = DOOROPEN
-	SetDoorOpenLamp(true)
+	SetMotorDirection(MD_Stop) 
+	Elevator.P_info.State = DOOROPEN 
+	SetDoorOpenLamp(true) 
 	time.Sleep(3 * time.Second) //placeholder
 	SetDoorOpenLamp(false)
 	Elevator.P_info.State = IDLE
@@ -81,7 +82,15 @@ func F_clearRequest(elevator T_Elevator) {
 }
 
 func F_chooseDirection(elevator T_Elevator) {
-	if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
+	if elevator.P_serveRequest == nil {
+		return
+	} else if C_stop{
+		
+		SetMotorDirection(MD_Stop)
+		elevator.P_info.State = IDLE
+		elevator.P_info.Direction = NONE
+		
+	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
 		elevator.P_info.Direction = UP
 		elevator.P_info.State = MOVING
 		SetMotorDirection(MD_Up)
@@ -93,7 +102,5 @@ func F_chooseDirection(elevator T_Elevator) {
 	} else {
 		elevator.P_info.Direction = NONE
 		F_clearRequest(elevator)
-
 	}
-
 }
