@@ -79,6 +79,8 @@ type T_NodeOperations struct {
 	// Add more channels for other operations as needed
 }
 
+var C_nodeOpMsg T_NodeOperations
+
 // Global Variables
 var ThisNode T_Node
 

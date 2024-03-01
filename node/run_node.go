@@ -401,8 +401,7 @@ func f_ElevatorManager(ops T_NodeOperations, c_entryFromElevator chan T_GlobalQu
 
 // should contain the main master/slave fsm in Run() function, to be called from main
 func F_RunNode() {
-	//to run the main FSM
-	c_nodeOpMsg := T_NodeOperations{ //Make global for jonas
+	C_nodeOpMsg = T_NodeOperations{ //Make global for jonas
 		c_readNodeInfo:         make(chan chan T_NodeInfo),
 		c_writeNodeInfo:        make(chan T_NodeInfo),
 		c_readAndWriteNodeInfo: make(chan chan T_NodeInfo),
@@ -419,6 +418,8 @@ func F_RunNode() {
 		c_writeElevator:        make(chan elevator.T_Elevator),
 		c_readAndWriteElevator: make(chan chan elevator.T_Elevator),
 	}
+
+	//to run the main FSM
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
 	c_transmitMasterMessage := make(chan T_MasterMessage)
@@ -501,7 +502,7 @@ func F_RunNode() {
 				}
 				c_writeGlobalQueue <- globalQueue
 
-				if thisNodeInfo.Role == SLAVE {
+				if newNodeInfo.Role == SLAVE {
 					close(c_quitMasterRoutines)
 				}
 			}
