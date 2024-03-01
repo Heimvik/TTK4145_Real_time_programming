@@ -41,7 +41,7 @@ func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
 	return closestNode
 }
 
-func F_AssignUnassignedRequest(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
+func F_AssignEntry(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
 
 	var distributedRequest T_GlobalQueueEntry
 	var chosenNode T_NodeInfo

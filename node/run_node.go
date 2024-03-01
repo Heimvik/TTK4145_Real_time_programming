@@ -237,31 +237,6 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 	}
 	return newNodeInfo
 }
-func f_AssignNewRequest(ops T_NodeOperations) {
-	var avalibaleNodes []T_NodeInfo
-	connectedNodes := f_GetConnectedNodes(ops)
-	for _, nodeInfo := range connectedNodes {
-		if nodeInfo.ElevatorInfo.State == elevator.IDLE {
-			avalibaleNodes = append(avalibaleNodes, nodeInfo)
-		}
-	}
-
-	c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
-	c_writeGlobalQueue := make(chan []T_GlobalQueueEntry)
-	c_quit := make(chan bool)
-	go f_GetAndSetGlobalQueue(ops, c_readGlobalQueue, c_writeGlobalQueue, c_quit)
-	globalQueue := <- c_readGlobalQueue
-	for i, entry := range globalQueue {
-		if (entry.Request.State == elevator.UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
-			assignedEntry := F_AssignUnassignedRequest(entry, avalibaleNodes)
-			globalQueue := f_GetGlobalQueue(ops)
-			globalQueue[i] = assignedEntry
-			f_SetGlobalQueue(ops, globalQueue)
-			break
-		}
-	}
-
-}
 func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
 	for i, nodeInfo := range nodes {
 		if nodeInfo.PRIORITY == nodeToRemove.PRIORITY {
@@ -269,6 +244,16 @@ func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
 		}
 	}
 	return nodes
+}
+func f_GetAvalibaleNodes(ops T_NodeOperations) []T_NodeInfo {
+	var avalibaleNodes []T_NodeInfo
+	connectedNodes := f_GetConnectedNodes(ops)
+	for _, nodeInfo := range connectedNodes {
+		if nodeInfo.ElevatorInfo.State == elevator.IDLE {
+			avalibaleNodes = append(avalibaleNodes, nodeInfo)
+		}
+	}
+	return avalibaleNodes
 }
 
 // decrements all timers in GQ and checks for any that has run out, will always try to reassign/remove GQ elements/connectednodes
@@ -500,8 +485,22 @@ func F_RunNode() {
 
 				f_UpdateConnectedNodes(c_nodeOpMsg, newNodeInfo) //Update connected nodes with newnodeinfo
 
-				f_AssignNewRequest()
-				
+				c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
+				c_writeGlobalQueue := make(chan []T_GlobalQueueEntry)
+				c_quit := make(chan bool)
+				go f_GetAndSetGlobalQueue(c_nodeOpMsg, c_readGlobalQueue, c_writeGlobalQueue, c_quit)
+
+				globalQueue := <-c_readGlobalQueue
+				avalibaleNodes := f_GetAvalibaleNodes(c_nodeOpMsg)
+				for i, entry := range globalQueue {
+					if (entry.Request.State == elevator.UNASSIGNED || entry.AssignedNode.PRIORITY == 0) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
+						assignedEntry := F_AssignEntry(entry, avalibaleNodes)
+						globalQueue[i] = assignedEntry
+						break
+					}
+				}
+				c_writeGlobalQueue <- globalQueue
+
 				if thisNodeInfo.Role == SLAVE {
 					close(c_quitMasterRoutines)
 				}

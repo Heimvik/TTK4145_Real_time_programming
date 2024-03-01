@@ -26,7 +26,7 @@ var C_obstruction bool
 var ID int //temp, spør arbo om flytting
 
 
-func F_RunElevator(ops T_NodeOperation, c_requestIn chan T_Request, c_requestOut chan T_Request) {
+func F_RunElevator(ops node.T_NodeOperation, c_requestIn chan T_Request, c_requestOut chan T_Request) {
 
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
