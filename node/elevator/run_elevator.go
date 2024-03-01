@@ -26,15 +26,23 @@ var C_obstruction bool
 var ID int //temp, spør arbo om flytting
 
 
-func F_RunElevator(ops node.T_NodeOperation, c_requestIn chan T_Request, c_requestOut chan T_Request) {
+func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requestOut chan T_Request) {
 
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
 
 	SetMotorDirection(MD_Down)
 
+
+
     C_stop = false
     C_obstruction = false
+
+	c_readElevatorInfo := make(chan T_ElevatorInfo)
+	c_writeElevatorInfo := make(chan T_ElevatorInfo)
+	c_quitGetSet := make(chan bool)
+
+	go node.f_Get
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)
