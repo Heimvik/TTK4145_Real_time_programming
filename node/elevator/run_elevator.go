@@ -9,7 +9,6 @@ import (
 TODO:
 - Ferdigutvikle timer.go, legge til channels som sier når timer skal starte. Opprette global variabel som sier hvor lenge døra skal være åpen.
   På denne måten kan man i fsmObstructionSwitch se om tiden døra skal være åpen har gått ut, og lukke døra hvis det ikke er noen hindring. Istedetfor å lukke døra når det ikke lenger er en hindring.
-- Endre F_sendRequest slik at den sender request av riktig type, nå inneholder requesten for lite informasjon.
 - Legge til at hvis heisen er obstructed, og har mottatt ny request, så skal den sende sin nåværende request tilbake til noden, slik at en annen heis fullfører requesten.
   (Kommer egentlig heisen til å ha noen request hvis den er obstructed? Obstruction stopper ikke heisen fra å åpne døra, så den skal egnetlig kunne cleare sin nåværende request uansett.
    Og den kommer ikke til å bli satt i IDLE hvis den er obstructed, så den kommer ikke til å motta nye requests.
@@ -50,16 +49,22 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
 
+
+	Elevator.P_info.State = IDLE
+	c_setElevator <- Elevator
+
+
+
 	SetMotorDirection(MD_Down)
 
 	C_stop = false
 	C_obstruction = false
 
-	//c_readElevatorInfo := make(chan T_ElevatorInfo)
-	//c_writeElevatorInfo := make(chan T_ElevatorInfo)
-	//c_quitGetSet := make(chan bool)
+	// c_readElevatorInfo := make(chan T_Elevator)
+	// c_writeElevatorInfo := make(chan T_Elevator)
+	// c_quitGetSet := make(chan bool)
 
-	//go node.f_Get
+	// go node.F_GetAndSetElevator(node.C_nodeOpMsg, c_readElevatorInfo, c_writeElevatorInfo, c_quitGetSet)
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)
