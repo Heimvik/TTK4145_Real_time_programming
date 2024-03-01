@@ -33,8 +33,6 @@ func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requ
 
 	SetMotorDirection(MD_Down)
 
-
-
     C_stop = false
     C_obstruction = false
 
@@ -42,7 +40,7 @@ func F_RunElevator(ops node.T_NodeOperations, c_requestIn chan T_Request, c_requ
 	c_writeElevatorInfo := make(chan T_ElevatorInfo)
 	c_quitGetSet := make(chan bool)
 
-	go node.f_Get
+	go node.F_GetAndSetElevator( c_readElevatorInfo, c_writeElevatorInfo, c_quitGetSet)
 
 	drv_buttons := make(chan ButtonEvent)
 	drv_floors := make(chan int)
