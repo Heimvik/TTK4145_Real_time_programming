@@ -9,5 +9,6 @@
   "reassigntime":15,
   "connectiontime":4,
   "sendperiod":1000,
-  "getsetperiod":5
+  "getsetperiod":5,
+  "assignbreakoutperiod":10
 }

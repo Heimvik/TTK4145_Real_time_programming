@@ -7,24 +7,25 @@ import (
 //common include packages:
 
 type T_Node struct {
-	Info           T_NodeInfo //role of node
+	NodeInfo       T_NodeInfo //role of node
 	GlobalQueue    []T_GlobalQueueEntry
 	ConnectedNodes []T_NodeInfo
-	P_ELEVATOR     *elevator.T_Elevator
+	Elevator       elevator.T_Elevator //Its info needs to point at NodeInfo.ElevatorInfo
 }
-type T_NodeRole int
+type T_NodeRole uint8
+
 type T_NodeInfo struct {
-	PRIORITY            int
+	PRIORITY            uint8
 	Role                T_NodeRole
+	TimeUntilDisconnect int
 	ElevatorInfo        elevator.T_ElevatorInfo
-	TimeUntilDisconnect float32
 }
 
 type T_GlobalQueueEntry struct {
 	Request           elevator.T_Request
-	RequestedNode     T_NodeInfo //The elevator that got the request
-	AssignedNode      T_NodeInfo
-	TimeUntilReassign float32
+	RequestedNode     uint8 //PRIORITY of the one that got request
+	AssignedNode      uint8
+	TimeUntilReassign uint8
 }
 
 type T_MasterMessage struct {
@@ -40,23 +41,30 @@ type T_SlaveMessage struct {
 	//Checksum int
 }
 
+type T_AssignState int
+
 type T_Config struct {
-	Ip             string  `json:"ip"`
-	SlavePort      int     `json:"slaveport"`
-	MasterPort     int     `json:"masterport"`
-	ElevatorPort   int     `json:"elevatorport"`
-	Priority       int     `json:"priority"`
-	Nodes          int     `json:"nodes"`
-	Floors         int     `json:"floors"`
-	ReassignTime   float32 `json:"reassigntime"`
-	ConnectionTime float32 `json:"connectiontime"`
-	SendPeriod     int     `json:"sendperiod"`
-	GetSetPeriod   int     `json:"getsetperiod"`
+	Ip                   string `json:"ip"`
+	SlavePort            int    `json:"slaveport"`
+	MasterPort           int    `json:"masterport"`
+	ElevatorPort         int    `json:"elevatorport"`
+	Priority             uint8  `json:"priority"`
+	Nodes                uint8  `json:"nodes"`
+	Floors               int8   `json:"floors"`
+	ReassignTime         uint8  `json:"reassigntime"`
+	ConnectionTime       int    `json:"connectiontime"`
+	SendPeriod           int    `json:"sendperiod"`
+	GetSetPeriod         int    `json:"getsetperiod"`
+	AssignBreakoutPeriod int    `json:"assignbreakoutperiod"`
 }
 
 const (
 	MASTER T_NodeRole = 0
 	SLAVE  T_NodeRole = 1
+)
+const (
+	ASSIGN     T_AssignState = 0
+	WAITFORACK T_AssignState = 1
 )
 
 // NodeOperation represents an operation to be performed on T_Node
@@ -78,12 +86,13 @@ type T_NodeOperations struct {
 // Global Variables
 var ThisNode T_Node
 
-var FLOORS int
+var FLOORS int8
 var IP string
-var REASSIGNTIME float32
-var CONNECTIONTIME float32
+var REASSIGNTIME uint8
+var CONNECTIONTIME int
 var SENDPERIOD int
 var GETSETPERIOD int
 var SLAVEPORT int
 var MASTERPORT int
 var ELEVATORPORT int
+var ASSIGNBREAKOUTPERIOD int

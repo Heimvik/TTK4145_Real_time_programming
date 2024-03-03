@@ -9,12 +9,14 @@ func f_NodeOperationManager(node *T_Node, nodeOps T_NodeOperations, elevatorOps 
 	for {
 		select {
 		case responseChan := <-nodeOps.c_readNodeInfo:
-			responseChan <- node.Info
+			responseChan <- node.NodeInfo
 		case newNodeInfo := <-nodeOps.c_writeNodeInfo:
-			node.Info = newNodeInfo
+			node.NodeInfo = newNodeInfo
+			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
 		case responseChan := <-nodeOps.c_readAndWriteNodeInfo:
-			responseChan <- node.Info
-			node.Info = <-responseChan
+			responseChan <- node.NodeInfo
+			node.NodeInfo = <-responseChan
+			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
 
 		case responseChan := <-nodeOps.c_readGlobalQueue:
 			responseChan <- node.GlobalQueue
@@ -33,15 +35,14 @@ func f_NodeOperationManager(node *T_Node, nodeOps T_NodeOperations, elevatorOps 
 			node.ConnectedNodes = <-responseChan
 
 		case responseChan := <-elevatorOps.C_readElevator:
-			responseChan <- *node.P_ELEVATOR
+			responseChan <- node.Elevator
 		case newElevator := <-elevatorOps.C_writeElevator:
-			*node.P_ELEVATOR = newElevator
+			node.Elevator = newElevator
 		case responseChan := <-elevatorOps.C_readAndWriteElevator:
-			responseChan <- *node.P_ELEVATOR
-			*node.P_ELEVATOR = <-responseChan
-
+			responseChan <- node.Elevator
+			node.Elevator = <-responseChan
 		default:
-			time.Sleep(50 * time.Millisecond)
+
 		}
 	}
 }

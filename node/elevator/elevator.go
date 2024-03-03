@@ -4,8 +4,8 @@ import (
 	"time"
 )
 
-type T_ElevatorState int
-type T_ElevatorDirection int
+type T_ElevatorState uint8
+type T_ElevatorDirection int8
 
 const (
 	IDLE     T_ElevatorState = 0
@@ -24,7 +24,7 @@ const (
 
 type T_Elevator struct {
 	CurrentID           int
-	P_info              *T_ElevatorInfo     //Poitner to the info of this elevator
+	P_info              *T_ElevatorInfo     //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
 	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
 	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
 	C_distributeRequest chan T_Request      //Requests to distriburte to node, you shoud provide this to node
@@ -34,11 +34,11 @@ type T_Elevator struct {
 }
 type T_ElevatorInfo struct {
 	Direction T_ElevatorDirection
-	Floor     int
+	Floor     int8 //ranges from 1-4
 	State     T_ElevatorState
 }
 
-type T_ElevatorOperations struct{
+type T_ElevatorOperations struct {
 	C_readElevator         chan chan T_Elevator
 	C_writeElevator        chan T_Elevator
 	C_readAndWriteElevator chan chan T_Elevator
@@ -50,10 +50,10 @@ func F_GetElevator(ops T_ElevatorOperations) T_Elevator {
 	elevator := <-c_responseChan         // Receive the connected nodes from the response channel
 	return elevator
 }
-func f_SetElevator(ops T_ElevatorOperations, elevator T_Elevator) {
+func F_SetElevator(ops T_ElevatorOperations, elevator T_Elevator) {
 	ops.C_writeElevator <- elevator // Send the connectedNodes directly to be written
 }
-func f_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevator, c_writeElevator chan T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
+func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevator, c_writeElevator chan T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
 	getSetTimer := time.NewTicker(time.Duration(2) * time.Second) //Hardkode 2 inntil videre, sync med initfil
 	c_responsChan := make(chan T_Elevator)
 
@@ -71,24 +71,6 @@ func f_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 		}
 	}
 }
-
-/*
-type T_GetAndSetElevator struct{
-	getElevator chan T_Elevator
-	setElevator chan T_Elevator
-}
-
-type T_ElevatorInterface struct {
-	C_requestFromElevator chan T_Request
-	C_requestToElevator   chan T_Request
-	C_getElevator         chan chan T_Elevator
-	C_setElevator         chan T_Elevator
-	C_getAndSetElevator   chan T_GetAndSetElevator
-}
-*/
-// Add more channels for other operations as needed
-
-//func for adding request, or create chan which sends to
 
 func Init_Elevator(requestIn chan T_Request, requestOut chan T_Request) T_Elevator {
 	return T_Elevator{
@@ -114,10 +96,10 @@ func F_clearRequest(elevator T_Elevator) {
 	if elevator.P_serveRequest == nil {
 		return
 	} else if elevator.P_serveRequest.Calltype == CAB { //skru av lys
-		SetButtonLamp(BT_Cab, elevator.P_serveRequest.Floor, false)
+		SetButtonLamp(BT_Cab, int(elevator.P_serveRequest.Floor), false)
 	} else if elevator.P_serveRequest.Calltype == HALL {
-		SetButtonLamp(BT_HallDown, elevator.P_serveRequest.Floor, false)
-		SetButtonLamp(BT_HallUp, elevator.P_serveRequest.Floor, false)
+		SetButtonLamp(BT_HallDown, int(elevator.P_serveRequest.Floor), false)
+		SetButtonLamp(BT_HallUp, int(elevator.P_serveRequest.Floor), false)
 	}
 	//set request til done
 	elevator.P_serveRequest.State = DONE

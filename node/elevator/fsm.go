@@ -1,8 +1,8 @@
 package elevator
 
-func F_fsmFloorArrival(newFloor int) {
+func F_fsmFloorArrival(newFloor int8) {
 	Elevator.P_info.Floor = newFloor
-	SetFloorIndicator(newFloor)
+	SetFloorIndicator(int(newFloor))
 
 	switch Elevator.P_info.State {
 	case MOVING:
@@ -50,10 +50,10 @@ func F_ReceiveRequest(req T_Request) {
 func F_sendRequest(button ButtonEvent, requestOut chan T_Request) {
 	Elevator.CurrentID++
 	if button.Button == BT_Cab {
-		requestOut <- T_Request{Id: Elevator.CurrentID, State: 0, Calltype: CAB, Floor: button.Floor}
+		requestOut <- T_Request{Id: uint16(Elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor)}
 		return
 	} else {
-		requestOut <- T_Request{Id: Elevator.CurrentID, State: 0, Calltype: HALL, Floor: button.Floor}
+		requestOut <- T_Request{Id: uint16(Elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor)}
 		return
 	}
 }

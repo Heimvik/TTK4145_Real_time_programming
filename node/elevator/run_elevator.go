@@ -49,11 +49,7 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 	Init("localhost:15657") //henter port fra config elno, må smelle på localhost sjæl tror jeg
 	Elevator = Init_Elevator(c_requestIn, c_requestOut)
 
-
 	Elevator.P_info.State = IDLE
-	c_setElevator <- Elevator
-
-
 
 	SetMotorDirection(MD_Down)
 
@@ -85,7 +81,7 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			F_sendRequest(a, Elevator.C_distributeRequest)
 
 		case a := <-drv_floors:
-			F_fsmFloorArrival(a)
+			F_fsmFloorArrival(int8(a))
 
 		case a := <-drv_obstr: //tipper dette er nok til å kun teste funksjonalitet
 			C_obstruction = a

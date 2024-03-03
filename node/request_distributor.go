@@ -21,14 +21,14 @@ import (
 // - diraction
 
 // Should give out the elevator that should serve the request
-func f_AbsInt(x int) int {
+func f_AbsInt(x int8) int8 {
 	if x < 0 {
 		return -x
 	}
 	return x
 }
 
-func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
+func f_ClosestElevatorNode(floor int8, nodes []T_NodeInfo) uint8 {
 	var closestNode T_NodeInfo
 	closestFloor := FLOORS
 	for _, nodeInfo := range nodes {
@@ -37,43 +37,56 @@ func f_ClosestElevatorNode(floor int, nodes []T_NodeInfo) T_NodeInfo {
 			closestFloor = nodeInfo.ElevatorInfo.Floor
 			closestNode = nodeInfo
 		}
-	}
-	return closestNode
-}
-
-func F_AssignEntry(undistributedRequest T_GlobalQueueEntry, avalibaleNodes []T_NodeInfo) T_GlobalQueueEntry {
-
-	var distributedRequest T_GlobalQueueEntry
-	var chosenNode T_NodeInfo
-	switch undistributedRequest.Request.Calltype {
-	case elevator.HALL:
-		chosenNode = f_ClosestElevatorNode(undistributedRequest.Request.Floor, avalibaleNodes)
-	case elevator.CAB:
-		if undistributedRequest.RequestedNode.ElevatorInfo.State == elevator.IDLE {
-			chosenNode = undistributedRequest.RequestedNode
-		} else {
-			chosenNode = f_ClosestElevatorNode(undistributedRequest.Request.Floor, avalibaleNodes)
+		if currentDifference > FLOORS {
+			F_WriteLog("Error: Found floordifference larger than max floors")
 		}
 	}
-
-	distributedRequest = T_GlobalQueueEntry{
-		Request:           undistributedRequest.Request,
-		RequestedNode:     undistributedRequest.RequestedNode,
-		AssignedNode:      chosenNode,
-		TimeUntilReassign: REASSIGNTIME,
-	}
-	return distributedRequest
+	return closestNode.PRIORITY
 }
 
-func F_FindAssignedRequest(globalQueue []T_GlobalQueueEntry, thisNodeInfo T_NodeInfo) elevator.T_Request {
-	var returnRequest elevator.T_Request
-	for _, entry := range globalQueue {
-		if entry.AssignedNode.PRIORITY == thisNodeInfo.PRIORITY && entry.Request.State == elevator.ASSIGNED {
-			F_WriteLog("Entry with ID: " + strconv.Itoa(entry.Request.Id) + " from " + strconv.Itoa(entry.RequestedNode.PRIORITY))
-			returnRequest = entry.Request
-		} else {
-			returnRequest = elevator.T_Request{}
+func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeInfo, avalibaleNodes []T_NodeInfo) (T_GlobalQueueEntry, int) {
+	assignedEntry := T_GlobalQueueEntry{}
+	assignedEntryIndex := -1
+	for i, entry := range globalQueue {
+		if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 { //OR for redundnacy, both should not be different in theory
+			chosenNode := uint8(0)
+			switch entry.Request.Calltype {
+			case elevator.HALL:
+				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
+			case elevator.CAB:
+				elevatorAvalibale := false
+				for _, nodeInfo := range connectedNodes {
+					if nodeInfo.PRIORITY == entry.RequestedNode && nodeInfo.ElevatorInfo.State == elevator.IDLE {
+						elevatorAvalibale = true
+					}
+				}
+				if elevatorAvalibale {
+					chosenNode = entry.RequestedNode
+				} else {
+					chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
+				}
+			}
+
+			entry.Request.State = elevator.ASSIGNED
+			assignedEntry = T_GlobalQueueEntry{
+				Request:           entry.Request,
+				RequestedNode:     entry.RequestedNode,
+				AssignedNode:      chosenNode,
+				TimeUntilReassign: REASSIGNTIME,
+			}
+			assignedEntryIndex = i
+			break
 		}
 	}
-	return returnRequest
+	return assignedEntry, assignedEntryIndex
+}
+
+func F_FindAssignedEntry(globalQueue []T_GlobalQueueEntry, thisNodeInfo T_NodeInfo) (T_GlobalQueueEntry, int) {
+	for i, entry := range globalQueue {
+		if entry.AssignedNode == thisNodeInfo.PRIORITY && entry.Request.State == elevator.ASSIGNED {
+			F_WriteLog("Found assigned request with ID: " + strconv.Itoa(int(entry.Request.Id)) + " assigned to node " + strconv.Itoa(int(entry.RequestedNode)))
+			return entry, i // Return both index and entry
+		}
+	}
+	return T_GlobalQueueEntry{}, -1 // Return -1 and an empty entry if not found
 }
