@@ -42,6 +42,8 @@ func f_simulateRequest(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 
 				request.State = elevator.DONE
 				c_requestFromElevator <- request
+			default:
+				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
 		}
 	}()
@@ -76,6 +78,7 @@ func f_simulateRequest(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 			increment += 1
 			c_requestFromElevator <- returnRequest
 		}
+		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
 
@@ -132,6 +135,9 @@ func init() {
 	MASTERPORT = config.MasterPort
 	ELEVATORPORT = config.ElevatorPort
 	ASSIGNBREAKOUTPERIOD = config.AssignBreakoutPeriod
+	MOSTRESPONSIVEPERIOD = config.MostResponsivePeriod
+	MEDIUMRESPONSIVEPERIOD = config.MiddleResponsivePeriod
+	LEASTRESPONSIVEPERIOD = config.LeastResponsivePeriod
 }
 
 func F_WriteLog(text string) bool {
@@ -142,7 +148,7 @@ func F_WriteLog(text string) bool {
 	log.Print(text)
 	return true
 }
-func nodeRoleToString(role T_NodeRole) string {
+func f_NodeRoleToString(role T_NodeRole) string {
 	switch role {
 	case MASTER:
 		return "MASTER"
@@ -152,23 +158,23 @@ func nodeRoleToString(role T_NodeRole) string {
 }
 func f_WriteLogConnectedNodes(ops T_NodeOperations, connectedNodes []T_NodeInfo) {
 	thisNode := f_GetNodeInfo(ops)
-	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, nodeRoleToString(thisNode.Role))
+	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.Role))
 	for _, info := range connectedNodes {
 		logStr += fmt.Sprintf("%d (Role: %s, ElevatorInfo: %+v, TimeUntilDisconnect: %d) | ",
-			info.PRIORITY, nodeRoleToString(info.Role), info.ElevatorInfo, info.TimeUntilDisconnect)
+			info.PRIORITY, f_NodeRoleToString(info.Role), info.ElevatorInfo, info.TimeUntilDisconnect)
 	}
 	F_WriteLog(logStr)
 }
 func F_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
 	logStr := fmt.Sprintf("Entry: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %.2f | ",
-		entry.Request.Id, requestStateToString(entry.Request.State), callTypeToString(entry.Request.Calltype), entry.Request.Floor, directionToString(entry.Request.Direction), float64(entry.TimeUntilReassign))
+		entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), entry.Request.Floor, f_DirectionToString(entry.Request.Direction), float64(entry.TimeUntilReassign))
 	logStr += fmt.Sprintf("Requested node: | %d | ",
 		entry.RequestedNode)
 	logStr += fmt.Sprintf("Assigned node: | %d | ",
 		entry.AssignedNode)
 	F_WriteLog(logStr)
 }
-func callTypeToString(callType elevator.T_Call) string {
+func f_CallTypeToString(callType elevator.T_Call) string {
 	switch callType {
 	case 0:
 		return "NONE"
@@ -180,7 +186,7 @@ func callTypeToString(callType elevator.T_Call) string {
 		return "UNKNOWN"
 	}
 }
-func requestStateToString(state elevator.T_RequestState) string {
+func f_RequestStateToString(state elevator.T_RequestState) string {
 	switch state {
 	case elevator.UNASSIGNED:
 		return "UNASSIGNED"
@@ -195,7 +201,7 @@ func requestStateToString(state elevator.T_RequestState) string {
 	}
 }
 
-func directionToString(direction elevator.T_ElevatorDirection) string {
+func f_DirectionToString(direction elevator.T_ElevatorDirection) string {
 	switch direction {
 	case 1:
 		return "UP"
@@ -210,24 +216,24 @@ func directionToString(direction elevator.T_ElevatorDirection) string {
 func f_WriteLogSlaveMessage(ops T_NodeOperations, slaveMessage T_SlaveMessage) {
 	request := slaveMessage.Entry.Request
 	thisNode := f_GetNodeInfo(ops)
-	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Request: | %d | Calltype: %s | Floor: %d | Direction: %s |",
-		thisNode.PRIORITY, nodeRoleToString(thisNode.Role), slaveMessage.Transmitter.PRIORITY, request.Id, callTypeToString(request.Calltype), request.Floor, directionToString(request.Direction))
+	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s |",
+		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.Role), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
 	F_WriteLog(logStr)
 }
 func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage) {
 	thisNode := f_GetNodeInfo(ops)
-	roleStr := nodeRoleToString(thisNode.Role)
-	transmitterRoleStr := nodeRoleToString(masterMessage.Transmitter.Role)
+	roleStr := f_NodeRoleToString(thisNode.Role)
+	transmitterRoleStr := f_NodeRoleToString(masterMessage.Transmitter.Role)
 
 	logStr := fmt.Sprintf("Node: | %d | %s | received MM from | %d | %s | GlobalQueue: [",
 		thisNode.PRIORITY, roleStr, masterMessage.Transmitter.PRIORITY, transmitterRoleStr)
 
 	// Iterate over the GlobalQueue to add details for each entry
 	for i, entry := range masterMessage.GlobalQueue {
-		entryStr := fmt.Sprintf("Request: | %d | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %d | Requested node: | %d | Assigned node: | %d |",
-			entry.Request.Id, callTypeToString(entry.Request.Calltype), entry.Request.Floor,
-			directionToString(entry.Request.Direction), entry.TimeUntilReassign,
-			entry.RequestedNode, entry.AssignedNode)
+		entryStr := fmt.Sprintf("Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %d | Requested node: | %d | Assigned node: | %d |",
+			entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), int(entry.Request.Floor),
+			f_DirectionToString(entry.Request.Direction), int(entry.TimeUntilReassign),
+			int(entry.RequestedNode), int(entry.AssignedNode))
 
 		// Append this entry's details to the log string
 		logStr += entryStr
@@ -319,9 +325,11 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 							assignBreakoutTimer.Stop()
 							break PollLastAssigned
 						}
+						//No sleep
 					}
 				}
 			}
+			time.Sleep(time.Duration(MEDIUMRESPONSIVEPERIOD) * time.Microsecond)
 		}
 	}()
 
@@ -371,6 +379,8 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 			}
 			c_writeGlobalQueue <- globalQueue
 			c_quitGetSetGlobalQueue <- true
+
+			time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 		}
 	}
 }
@@ -401,6 +411,8 @@ func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 			}
 			c_writeConnectedNodes <- connectedNodes
 			c_quitGetSetConnectedNodes <- true
+
+			time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 		}
 	}
 }
@@ -425,6 +437,7 @@ func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
 			//remove all entries being DONE and
 			c_writeGlobalQueue <- globalQueue
 			c_quitGetSetGlobalQueue <- true
+
 			time.Sleep(1 * time.Second)
 		}
 	}
@@ -500,35 +513,33 @@ func f_AddEntryGlobalQueue(nodeOps T_NodeOperations, entryToAdd T_GlobalQueueEnt
 	if entryIsUnique {
 		globalQueue = append(globalQueue, entryToAdd)
 	} else { //should update the existing entry
-		if entryToAdd.Request.State > globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
+		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign <= globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
 		} else { //you get a entry that has come longer somewhere else, use its values
-			F_WriteLog("Disallowed backward entrystate")
+			F_WriteLog("Disallowed backward information")
 		}
 	}
 	c_writeGlobalQueue <- globalQueue
 	c_quit <- true
 }
-func f_UpdateGlobalQueue(nodeOps T_NodeOperations, masterMessage T_MasterMessage) {
-	thisNodeInfo := f_GetNodeInfo(nodeOps)
-	if thisNodeInfo.Role == MASTER {
+func f_UpdateGlobalQueueMaster(nodeOps T_NodeOperations, masterMessage T_MasterMessage) {
+	for _, remoteEntry := range masterMessage.GlobalQueue {
+		f_AddEntryGlobalQueue(nodeOps, remoteEntry)
+	}
+}
+func f_UpdateGlobalQueueSlave(nodeOps T_NodeOperations, masterMessage T_MasterMessage) {
+	notUnassignedEntries := true
+	globalQueue := f_GetGlobalQueue(nodeOps)
+	for _, entry := range globalQueue {
+		if entry.Request.State == elevator.UNASSIGNED {
+			notUnassignedEntries = false
+		}
+	}
+	if notUnassignedEntries && len(masterMessage.GlobalQueue) == 0 {
+		f_SetGlobalQueue(nodeOps, []T_GlobalQueueEntry{}) //TRIPLE CHECK, VERY POWERFUL OPERATION
+	} else {
 		for _, remoteEntry := range masterMessage.GlobalQueue {
 			f_AddEntryGlobalQueue(nodeOps, remoteEntry)
-		}
-	} else if thisNodeInfo.Role == SLAVE {
-		notUnassignedEntries := true
-		globalQueue := f_GetGlobalQueue(nodeOps)
-		for _, entry := range globalQueue {
-			if entry.Request.State == elevator.UNASSIGNED {
-				notUnassignedEntries = false
-			}
-		}
-		if notUnassignedEntries && len(masterMessage.GlobalQueue) == 0 {
-			f_SetGlobalQueue(nodeOps, []T_GlobalQueueEntry{}) //TRIPLE CHECK, VERY POWERFUL OPERATION
-		} else {
-			for _, remoteEntry := range masterMessage.GlobalQueue {
-				f_AddEntryGlobalQueue(nodeOps, remoteEntry)
-			}
 		}
 	}
 }
@@ -585,6 +596,7 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 					shouldCheckIfAssigned = false
 				}
 			}
+			time.Sleep(time.Duration(MOSTRESPONSIVEPERIOD) * time.Microsecond)
 		}
 	}
 }
@@ -649,6 +661,8 @@ func F_RunNode() {
 				c_quitSlaveRoutines = make(chan bool)
 				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveRoutines)
 				go f_SlaveTimeManager(nodeOperations, c_quitSlaveRoutines)
+			default:
+				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
 		}
 	}()
@@ -676,11 +690,12 @@ func F_RunNode() {
 				f_WriteLogConnectedNodes(nodeOperations, f_GetConnectedNodes(nodeOperations))
 				thisNode := f_GetNodeInfo(nodeOperations)
 				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
-					f_UpdateGlobalQueue(nodeOperations, masterMessage)
+					f_UpdateGlobalQueueMaster(nodeOperations, masterMessage)
 				}
 				//IMPORTANT: cannot really propagate to slave until it knows that the other master has received its GQ
 
 			case slaveMessage := <-c_receiveSlaveMessage:
+
 				f_WriteLogSlaveMessage(nodeOperations, slaveMessage)
 				f_UpdateConnectedNodes(nodeOperations, slaveMessage.Transmitter)
 				f_WriteLogConnectedNodes(nodeOperations, f_GetConnectedNodes(nodeOperations))
@@ -706,6 +721,7 @@ func F_RunNode() {
 				}
 				c_transmitMasterMessage <- masterMessage
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
+
 			case <-printGQTimer.C:
 				globalQueue := f_GetGlobalQueue(nodeOperations)
 				nodeInfo := f_GetNodeInfo(nodeOperations)
@@ -714,6 +730,7 @@ func F_RunNode() {
 					F_WriteLogGlobalQueueEntry(entry)
 				}
 				printGQTimer.Reset(time.Duration(2000) * time.Millisecond)
+
 			default:
 				c_readNodeInfo := make(chan T_NodeInfo)
 				c_writeNodeInfo := make(chan T_NodeInfo)
@@ -775,13 +792,14 @@ func F_RunNode() {
 					assignState = ASSIGN
 					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered SLAVE mode")
 				}
+
 			}
 
 		case SLAVE:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_WriteLogMasterMessage(nodeOperations, masterMessage)
-				f_UpdateGlobalQueue(nodeOperations, masterMessage)
+				f_UpdateGlobalQueueSlave(nodeOperations, masterMessage)
 				f_UpdateConnectedNodes(nodeOperations, masterMessage.Transmitter)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
@@ -794,7 +812,7 @@ func F_RunNode() {
 					c_shouldCheckIfAssigned <- true
 				}
 				thisNode := f_GetNodeInfo(nodeOperations)
-				F_WriteLog("Node: | " + strconv.Itoa(int(thisNode.PRIORITY)) + " | MASTER | updated GQ entry:\n")
+				F_WriteLog("Node: | " + strconv.Itoa(int(thisNode.PRIORITY)) + " | SLAVE | updated GQ entry:\n")
 				F_WriteLogGlobalQueueEntry(entryFromElevator)
 
 				transmitter := f_GetNodeInfo(nodeOperations)
@@ -838,80 +856,8 @@ func F_RunNode() {
 					c_nodeIsMaster <- true
 					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered MASTER mode")
 				}
-				/*
-					KNOWN BUG
-					In the situation:
-					Node: | 1 | MASTER | updated GQ entry:
-					2024/03/03 03:48:06 run_node.go:139: Entry: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 |
-					2024/03/03 03:48:06 run_node.go:139: Assigned request with ID: 1 assigned to node 2
-					2024/03/03 03:48:06 run_node.go:139: Getting ack from last assinged...
-					2024/03/03 03:48:06 run_node.go:139: Node: | 1 | MASTER | has GQ:
-					2024/03/03 03:48:06 run_node.go:139: Entry: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 12.00 | Requested node: | 1 | Assigned node: | 1 |
-					2024/03/03 03:48:06 run_node.go:139: Entry: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 2 |
-					2024/03/03 03:48:06 run_node.go:139: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 11 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 14 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:06 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 11 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 14 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:06 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) |
-					2024/03/03 03:48:07 run_node.go:139: Node: | 2 | SLAVE | received SM from | 2 | Request: | 0 | Calltype: NONE | Floor: 0 | Direction: NONE |
-					2024/03/03 03:48:07 run_node.go:139: Node: | 1 | MASTER | received SM from | 2 | Request: | 0 | Calltype: NONE | Floor: 0 | Direction: NONE |
-					2024/03/03 03:48:07 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) |
-					2024/03/03 03:48:07 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 10 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 13 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:07 run_node.go:139: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 10 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 13 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:07 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) |
-					2024/03/03 03:48:07 run_node.go:139: Found assigned request with ID: 1 assigned to node 2
-					2024/03/03 03:48:08 run_node.go:139: Node: | 2 | SLAVE | received SM from | 2 | Request: | 0 | Calltype: NONE | Floor: 0 | Direction: NONE |
-					2024/03/03 03:48:08 run_node.go:139: Node: | 1 | MASTER | received SM from | 2 | Request: | 0 | Calltype: NONE | Floor: 0 | Direction: NONE |
-					2024/03/03 03:48:08 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) |
-					2024/03/03 03:48:08 run_node.go:139: Found ack
-					2024/03/03 03:48:08 run_node.go:139: Node: | 1 | MASTER | has GQ:
-					2024/03/03 03:48:08 run_node.go:139: Entry: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 10.00 | Requested node: | 1 | Assigned node: | 1 |
-					2024/03/03 03:48:08 run_node.go:139: Entry: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 2 |
-					2024/03/03 03:48:08 run_node.go:139: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 9 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 12 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:08 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 9 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 12 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:08 run_node.go:139: Found assigned request with ID: 1 assigned to node 2
-					2024/03/03 03:48:08 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 3) |
-					2024/03/03 03:48:09 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 8 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 11 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:09 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 2) |
-					2024/03/03 03:48:10 run_node.go:139: Node: | 1 | MASTER | has GQ:
-					2024/03/03 03:48:10 run_node.go:139: Entry: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 8.00 | Requested node: | 1 | Assigned node: | 1 |
-					2024/03/03 03:48:10 run_node.go:139: Entry: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 2 |
-					2024/03/03 03:48:10 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 7 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 10 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:10 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 1) |
-					2024/03/03 03:48:11 run_node.go:139: Node 2 disconnected
-					2024/03/03 03:48:11 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 6 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 9 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:11 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) |
-					2024/03/03 03:48:12 run_node.go:139: Node: | 1 | MASTER | has GQ:
-					2024/03/03 03:48:12 run_node.go:139: Entry: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 6.00 | Requested node: | 1 | Assigned node: | 1 |
-					2024/03/03 03:48:12 run_node.go:139: Entry: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 9.00 | Requested node: | 1 | Assigned node: | 2 |
-					2024/03/03 03:48:12 run_node.go:139: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: [Request: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 5 | Requested node: | 1 | Assigned node: | 1 |, Request: | 1 | Calltype: CAB | Floor: 2 | Direction: UP | Reassigned in: 8 | Requested node: | 1 | Assigned node: | 2 |]
-					2024/03/03 03:48:12 run_node.go:139: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:2}, TimeUntilDisconnect: 4) |
-					2024/03/03 03:48:13 run_node.go:139: Node: | 1 | MASTER | updated GQ entry:
-					2024/03/03 03:48:13 run_node.go:139: Entry: | 0 | Calltype: CAB | Floor: 1 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 |
-					2024/03/03 03:48:13 run_node.go:139: Removed entry: | 0 | 1 | from global queue
-					2024/03/03 03:48:13 run_node.go:139: Ended GetSet goroutine of GQ because of deadlock
-
-					Happens because try to write the same request to node 2s elevator twise, witch causes the deadlock.
-					Node 2 (slave) writes its own globalQueue in elevatorManager
-					TODO: Find out why it gets assigned twise, its update to the GQ should hinder this.
-					Conseptual thing: SlaveNode SHOLD NOT make changes to the GQ it receives from master
-					Remove all SLAVES references to GQ() modifiaction?
-
-					Alternatives:
-
-					Let slave wait until it receives a GQ with a ACK that the master adds, after received confirmation of done request from slave, updated GQ (removed salves order).
-					By arranging such that the MM is sent once the GQ is updated, the slave wont try to do the same order again (unless it was reassigned by master)
-
-					Let slave keep a list of done orders, not exe those that has known ID and ReceivedNode
-
-					Let slave set the ACTIVE flag in the global queue (wont help, the master sends one with !ACTIVE that overwrites (can try to make one-way changes, so that it only is overwritten if a GQ is more DONE than other entry))
-					Implement such that AddGQ() only can overwrite forward requestStates except DONE to UNASSIGNED and ASSIGNED (if the master do not receive the ACTIVE message, thus not updating its GQ,
-					the worst thing that happens is that the salve receives the order it just completed and sent DONE to master, as ASSIGNED from master and does it again. This is an edge case and simplifies
-					significantly. Chosen solution.)
-
-					Do two things:
-					- Update AddGQ() to only allow forward requstState transitions	x
-					- Update slavenode to update local GQ x
-				*/
 			}
 		}
+		time.Sleep(time.Duration(MOSTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
