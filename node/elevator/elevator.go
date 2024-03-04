@@ -67,6 +67,7 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:
+			// getSetTimer.Stop() //lurer på om den kanskje bør stoppes en gang? hvis ikke vil den melde deadlock hvert andre sekund
 			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
 		}
 	}
@@ -91,48 +92,39 @@ func F_shouldStop(elevator T_Elevator) bool {
 	return false
 }
 
-func F_clearRequest(elevator T_Elevator) {
+func F_clearRequest(elevator T_Elevator) T_Elevator { //endre denne
 	//sjekk at det er en request å cleare
 	if elevator.P_serveRequest == nil {
-		return
-	} else if elevator.P_serveRequest.Calltype == CAB { //skru av lys
-		SetButtonLamp(BT_Cab, int(elevator.P_serveRequest.Floor), false)
-	} else if elevator.P_serveRequest.Calltype == HALL {
-		SetButtonLamp(BT_HallDown, int(elevator.P_serveRequest.Floor), false)
-		SetButtonLamp(BT_HallUp, int(elevator.P_serveRequest.Floor), false)
+		return elevator
+	} else {
+		elevator.P_serveRequest = nil
+		elevator.P_info.State = DOOROPEN
+		C_timerStart <- true	
 	}
-	//set request til done
-	elevator.P_serveRequest.State = DONE
-	// elevator.C_distributeRequest <- *elevator.P_serveRequest
-	SetMotorDirection(MD_Stop)
-	Elevator.P_info.State = DOOROPEN
-	SetDoorOpenLamp(true)
-	time.Sleep(3 * time.Second) //placeholder
-	SetDoorOpenLamp(false)
-	Elevator.P_info.State = IDLE
-	elevator.P_serveRequest = nil
+	return elevator
 }
 
-func F_chooseDirection(elevator T_Elevator) {
-	if elevator.P_serveRequest == nil {
-		return
-	} else if C_stop {
+func F_chooseDirection(elevator T_Elevator) T_Elevator{
 
-		SetMotorDirection(MD_Stop)
+	if elevator.P_serveRequest == nil {
+		return elevator
+	} else if C_stop {
 		elevator.P_info.State = IDLE
 		elevator.P_info.Direction = NONE
+		SetMotorDirection(MD_Stop)
 
 	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
-		elevator.P_info.Direction = UP
 		elevator.P_info.State = MOVING
+		elevator.P_info.Direction = UP
 		SetMotorDirection(MD_Up)
 
 	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
-		elevator.P_info.Direction = DOWN
 		elevator.P_info.State = MOVING
+		elevator.P_info.Direction = DOWN
 		SetMotorDirection(MD_Down)
 	} else {
 		elevator.P_info.Direction = NONE
-		F_clearRequest(elevator)
+		elevator = F_clearRequest(elevator)
 	}
+	return elevator
 }
