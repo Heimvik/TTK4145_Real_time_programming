@@ -544,31 +544,6 @@ func f_UpdateGlobalQueueMaster(nodeOps T_NodeOperations, masterMessage T_MasterM
 	}
 }
 func f_UpdateGlobalQueueSlave(nodeOps T_NodeOperations, masterMessage T_MasterMessage) {
-	/*
-			Master must also bcast Done entries
-
-			The adding of GlobalQueue should woork as following for a slave:
-			- Should add entries from Master and update if forward information flow
-			- Only remove entries that they receive Done from master
-
-
-		notUnassignedEntries := true
-		globalQueue := f_GetGlobalQueue(nodeOps)
-		for _, entry := range globalQueue {
-			if entry.Request.State == elevator.UNASSIGNED {
-				notUnassignedEntries = false
-			}
-		}
-
-			if notUnassignedEntries && len(masterMessage.GlobalQueue) == 0 {
-				f_SetGlobalQueue(nodeOps, []T_GlobalQueueEntry{}) //TRIPLE CHECK, VERY POWERFUL OPERATION
-			} else {
-				for _, remoteEntry := range masterMessage.GlobalQueue {
-					f_AddEntryGlobalQueue(nodeOps, remoteEntry)
-				}
-			}
-	*/
-
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {
 		f_AddEntryGlobalQueue(nodeOps, remoteEntry)
