@@ -22,16 +22,14 @@ const (
 //Keeping this in case of future improvements regarding secondary requirements,
 //see single-elevator/elevator.go for inspiration
 
-type T_Elevator struct {
-	CurrentID           int
-	P_info              *T_ElevatorInfo     //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
-	P_serveRequest      *T_Request          //Pointer to the current request you are serviceing
-	C_receiveRequest    chan T_Request      //Request to put in ServeRequest and do, you will get this from node
-	C_distributeRequest chan T_Request      //Requests to distriburte to node, you shoud provide this to node
-	C_distributeInfo    chan T_ElevatorInfo //Info on elevator whereabouts, you should provide this to node
-	//three last ones has to be channels as elevator and node has seperate goroutines, has to be like this
-	//on comilation of one request: redistribute it on D
+type T_Elevator struct { 
+	CurrentID      int
+	Obstructed	   bool
+	StopButton	   bool
+	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
+	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
 }
+
 type T_ElevatorInfo struct {
 	Direction T_ElevatorDirection
 	Floor     int8 //ranges from 1-4
@@ -72,44 +70,34 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 		}
 	}
 }
-
-func Init_Elevator(requestIn chan T_Request, requestOut chan T_Request) T_Elevator {
+//might delete this function, as elevator is initialized outside of this package
+func Init_Elevator() T_Elevator {
 	return T_Elevator{
-		P_info:              &T_ElevatorInfo{Direction: NONE, Floor: 0, State: IDLE},
-		P_serveRequest:      nil,
-		C_receiveRequest:    requestIn,
-		C_distributeRequest: requestOut,
-		C_distributeInfo:    make(chan T_ElevatorInfo),
+		P_info:         &T_ElevatorInfo{Direction: NONE, Floor: -1, State: IDLE},
+		P_serveRequest: nil,
 	}
 }
 
 func F_shouldStop(elevator T_Elevator) bool {
-	if elevator.P_info.State == MOVING {
-		if elevator.P_info.Floor == elevator.P_serveRequest.Floor {
-			return true
-		}
-	}
-	return false
+	return (elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
-func F_clearRequest(elevator T_Elevator) T_Elevator { //endre denne
-	//sjekk at det er en request å cleare
+func F_clearRequest(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
 	if elevator.P_serveRequest == nil {
 		return elevator
 	} else {
+		elevator.P_serveRequest.State = DONE
+		c_requestOut <- *elevator.P_serveRequest
 		elevator.P_serveRequest = nil
 		elevator.P_info.State = DOOROPEN
-		C_timerStart <- true	
 	}
 	return elevator
 }
 
-func F_chooseDirection(elevator T_Elevator) T_Elevator{
-
+func F_chooseDirection(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
 	if elevator.P_serveRequest == nil {
 		return elevator
-	} else if C_stop {
-		elevator.P_info.State = IDLE
+	} else if elevator.StopButton {
 		elevator.P_info.Direction = NONE
 		SetMotorDirection(MD_Stop)
 
@@ -122,9 +110,10 @@ func F_chooseDirection(elevator T_Elevator) T_Elevator{
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = DOWN
 		SetMotorDirection(MD_Down)
+
 	} else {
 		elevator.P_info.Direction = NONE
-		elevator = F_clearRequest(elevator)
+		elevator = F_clearRequest(elevator, c_requestOut)
 	}
 	return elevator
 }
