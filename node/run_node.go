@@ -95,15 +95,10 @@ func f_InitNode(config T_Config) T_Node {
 		ElevatorInfo: thisElevatorInfo,
 		Role:         MASTER,
 	}
-	var c_receiveRequest chan elevator.T_Request
-	var c_distributeRequest chan elevator.T_Request
-	var c_distributeInfo chan elevator.T_ElevatorInfo
 
 	thisElevator := elevator.T_Elevator{
-		P_info:              &thisElevatorInfo,
-		C_receiveRequest:    c_receiveRequest,
-		C_distributeRequest: c_distributeRequest,
-		C_distributeInfo:    c_distributeInfo,
+		P_info:         &thisElevatorInfo,
+		P_serveRequest: &elevator.T_Request{},
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
@@ -392,7 +387,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 				case <-c_sentDoneEntryToSlave:
 					F_WriteLog("Removed entry: | " + strconv.Itoa(int(servicedEntry.Request.Id)) + " | " + strconv.Itoa(int(servicedEntry.RequestedNode)) + " | from global queue")
 					globalQueue = append(globalQueue[:servicedEntryIdex], globalQueue[servicedEntryIdex+1:]...)
-					f_SetGlobalQueue(ops,globalQueue)
+					f_SetGlobalQueue(ops, globalQueue)
 				case <-breakOutTimer.C:
 				}
 			}
