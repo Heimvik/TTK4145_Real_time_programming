@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 	"the-elevator/node/elevator"
@@ -619,21 +620,13 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 func f_ProcessPairManager(nodeOps T_NodeOperations) {
 	//has init
 	go f_NodeOperationManager()
-	go F_ReceiveMasterMessage()
-	go F_ReceiveMasterMessage()
-	//upon hearing a call -> transfer to P
-	//not heard a call -> transfer to B
-	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Millisecond)
-	for {
-		switch thisNodeInfo.PBRole {
-		case UNDEFINED:
-			s
 
-		case PRIMARY:
-			F_RunPrimary()
-		case BACKUP:
-			F_RunBackup()
-		}
+	go F_RunBackup(nodeOps, c_isPrimary, c_quitBackupRoutines)
+	select {
+	case <-c_isPrimary:
+		close(c_quitBackupRoutines)
+		exec.Command("gnome-terminal", "--", "go", "run", "filename.go").Run()
+		go F_RunPrimary(stateChan)
 	}
 }
 
@@ -641,35 +634,34 @@ func f_ProcessPairManager(nodeOps T_NodeOperations) {
 //-global variables should ALWAYS be handled by server to operate onn good data
 //-all receive from channles should be organized in for-select!!! -> walk trough code and do
 
-func F_RunBackup() {
+func F_RunBackup(nodeOps, c_stateChan, c_quit) {
 	//constantly check if we receive messages
-	thisNodeInfo := f_GetNodeInfo(nodeOperations)
-	select {
-	case <-PBTimer.C:
-		//change state
-	default:
-		switch thisNodeInfo.MSRole {
-		case MASTER:
-
-			for {
-				select {
-				case masterMessage <- c_receiveMasterMessage:
-					thisNodeInfo := f_GetNodeInfo(nodeOperations)
-					if thisNodeInfo.PRIORITY == masterMessage.PRIORITY {
-						PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
-					}
-				}
+	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, c_quit)
+	go F_ReceiveMasterMessage(c_receiveMasterMessage, c_quit)
+	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME-1) * time.Second)
+	for {
+		select {
+		case <-PBTimer.C:
+			c_stateChan <- PRIMARY
+			close(c_quit)
+			return
+		case masterMessage <- c_receiveMasterMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOperations)
+			if thisNodeInfo.PRIORITY == masterMessage.PRIORITY && thisNodeInfo.MSRole == MASTER {
+				f_SetNodeInfo(mastermessage.Transmitter)
+				f_SetGlobalQueue(masterMessage.GlobalQueue)
+				//CN will come when entered primary
+				//Elevator inited
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
 			}
-		case SLAVE:
-			go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOperations, SLAVEPORT)
-			for {
-				select {
-				case slaveMessage <- c_receiveSlaveMessage:
-					thisNodeInfo := f_GetNodeInfo(nodeOperations)
-					if thisNodeInfo.PRIORITY == slaveMessage.PRIORITY {
-						PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
-					}
-				}
+		case slaveMessage <- c_receiveSlaveMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOperations)
+			if thisNodeInfo.PRIORITY == slaveMessage.PRIORITY && thisNodeInfo.MSRole == SLAVE {
+				f_SetNodeInfo(mastermessage.Transmitter)
+				f_SetGlobalQueue(masterMessage.GlobalQueue)
+				//CN will come when entered primary
+				//Elevator inited
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
 			}
 		}
 	}

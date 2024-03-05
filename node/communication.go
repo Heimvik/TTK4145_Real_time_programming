@@ -30,30 +30,34 @@ func F_TransmitMasterMessage(c_transmitMessage chan T_MasterMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
 
-func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOperations, port int) {
+func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOperations, port int, c_quit chan bool) {
 	c_receive := make(chan T_SlaveMessage)
 
-	go bcast.Receiver(port, c_receive)
+	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestSM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage
 			}
+		case <-c_quit:
+			return
 		}
 	}
 }
 
-func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOperations, port int) {
+func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOperations, port int, c_quit chan bool) {
 	c_receive := make(chan T_MasterMessage)
 
-	go bcast.Receiver(port, c_receive)
+	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestMM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage
 			}
+		case <-c_quit:
+			return
 		}
 	}
 }
