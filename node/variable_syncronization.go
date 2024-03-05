@@ -42,7 +42,7 @@ func f_NodeOperationManager(node *T_Node, nodeOps T_NodeOperations, elevatorOps 
 			responseChan <- node.Elevator
 			node.Elevator = <-responseChan
 		default:
-
+			//No sleep, this has to be fastest of them all
 		}
 	}
 }
@@ -71,6 +71,7 @@ func f_GetAndSetNodeInfo(ops T_NodeOperations, c_readConnectedNodes chan T_NodeI
 		case <-getSetTimer.C:
 			F_WriteLog("Ended GetSet goroutine of NI because of deadlock")
 		}
+		//No sleep
 	}
 }
 func f_GetGlobalQueue(ops T_NodeOperations) []T_GlobalQueueEntry {
@@ -98,6 +99,7 @@ func f_GetAndSetGlobalQueue(ops T_NodeOperations, c_readGlobalQueue chan []T_Glo
 		case <-getSetTimer.C:
 			F_WriteLog("Ended GetSet goroutine of GQ because of deadlock")
 		}
+		//No sleep
 	}
 }
 func f_GetConnectedNodes(ops T_NodeOperations) []T_NodeInfo {
@@ -125,5 +127,6 @@ func f_GetAndSetConnectedNodes(ops T_NodeOperations, c_readConnectedNodes chan [
 		case <-getSetTimer.C:
 			F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
 		}
+		//No sleep
 	}
 }

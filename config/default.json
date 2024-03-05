@@ -3,12 +3,15 @@
   "slaveport": 20013,
   "masterport": 20014,
   "elevatorport": 15657,
-  "priority": 2,
+  "priority": 3,
   "nodes": 3,
   "floors": 4,
   "reassigntime":15,
   "connectiontime":4,
   "sendperiod":1000,
   "getsetperiod":5,
-  "assignbreakoutperiod":10
+  "assignbreakoutperiod":10,
+  "mostresponsiveperiod":500,
+  "mediumresponsiveperiod":1500,
+  "leastresponsiveperiod":5000
 }
