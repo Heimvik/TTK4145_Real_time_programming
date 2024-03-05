@@ -28,6 +28,12 @@ type T_GlobalQueueEntry struct {
 	TimeUntilReassign uint8
 }
 
+type T_AckObject struct {
+	ObjectToAcknowledge interface{}
+	ObjectToSupportAcknowledge interface{}
+	C_Acknowledgement  chan bool
+}
+
 type T_MasterMessage struct {
 	Transmitter T_NodeInfo
 	//Receiver    T_NodeInfo //For checking

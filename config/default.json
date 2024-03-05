@@ -11,7 +11,7 @@
   "sendperiod":1000,
   "getsetperiod":5,
   "assignbreakoutperiod":10,
-  "mostresponsiveperiod":100,
-  "mediumresponsiveperiod":400,
-  "leastresponsiveperiod":1000
+  "mostresponsiveperiod":500,
+  "mediumresponsiveperiod":1500,
+  "leastresponsiveperiod":5000
 }
