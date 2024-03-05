@@ -99,17 +99,17 @@ func F_chooseDirection(elevator T_Elevator, c_requestOut chan T_Request) T_Eleva
 		return elevator
 	} else if elevator.StopButton {
 		elevator.P_info.Direction = NONE
-		SetMotorDirection(MD_Stop)
+		F_SetMotorDirection(NONE)
 
 	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = UP
-		SetMotorDirection(MD_Up)
+		F_SetMotorDirection(UP)
 
 	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = DOWN
-		SetMotorDirection(MD_Down)
+		F_SetMotorDirection(DOWN)
 
 	} else {
 		elevator.P_info.Direction = NONE

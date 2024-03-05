@@ -10,9 +10,8 @@ TODO:
 - Brief heimvik på initialisering av heis (fjerna channels, la til ID, obstructed og stop variabler, start på floor -1)
 - Fikse alt av lampegreier (ÆSJ!!!)
 - Finn ut av hva som skal skje med ID
-- Endre elevio til å bruke egendefinerte typer
 - Fjerne unødvendige variabler og funksjoner (ongoing)
-- Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode.
+- Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode. (going pretty good)
 - Legge til elevatormusic.
 */
 
@@ -21,9 +20,9 @@ TODO:
 var DOOROPENTIME int = 3 //kan kanskje flyttes men foreløpig kan den bli
 
 func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
-	Init(fmt.Sprintf("localhost:%d", elevatorport))
+	F_InitDriver(fmt.Sprintf("localhost:%d", elevatorport))
 
-	SetMotorDirection(MD_Down)
+	F_SetMotorDirection(DOWN)
 
 	c_readElevator := make(chan T_Elevator)
 	c_writeElevator := make(chan T_Elevator)
@@ -41,26 +40,26 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 
 	c_timerStop := make(chan bool)
 	c_timerTimeout := make(chan bool)
-	drv_buttons := make(chan ButtonEvent)
-	drv_floors := make(chan int)
-	drv_obstr := make(chan bool)
-	drv_stop := make(chan bool)
+	c_buttons := make(chan T_ButtonEvent)
+	c_floors := make(chan int)
+	c_obstr := make(chan bool)
+	c_stop := make(chan bool)
 
-	go PollButtons(drv_buttons)
-	go PollFloorSensor(drv_floors)
-	go PollObstructionSwitch(drv_obstr)
-	go PollStopButton(drv_stop)
+	go F_PollButtons(c_buttons)
+	go F_PollFloorSensor(c_floors)
+	go F_PollObstructionSwitch(c_obstr)
+	go F_PollStopButton(c_stop)
 
 	for {
 		select {
-		case a := <-drv_buttons:
+		case a := <-c_buttons:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			newElevator := F_sendRequest(a, c_requestOut, oldElevator)
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 
-		case a := <-drv_floors:
+		case a := <-c_floors:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			newElevator := F_fsmFloorArrival(int8(a), oldElevator, c_requestOut)
@@ -70,14 +69,14 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 
-		case a := <-drv_obstr:
+		case a := <-c_obstr:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			oldElevator.Obstructed = a
 			c_writeElevator <- oldElevator
 			c_quitGetSetElevator <- true
 
-		case a := <-drv_stop:
+		case a := <-c_stop:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			oldElevator.StopButton = a

@@ -8,7 +8,7 @@ func F_fsmFloorArrival(newFloor int8, elevator T_Elevator, c_requestOut chan T_R
 			elevator = F_clearRequest(elevator, c_requestOut)
 		}
 	case IDLE: //should only happen when initializing, when the elevator first reaches a floor
-		SetMotorDirection(MD_Stop)
+		F_SetMotorDirection(NONE)
 	}
 	return elevator
 }
@@ -37,13 +37,12 @@ func F_ReceiveRequest(req T_Request, elevator T_Elevator, c_requestOut chan T_Re
 	return elevator
 }
 
-func F_sendRequest(button ButtonEvent, requestOut chan T_Request, elevator T_Elevator) T_Elevator {
+func F_sendRequest(button T_ButtonEvent, requestOut chan T_Request, elevator T_Elevator) T_Elevator {
 	elevator.CurrentID++
 	if button.Button == BT_Cab {
 		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor)}
-		return elevator
 	} else {
 		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor)}
-		return elevator
 	}
+	return elevator
 }
