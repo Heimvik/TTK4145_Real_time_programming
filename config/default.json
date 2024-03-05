@@ -3,7 +3,7 @@
   "slaveport": 20013,
   "masterport": 20014,
   "elevatorport": 15657,
-  "priority": 3,
+  "priority": 1,
   "nodes": 3,
   "floors": 4,
   "reassigntime":15,

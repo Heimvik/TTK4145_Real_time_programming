@@ -1,28 +1,367 @@
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | has GQ:
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:38 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | has GQ:
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:39 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:40 run_node.go:148: Node: | 3 | MASTER | has GQ:
-2024/03/05 13:43:40 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:40 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:41 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:41 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:42 run_node.go:148: Node: | 3 | MASTER | has GQ:
-2024/03/05 13:43:42 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:42 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/05 13:43:43 run_node.go:148: Node: | 3 | MASTER | received MM from | 3 | MASTER | GlobalQueue: []
-2024/03/05 13:43:43 run_node.go:148: Node: | 3 | MASTER | has connected nodes | 3 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:52 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:50:52 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:52 run_node.go:148: Node: | 1 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:50:52 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:52 run_node.go:148: Node: | 2 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:52 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:52 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:52 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:53 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:50:53 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:53 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:53 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:54 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:54 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:50:54 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:54 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:54 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:54 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:54 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:54 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:55 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:55 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:55 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:50:55 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:55 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:55 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:56 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:56 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:56 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:56 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:50:56 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:56 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:56 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:57 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:57 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:57 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:57 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:50:57 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:57 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:57 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:58 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:58 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:58 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:58 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:50:58 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:58 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:58 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:59 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:59 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:50:59 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:50:59 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:50:59 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:59 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:50:59 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:00 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:00 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:51:00 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:00 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
+2024/03/05 13:51:00 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:00 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:00 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:01 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:01 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:01 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:01 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:51:01 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:01 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:01 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:02 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:02 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:02 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
+2024/03/05 13:51:02 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:51:02 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:02 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:02 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:03 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:03 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:03 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
+2024/03/05 13:51:03 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:51:03 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:03 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:03 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:04 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:04 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:04 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
+2024/03/05 13:51:04 run_node.go:148: Node: | 1 | MASTER | has GQ:
+2024/03/05 13:51:04 run_node.go:148: Node: | 1 | MASTER | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:04 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:04 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:05 run_node.go:148: Node: | 2 | SLAVE | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:05 run_node.go:148: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/05 13:51:05 run_node.go:148: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 2 (Role: SLAVE, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
+2024/03/05 13:51:05 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:51:05 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:06 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:07 run_node.go:148: Node: | 2 | SLAVE | has GQ:
+2024/03/05 13:51:07 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:08 run_node.go:148: Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED | Calltype: NONE | Floor: 0 | Direction: NONE |
+2024/03/05 13:51:09 run_node.go:148: Node 1 disconnected
+2024/03/05 13:51:09 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:09 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:09 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:10 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:10 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:11 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:11 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:11 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:12 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:12 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:13 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:13 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:13 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:14 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:14 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:15 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:15 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:15 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:16 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:16 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:17 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:17 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:17 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:18 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:18 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:19 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:19 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:19 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:20 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:20 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:21 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:21 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:21 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:22 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:22 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:23 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:23 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:23 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:24 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:24 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:25 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:25 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:25 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:26 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:26 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:27 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:27 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:27 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:28 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:28 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:29 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:29 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:29 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:30 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:30 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:31 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:31 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:31 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:32 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:32 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:33 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:33 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:33 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:34 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:34 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:35 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:35 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:35 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:36 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:36 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:37 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:37 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:37 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:38 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:38 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:39 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:39 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:39 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:40 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:40 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:41 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:41 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:41 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:42 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:42 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:43 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:43 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:43 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:44 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:44 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:45 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:45 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:45 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:46 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:46 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:47 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:47 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:47 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:48 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:48 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:49 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:49 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:49 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:50 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:50 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:51 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:51 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:51 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:52 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:52 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:53 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:53 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:53 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:54 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:54 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:55 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:55 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:55 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:56 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:56 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:57 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:57 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:57 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:58 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:58 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:51:59 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:51:59 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:51:59 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:00 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:00 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:01 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:01 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:01 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:02 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:02 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:03 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:03 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:03 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:04 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:04 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:05 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:05 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:05 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:06 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:06 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:07 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:07 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:07 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:08 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:08 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:09 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:09 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:09 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:10 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:10 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:11 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:11 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:11 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:12 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:12 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:13 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:13 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:13 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:14 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:14 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:15 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:15 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:15 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:16 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:16 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:17 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:17 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:17 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:18 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:18 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:19 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:19 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:19 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:20 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:20 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:21 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:21 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:21 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:22 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:22 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:23 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:23 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:23 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:24 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:24 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:25 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:25 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:25 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:26 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:26 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:27 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:27 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:27 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:28 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:28 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:29 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:29 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:29 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:30 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:30 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:31 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:31 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:31 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:32 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:32 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:33 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:33 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:33 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:34 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:34 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:35 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:35 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:35 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:36 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:36 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:37 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:37 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:37 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:38 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:38 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:39 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:39 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:39 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:40 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:40 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:41 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:41 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:41 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:42 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:42 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:43 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:43 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:43 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:44 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:44 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:45 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:45 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:45 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:46 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:46 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:47 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:47 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:47 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:48 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:48 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:49 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:49 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:49 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:50 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:50 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:51 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:51 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:51 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:52 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:52 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:53 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:53 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:53 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:54 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:54 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/05 13:52:55 run_node.go:148: Node: | 2 | MASTER | has GQ:
+2024/03/05 13:52:55 run_node.go:148: Node: | 2 | MASTER | received MM from | 2 | MASTER | GlobalQueue: []
+2024/03/05 13:52:55 run_node.go:148: Node: | 2 | MASTER | has connected nodes | 2 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 

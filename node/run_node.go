@@ -97,13 +97,11 @@ func f_InitNode(config T_Config) T_Node {
 	}
 	var c_receiveRequest chan elevator.T_Request
 	var c_distributeRequest chan elevator.T_Request
-	var c_distributeInfo chan elevator.T_ElevatorInfo
 
 	thisElevator := elevator.T_Elevator{
 		P_info:              &thisElevatorInfo,
 		C_receiveRequest:    c_receiveRequest,
 		C_distributeRequest: c_distributeRequest,
-		C_distributeInfo:    c_distributeInfo,
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
@@ -228,20 +226,18 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 	logStr := fmt.Sprintf("Node: | %d | %s | received MM from | %d | %s | GlobalQueue: [",
 		thisNode.PRIORITY, roleStr, masterMessage.Transmitter.PRIORITY, transmitterRoleStr)
 
-	// Iterate over the GlobalQueue to add details for each entry
 	for i, entry := range masterMessage.GlobalQueue {
 		entryStr := fmt.Sprintf("Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %d | Requested node: | %d | Assigned node: | %d |",
 			entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), int(entry.Request.Floor),
 			f_DirectionToString(entry.Request.Direction), int(entry.TimeUntilReassign),
 			int(entry.RequestedNode), int(entry.AssignedNode))
 
-		// Append this entry's details to the log string
 		logStr += entryStr
 		if i < len(masterMessage.GlobalQueue)-1 {
-			logStr += ", " // Add a comma separator between entries, except after the last one
+			logStr += ", "
 		}
 	}
-	logStr += "]" // Close the GlobalQueue information
+	logStr += "]"
 
 	F_WriteLog(logStr)
 }
@@ -261,14 +257,7 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 	}
 	return newNodeInfo
 }
-func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
-	for i, nodeInfo := range nodes {
-		if nodeInfo.PRIORITY == nodeToRemove.PRIORITY {
-			return append(nodes[:i], nodes[i+1:]...)
-		}
-	}
-	return nodes
-}
+
 func f_FindNodeInfo(node uint8, connectedNodes []T_NodeInfo) T_NodeInfo {
 	returnNode := T_NodeInfo{}
 	for _, nodeInfo := range connectedNodes {
@@ -392,7 +381,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 				case <-c_sentDoneEntryToSlave:
 					F_WriteLog("Removed entry: | " + strconv.Itoa(int(servicedEntry.Request.Id)) + " | " + strconv.Itoa(int(servicedEntry.RequestedNode)) + " | from global queue")
 					globalQueue = append(globalQueue[:servicedEntryIdex], globalQueue[servicedEntryIdex+1:]...)
-					f_SetGlobalQueue(ops,globalQueue)
+					f_SetGlobalQueue(ops, globalQueue)
 				case <-breakOutTimer.C:
 				}
 			}
@@ -528,10 +517,10 @@ func f_AddEntryGlobalQueue(nodeOps T_NodeOperations, entryToAdd T_GlobalQueueEnt
 	}
 	if entryIsUnique {
 		globalQueue = append(globalQueue, entryToAdd)
-	} else { //should update the existing entry
+	} else {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign <= globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
-		} else { //you get a entry that has come longer somewhere else, use its values
+		} else {
 			F_WriteLog("Disallowed backward information")
 		}
 	}
@@ -544,31 +533,6 @@ func f_UpdateGlobalQueueMaster(nodeOps T_NodeOperations, masterMessage T_MasterM
 	}
 }
 func f_UpdateGlobalQueueSlave(nodeOps T_NodeOperations, masterMessage T_MasterMessage) {
-	/*
-			Master must also bcast Done entries
-
-			The adding of GlobalQueue should woork as following for a slave:
-			- Should add entries from Master and update if forward information flow
-			- Only remove entries that they receive Done from master
-
-
-		notUnassignedEntries := true
-		globalQueue := f_GetGlobalQueue(nodeOps)
-		for _, entry := range globalQueue {
-			if entry.Request.State == elevator.UNASSIGNED {
-				notUnassignedEntries = false
-			}
-		}
-
-			if notUnassignedEntries && len(masterMessage.GlobalQueue) == 0 {
-				f_SetGlobalQueue(nodeOps, []T_GlobalQueueEntry{}) //TRIPLE CHECK, VERY POWERFUL OPERATION
-			} else {
-				for _, remoteEntry := range masterMessage.GlobalQueue {
-					f_AddEntryGlobalQueue(nodeOps, remoteEntry)
-				}
-			}
-	*/
-
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {
 		f_AddEntryGlobalQueue(nodeOps, remoteEntry)
@@ -598,7 +562,7 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator)
+	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator,ELEVATORPORT)
 	go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo(nodeOps)
@@ -651,14 +615,70 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 	}
 }
 
+// START DEV
+func f_ProcessPairManager(nodeOps T_NodeOperations) {
+	//has init
+	go f_NodeOperationManager()
+	go F_ReceiveMasterMessage()
+	go F_ReceiveMasterMessage()
+	//upon hearing a call -> transfer to P
+	//not heard a call -> transfer to B
+	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Millisecond)
+	for {
+		switch thisNodeInfo.PBRole {
+		case UNDEFINED:
+			s
+
+		case PRIMARY:
+			F_RunPrimary()
+		case BACKUP:
+			F_RunBackup()
+		}
+	}
+}
+
 //IMPORTANT:
 //-global variables should ALWAYS be handled by server to operate onn good data
 //-all receive from channles should be organized in for-select!!! -> walk trough code and do
 
-// should contain the main master/slave fsm in Run() function, to be called from main
-func F_RunNode() {
+func F_RunBackup() {
+	//constantly check if we receive messages
+	thisNodeInfo := f_GetNodeInfo(nodeOperations)
+	select {
+	case <-PBTimer.C:
+		//change state
+	default:
+		switch thisNodeInfo.MSRole {
+		case MASTER:
 
-	nodeOperations := T_NodeOperations{ //Make global for jonas
+			for {
+				select {
+				case masterMessage <- c_receiveMasterMessage:
+					thisNodeInfo := f_GetNodeInfo(nodeOperations)
+					if thisNodeInfo.PRIORITY == masterMessage.PRIORITY {
+						PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+					}
+				}
+			}
+		case SLAVE:
+			go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOperations, SLAVEPORT)
+			for {
+				select {
+				case slaveMessage <- c_receiveSlaveMessage:
+					thisNodeInfo := f_GetNodeInfo(nodeOperations)
+					if thisNodeInfo.PRIORITY == slaveMessage.PRIORITY {
+						PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+					}
+				}
+			}
+		}
+	}
+}
+
+func F_RunPrimary() {
+
+	//END DEV
+	nodeOperations := T_NodeOperations{
 		c_readNodeInfo:         make(chan chan T_NodeInfo),
 		c_writeNodeInfo:        make(chan T_NodeInfo),
 		c_readAndWriteNodeInfo: make(chan chan T_NodeInfo),
@@ -723,7 +743,6 @@ func F_RunNode() {
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
 	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond) //Test function
 	assignState := ASSIGN
-	ackinc := 0
 	nodeRole := f_GetNodeInfo(nodeOperations).Role
 	if nodeRole == MASTER {
 		c_nodeIsMaster <- true
@@ -744,7 +763,6 @@ func F_RunNode() {
 				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
 					f_UpdateGlobalQueueMaster(nodeOperations, masterMessage)
 				}
-				//IMPORTANT: cannot really propagate to slave until it knows that the other master has received its GQ
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 
@@ -810,9 +828,8 @@ func F_RunNode() {
 				c_quitGetSetNodeInfo <- true
 
 				thisNodeInfo := newNodeInfo
-				f_UpdateConnectedNodes(nodeOperations, thisNodeInfo) //Update connected nodes with newnodeinfo
+				f_UpdateConnectedNodes(nodeOperations, thisNodeInfo)
 
-				//Need to be in own FSM
 				switch assignState {
 				case ASSIGN:
 					c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
@@ -836,21 +853,10 @@ func F_RunNode() {
 				case WAITFORACK:
 					select {
 					case assigmentWasSucessFull := <-c_assignmentWasSucessFull:
-						ackinc = 0
 						if assigmentWasSucessFull {
 							assignState = ASSIGN
-						} else {
-							//assignState = ASSIGN
-							//An entry, assigned but not resent and confirmed will be reassigned by VairableWatchdog
-							//However, if it never leaves IDLE, but somehow is not ready (i.e. local elevator is not in idle)
-							//it can lead to deadlock. Unsure of what to do
-							//The connectiontime is less than the breakouttime, meaning we will disconnect if elevator.state is not updated
 						}
 					default:
-						ackinc++
-						if ackinc < 10 {
-							fmt.Println("Waiting for ACK...")
-						}
 					}
 				}
 
