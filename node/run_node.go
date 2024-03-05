@@ -891,7 +891,7 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == MASTER {
 					c_nodeIsMaster <- true
-					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered MASTER mode")
+					fmt.Println("Node | " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + " | entered MASTER mode")
 				}
 			}
 		}
