@@ -645,7 +645,10 @@ func F_ProcessPairManager() {
 	go F_RunBackup(nodeOperations, c_isPrimary)
 	select {
 	case <-c_isPrimary:
-		exec.Command("gnome-terminal", "--", "go", "run", "main.go").Run()
+		err := exec.Command("gnome-terminal", "--", "go", "run", "main.go").Run()
+		if err != nil {
+			fmt.Println("Error starting BACKUP")
+		}
 		F_RunPrimary(nodeOperations, elevatorOperations)
 	}
 }
@@ -656,6 +659,7 @@ func F_ProcessPairManager() {
 
 func F_RunBackup(nodeOps T_NodeOperations, c_isPrimary chan bool) {
 	//constantly check if we receive messages
+	F_WriteLog("Started as BACKUP")
 	c_quitBackupRoutines := make(chan bool)
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
@@ -663,10 +667,11 @@ func F_RunBackup(nodeOps T_NodeOperations, c_isPrimary chan bool) {
 	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOps, MASTERPORT, c_quitBackupRoutines)
 	go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOps, SLAVEPORT, c_quitBackupRoutines)
 
-	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME-1) * time.Second)
+	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Second)
 	for {
 		select {
 		case <-PBTimer.C:
+			F_WriteLog("Switched to PRIMARY")
 			c_isPrimary <- true
 			close(c_quitBackupRoutines)
 			return
