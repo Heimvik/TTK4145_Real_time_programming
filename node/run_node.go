@@ -94,7 +94,8 @@ func f_InitNode(config T_Config) T_Node {
 	thisNodeInfo := T_NodeInfo{
 		PRIORITY:     config.Priority,
 		ElevatorInfo: thisElevatorInfo,
-		Role:         MASTER,
+		MSRole:       MASTER,
+		PBRole:       BACKUP,
 	}
 	var c_receiveRequest chan elevator.T_Request
 	var c_distributeRequest chan elevator.T_Request
@@ -147,7 +148,7 @@ func F_WriteLog(text string) bool {
 	log.Print(text)
 	return true
 }
-func f_NodeRoleToString(role T_NodeRole) string {
+func f_NodeRoleToString(role T_MasterSlaveRole) string {
 	switch role {
 	case MASTER:
 		return "MASTER"
@@ -157,10 +158,10 @@ func f_NodeRoleToString(role T_NodeRole) string {
 }
 func f_WriteLogConnectedNodes(ops T_NodeOperations, connectedNodes []T_NodeInfo) {
 	thisNode := f_GetNodeInfo(ops)
-	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.Role))
+	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.MSRole))
 	for _, info := range connectedNodes {
 		logStr += fmt.Sprintf("%d (Role: %s, ElevatorInfo: %+v, TimeUntilDisconnect: %d) | ",
-			info.PRIORITY, f_NodeRoleToString(info.Role), info.ElevatorInfo, info.TimeUntilDisconnect)
+			info.PRIORITY, f_NodeRoleToString(info.MSRole), info.ElevatorInfo, info.TimeUntilDisconnect)
 	}
 	F_WriteLog(logStr)
 }
@@ -216,13 +217,13 @@ func f_WriteLogSlaveMessage(ops T_NodeOperations, slaveMessage T_SlaveMessage) {
 	request := slaveMessage.Entry.Request
 	thisNode := f_GetNodeInfo(ops)
 	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s |",
-		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.Role), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
+		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.MSRole), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
 	F_WriteLog(logStr)
 }
 func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage) {
 	thisNode := f_GetNodeInfo(ops)
-	roleStr := f_NodeRoleToString(thisNode.Role)
-	transmitterRoleStr := f_NodeRoleToString(masterMessage.Transmitter.Role)
+	roleStr := f_NodeRoleToString(thisNode.MSRole)
+	transmitterRoleStr := f_NodeRoleToString(masterMessage.Transmitter.MSRole)
 
 	logStr := fmt.Sprintf("Node: | %d | %s | received MM from | %d | %s | GlobalQueue: [",
 		thisNode.PRIORITY, roleStr, masterMessage.Transmitter.PRIORITY, transmitterRoleStr)
@@ -244,7 +245,7 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 }
 
 func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeInfo {
-	var returnRole T_NodeRole = MASTER
+	var returnRole T_MasterSlaveRole = MASTER
 	for _, remoteNodeInfo := range connectedNodes {
 		if remoteNodeInfo.PRIORITY < thisNodeInfo.PRIORITY {
 			returnRole = SLAVE
@@ -252,7 +253,7 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 	}
 	newNodeInfo := T_NodeInfo{
 		PRIORITY:            thisNodeInfo.PRIORITY,
-		Role:                returnRole,
+		MSRole:              returnRole,
 		TimeUntilDisconnect: thisNodeInfo.TimeUntilDisconnect,
 		ElevatorInfo:        thisNodeInfo.ElevatorInfo,
 	}
@@ -617,59 +618,8 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 }
 
 // START DEV
-func f_ProcessPairManager(nodeOps T_NodeOperations) {
+func F_ProcessPairManager() {
 	//has init
-	go f_NodeOperationManager()
-
-	go F_RunBackup(nodeOps, c_isPrimary, c_quitBackupRoutines)
-	select {
-	case <-c_isPrimary:
-		close(c_quitBackupRoutines)
-		exec.Command("gnome-terminal", "--", "go", "run", "filename.go").Run()
-		go F_RunPrimary(stateChan)
-	}
-}
-
-//IMPORTANT:
-//-global variables should ALWAYS be handled by server to operate onn good data
-//-all receive from channles should be organized in for-select!!! -> walk trough code and do
-
-func F_RunBackup(nodeOps, c_stateChan, c_quit) {
-	//constantly check if we receive messages
-	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, c_quit)
-	go F_ReceiveMasterMessage(c_receiveMasterMessage, c_quit)
-	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME-1) * time.Second)
-	for {
-		select {
-		case <-PBTimer.C:
-			c_stateChan <- PRIMARY
-			close(c_quit)
-			return
-		case masterMessage <- c_receiveMasterMessage:
-			thisNodeInfo := f_GetNodeInfo(nodeOperations)
-			if thisNodeInfo.PRIORITY == masterMessage.PRIORITY && thisNodeInfo.MSRole == MASTER {
-				f_SetNodeInfo(mastermessage.Transmitter)
-				f_SetGlobalQueue(masterMessage.GlobalQueue)
-				//CN will come when entered primary
-				//Elevator inited
-				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
-			}
-		case slaveMessage <- c_receiveSlaveMessage:
-			thisNodeInfo := f_GetNodeInfo(nodeOperations)
-			if thisNodeInfo.PRIORITY == slaveMessage.PRIORITY && thisNodeInfo.MSRole == SLAVE {
-				f_SetNodeInfo(mastermessage.Transmitter)
-				f_SetGlobalQueue(masterMessage.GlobalQueue)
-				//CN will come when entered primary
-				//Elevator inited
-				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
-			}
-		}
-	}
-}
-
-func F_RunPrimary() {
-
-	//END DEV
 	nodeOperations := T_NodeOperations{
 		c_readNodeInfo:         make(chan chan T_NodeInfo),
 		c_writeNodeInfo:        make(chan T_NodeInfo),
@@ -689,9 +639,62 @@ func F_RunPrimary() {
 		C_readAndWriteElevator: make(chan chan elevator.T_Elevator),
 	}
 
+	go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
+
+	c_isPrimary := make(chan bool)
+	go F_RunBackup(nodeOperations, c_isPrimary)
+	select {
+	case <-c_isPrimary:
+		exec.Command("gnome-terminal", "--", "go", "run", "main.go").Run()
+		F_RunPrimary(nodeOperations, elevatorOperations)
+	}
+}
+
+//IMPORTANT:
+//-global variables should ALWAYS be handled by server to operate onn good data
+//-all receive from channles should be organized in for-select!!! -> walk trough code and do
+
+func F_RunBackup(nodeOps T_NodeOperations, c_isPrimary chan bool) {
+	//constantly check if we receive messages
+	c_quitBackupRoutines := make(chan bool)
+	c_receiveSlaveMessage := make(chan T_SlaveMessage)
+	c_receiveMasterMessage := make(chan T_MasterMessage)
+
+	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOps, MASTERPORT, c_quitBackupRoutines)
+	go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOps, SLAVEPORT, c_quitBackupRoutines)
+
+	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME-1) * time.Second)
+	for {
+		select {
+		case <-PBTimer.C:
+			c_isPrimary <- true
+			close(c_quitBackupRoutines)
+			return
+		case masterMessage := <-c_receiveMasterMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOps)
+			f_SetGlobalQueue(nodeOps, masterMessage.GlobalQueue)
+			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == MASTER {
+				f_SetNodeInfo(nodeOps, masterMessage.Transmitter)
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+			}
+		case slaveMessage := <-c_receiveSlaveMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOps)
+			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == SLAVE {
+				f_SetNodeInfo(nodeOps, slaveMessage.Transmitter)
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+			}
+		}
+	}
+}
+
+func F_RunPrimary(nodeOperations T_NodeOperations, elevatorOperations elevator.T_ElevatorOperations) {
+
+	//END DEV
+
 	//to run the main FSM
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
+	c_quitPrimaryReceive := make(chan bool)
 	c_transmitMasterMessage := make(chan T_MasterMessage)
 	c_transmitSlaveMessage := make(chan T_SlaveMessage)
 
@@ -706,10 +709,9 @@ func F_RunPrimary() {
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
 	go func() {
-		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
 		go f_ElevatorManager(nodeOperations, elevatorOperations, c_shouldCheckIfAssigned, c_entryFromElevator)
-		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOperations, SLAVEPORT)
-		go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOperations, MASTERPORT)
+		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOperations, SLAVEPORT, c_quitPrimaryReceive)
+		go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOperations, MASTERPORT, c_quitPrimaryReceive)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
 		go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
 		for {
@@ -735,7 +737,7 @@ func F_RunPrimary() {
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
 	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond) //Test function
 	assignState := ASSIGN
-	nodeRole := f_GetNodeInfo(nodeOperations).Role
+	nodeRole := f_GetNodeInfo(nodeOperations).MSRole
 	if nodeRole == MASTER {
 		c_nodeIsMaster <- true
 	} else {
@@ -743,7 +745,7 @@ func F_RunPrimary() {
 	}
 
 	for {
-		nodeRole = f_GetNodeInfo(nodeOperations).Role
+		nodeRole = f_GetNodeInfo(nodeOperations).MSRole
 		switch nodeRole {
 		case MASTER:
 			select {
@@ -852,7 +854,7 @@ func F_RunPrimary() {
 					}
 				}
 
-				if newNodeInfo.Role == SLAVE {
+				if newNodeInfo.MSRole == SLAVE {
 					c_nodeIsSlave <- true
 					assignState = ASSIGN
 					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered SLAVE mode")
@@ -917,7 +919,7 @@ func F_RunPrimary() {
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(nodeOperations, thisNodeInfo)
 
-				if newNodeInfo.Role == MASTER {
+				if newNodeInfo.MSRole == MASTER {
 					c_nodeIsMaster <- true
 					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered MASTER mode")
 				}

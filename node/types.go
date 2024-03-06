@@ -12,11 +12,13 @@ type T_Node struct {
 	ConnectedNodes []T_NodeInfo
 	Elevator       elevator.T_Elevator //Its info needs to point at NodeInfo.ElevatorInfo
 }
-type T_NodeRole uint8
+type T_MasterSlaveRole uint8
+type T_PrimaryBackupRole uint8
 
 type T_NodeInfo struct {
 	PRIORITY            uint8
-	Role                T_NodeRole
+	MSRole              T_MasterSlaveRole
+	PBRole				T_PrimaryBackupRole
 	TimeUntilDisconnect int
 	ElevatorInfo        elevator.T_ElevatorInfo
 }
@@ -68,8 +70,13 @@ type T_Config struct {
 }
 
 const (
-	MASTER T_NodeRole = 0
-	SLAVE  T_NodeRole = 1
+	BACKUP T_PrimaryBackupRole = 0
+	PRIMARY T_PrimaryBackupRole = 1
+)
+
+const (
+	MASTER T_MasterSlaveRole = 0
+	SLAVE  T_MasterSlaveRole = 1
 )
 const (
 	ASSIGN     T_AssignState = 0
