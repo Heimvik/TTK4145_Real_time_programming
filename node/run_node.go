@@ -599,9 +599,7 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 			} else {
 				F_WriteLog("Error: Received Assigned request from elevator")
 			}
-			fmt.Println("GetsHere")
 			c_entryFromElevator <- newEntry
-			fmt.Println("GetsHere2")
 		case <-c_shouldCheckIfAssigned:
 			shouldCheckIfAssigned = true
 		default:
@@ -657,10 +655,13 @@ func F_RunNode() {
 	c_assignmentWasSucessFull := make(chan bool)
 	c_shouldCheckIfAssigned := make(chan bool)
 	c_nodeIsMaster := make(chan bool)
-	c_quitMasterRoutines := make(chan bool)
 	c_nodeIsSlave := make(chan bool)
-	c_quitSlaveRoutines := make(chan bool)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
+
+	c_quitMasterVariableWatchDog := make(chan bool)
+	c_quitMasterTimeManager := make(chan bool)
+	c_quitSlaveVariableWatchDog := make(chan bool)
+	c_quitSlaveTimeManager := make(chan bool)
 
 	go func() {
 		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
@@ -672,22 +673,11 @@ func F_RunNode() {
 		for {
 			select {
 			case <-c_nodeIsMaster:
-				fmt.Println("Node", ThisNode.NodeInfo.PRIORITY, "er faktisk master")
-				if c_quitSlaveRoutines != nil {
-					close(c_quitSlaveRoutines)
-				}
-				c_quitMasterRoutines = make(chan bool)
-				c_quitSlaveRoutines = make(chan bool)
-				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
-				go f_MasterTimeManager(nodeOperations, c_quitMasterRoutines)
+				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterVariableWatchDog)
+				go f_MasterTimeManager(nodeOperations, c_quitMasterTimeManager)
 			case <-c_nodeIsSlave:
-				if c_quitMasterRoutines != nil {
-					close(c_quitMasterRoutines)
-				}
-				c_quitMasterRoutines = make(chan bool)
-				c_quitSlaveRoutines = make(chan bool)
-				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveRoutines)
-				go f_SlaveTimeManager(nodeOperations, c_quitSlaveRoutines)
+				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveVariableWatchDog)
+				go f_SlaveTimeManager(nodeOperations, c_quitSlaveTimeManager)
 			default:
 				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
@@ -817,6 +807,8 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == SLAVE {
 					c_nodeIsSlave <- true
+					c_quitMasterVariableWatchDog <- true
+					c_quitMasterTimeManager <- true
 					assignState = ASSIGN
 					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered SLAVE mode")
 				}
@@ -882,6 +874,8 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == MASTER {
 					c_nodeIsMaster <- true
+					c_quitSlaveVariableWatchDog <- true
+					c_quitSlaveTimeManager <- true
 					fmt.Println("Node | " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + " | entered MASTER mode")
 				}
 			}
