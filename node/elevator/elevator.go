@@ -1,6 +1,7 @@
 package elevator
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -65,6 +66,7 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:
+			fmt.Println("Elevator deadlock")
 			// getSetTimer.Stop() //lurer på om den kanskje bør stoppes en gang? hvis ikke vil den melde deadlock hvert andre sekund
 			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
 		}
@@ -82,12 +84,11 @@ func F_shouldStop(elevator T_Elevator) bool {
 	return (elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
+//her sender jeg ut (fiks deadlock)
 func F_clearRequest(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
 	if elevator.P_serveRequest == nil {
 		return elevator
 	} else {
-		elevator.P_serveRequest.State = DONE
-		c_requestOut <- *elevator.P_serveRequest
 		elevator.P_serveRequest = nil
 		elevator.P_info.State = DOOROPEN
 	}
