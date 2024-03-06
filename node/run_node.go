@@ -292,25 +292,21 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 		PollLastAssigned:
 			select {
 			case lastAssignedEntry := <-c_lastAssignedEntry:
-				fmt.Println("Getting ack from last assinged...")
+				F_WriteLog("Getting ack from last assinged...")
 				assignBreakoutTimer := time.NewTicker(time.Duration(ASSIGNBREAKOUTPERIOD) * time.Second)
 				for {
 					select {
 					case <-assignBreakoutTimer.C:
-						fmt.Println("Enters breakout")
 						c_assignmentSuccessfull <- false
 						assignBreakoutTimer.Stop()
 						break PollLastAssigned
 					case <-c_quit:
-						fmt.Println("Enters quit")
 						return
 					default:
-						fmt.Println("Jonas er kul")
 						connectedNodes := f_GetConnectedNodes(ops)
 						globalQueue := f_GetGlobalQueue(ops)
 						updatedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
 						updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
-						fmt.Println("ElevatorState checked: |" + strconv.Itoa(int(updatedAssignedNode.ElevatorInfo.State)) + " | RequestState: | " + strconv.Itoa(int(updatedEntry.Request.State)) + " |)")
 						if updatedAssignedNode.ElevatorInfo.State != elevator.IDLE || updatedEntry.Request.State != elevator.ASSIGNED {
 							c_assignmentSuccessfull <- true
 							F_WriteLog("Found ack")
@@ -673,11 +669,15 @@ func F_RunNode() {
 		for {
 			select {
 			case <-c_nodeIsMaster:
-				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterVariableWatchDog)
-				go f_MasterTimeManager(nodeOperations, c_quitMasterTimeManager)
+				c_quitMasterRoutines = make(chan bool)
+				c_quitSlaveRoutines = make(chan bool)
+				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
+				go f_MasterTimeManager(nodeOperations, c_quitMasterRoutines)
 			case <-c_nodeIsSlave:
-				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveVariableWatchDog)
-				go f_SlaveTimeManager(nodeOperations, c_quitSlaveTimeManager)
+				c_quitMasterRoutines = make(chan bool)
+				c_quitSlaveRoutines = make(chan bool)
+				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveRoutines)
+				go f_SlaveTimeManager(nodeOperations, c_quitSlaveRoutines)
 			default:
 				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
@@ -807,10 +807,8 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == SLAVE {
 					c_nodeIsSlave <- true
-					c_quitMasterVariableWatchDog <- true
-					c_quitMasterTimeManager <- true
+					close(c_quitMasterRoutines)
 					assignState = ASSIGN
-					fmt.Println("Node " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + "entered SLAVE mode")
 				}
 
 			}
@@ -874,9 +872,7 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == MASTER {
 					c_nodeIsMaster <- true
-					c_quitSlaveVariableWatchDog <- true
-					c_quitSlaveTimeManager <- true
-					fmt.Println("Node | " + strconv.Itoa(int(newNodeInfo.PRIORITY)) + " | entered MASTER mode")
+					close(c_quitSlaveRoutines)
 				}
 			}
 		}

@@ -1,6 +1,5 @@
 package elevator
 
-import "fmt"
 
 func F_fsmFloorArrival(newFloor int8, elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
 	elevator.P_info.Floor = newFloor
@@ -41,13 +40,9 @@ func F_ReceiveRequest(req T_Request, elevator T_Elevator, c_requestOut chan T_Re
 // her sender jeg ut (bør ha fiksa deadlock)
 func F_sendRequest(button T_ButtonEvent, requestOut chan T_Request, elevator T_Elevator) {
 	if button.Button == BT_Cab {
-		fmt.Println("Sending cab request to node at floor: ", button.Floor, " with state: ", 0)
 		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor)}
-		fmt.Println("Cab request sent")
 	} else {
-		fmt.Println("Sending hall request to node at floor: ", button.Floor, " with state: ", 0)
 		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor)}
-		fmt.Println("Hall request sent")
 	}
 
 }
