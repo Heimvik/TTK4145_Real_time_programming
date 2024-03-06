@@ -15,8 +15,6 @@ TODO:
 - Legge til elevatormusic.
 */
 
-
-
 var DOOROPENTIME int = 3 //kan kanskje flyttes men foreløpig kan den bli
 
 func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
@@ -95,7 +93,6 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			newElevator := F_ReceiveRequest(a, oldElevator, c_requestOut)
-			newElevator = F_chooseDirection(newElevator, c_requestOut)
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 		}
