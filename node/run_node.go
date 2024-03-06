@@ -234,7 +234,7 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 
 		logStr += entryStr
 		if i < len(masterMessage.GlobalQueue)-1 {
-			logStr += ", " 
+			logStr += ", "
 		}
 	}
 	logStr += "]"
