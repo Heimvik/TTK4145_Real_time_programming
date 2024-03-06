@@ -98,7 +98,7 @@ func f_InitNode(config T_Config) T_Node {
 
 	thisElevator := elevator.T_Elevator{
 		P_info:         &thisElevatorInfo,
-		P_serveRequest: &elevator.T_Request{},
+		P_serveRequest: nil,
 		CurrentID:      0,
 		Obstructed:     false,
 		StopButton:     false,
@@ -324,6 +324,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Exited Master Variable Watchdog")
 			return
 		default:
 			thisNodeInfo := f_GetNodeInfo(ops)
@@ -372,7 +373,6 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 					ObjectToSupportAcknowledge: thisNodeInfo,
 					C_Acknowledgement:          c_sentDoneEntryToSlave,
 				}
-				F_WriteLog("Finds here")
 				c_ackSentEntryToSlave <- ackSentEntryToSlave
 				breakOutTimer := time.NewTicker(time.Duration(1000) * time.Millisecond)
 				F_WriteLog("MASTER found done entry, waiting for sending to slave before removing")
@@ -392,6 +392,7 @@ func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Exited Slave Variable Watchdog")
 			return
 		default:
 			c_readConnectedNodes := make(chan []T_NodeInfo)
@@ -425,6 +426,7 @@ func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Exited master TimeManager")
 			return
 		default:
 			c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
@@ -450,6 +452,7 @@ func f_SlaveTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Exited slave TimeManager")
 			return
 		default:
 			c_readConnectedNodes := make(chan []T_NodeInfo)
@@ -572,6 +575,7 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 		case receivedRequest := <-c_requestFromElevator:
 			newEntry := T_GlobalQueueEntry{}
 			if receivedRequest.State == elevator.DONE {
+				F_WriteLog("Node: | " + strconv.Itoa(int(thisNodeInfo.PRIORITY)) + " | request resent DONE")
 				newEntry = T_GlobalQueueEntry{
 					Request:           receivedRequest,
 					RequestedNode:     assignedEntry.RequestedNode,
@@ -579,6 +583,7 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 					TimeUntilReassign: 0,
 				}
 			} else if receivedRequest.State == elevator.ACTIVE {
+				F_WriteLog("Node: | " + strconv.Itoa(int(thisNodeInfo.PRIORITY)) + " | request resent ACTIVE")
 				newEntry = T_GlobalQueueEntry{
 					Request:           receivedRequest,
 					RequestedNode:     assignedEntry.RequestedNode,
@@ -651,11 +656,13 @@ func F_RunNode() {
 	c_assignmentWasSucessFull := make(chan bool)
 	c_shouldCheckIfAssigned := make(chan bool)
 	c_nodeIsMaster := make(chan bool)
-	c_quitMasterRoutines := make(chan bool)
 	c_nodeIsSlave := make(chan bool)
-	c_quitSlaveRoutines := make(chan bool)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
+	c_quitMasterVariableWatchDog := make(chan bool)
+	c_quitMasterTimeManager := make(chan bool)
+	c_quitSlaveVariableWatchDog := make(chan bool)
+	c_quitSlaveTimeManager := make(chan bool)
 
 	go func() {
 		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
@@ -667,15 +674,11 @@ func F_RunNode() {
 		for {
 			select {
 			case <-c_nodeIsMaster:
-				c_quitMasterRoutines = make(chan bool)
-				c_quitSlaveRoutines = make(chan bool)
-				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
-				go f_MasterTimeManager(nodeOperations, c_quitMasterRoutines)
+				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterVariableWatchDog)
+				go f_MasterTimeManager(nodeOperations, c_quitMasterTimeManager)
 			case <-c_nodeIsSlave:
-				c_quitMasterRoutines = make(chan bool)
-				c_quitSlaveRoutines = make(chan bool)
-				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveRoutines)
-				go f_SlaveTimeManager(nodeOperations, c_quitSlaveRoutines)
+				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveVariableWatchDog)
+				go f_SlaveTimeManager(nodeOperations, c_quitSlaveTimeManager)
 			default:
 				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
@@ -751,6 +754,7 @@ func F_RunNode() {
 			case <-printGQTimer.C:
 				globalQueue := f_GetGlobalQueue(nodeOperations)
 				nodeInfo := f_GetNodeInfo(nodeOperations)
+				F_WriteLog("Assignstate: | " + strconv.Itoa(int(assignState)) + " |")
 				F_WriteLog("Node: | " + strconv.Itoa(int(nodeInfo.PRIORITY)) + " | MASTER | has GQ:\n")
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
@@ -804,8 +808,9 @@ func F_RunNode() {
 				}
 
 				if newNodeInfo.Role == SLAVE {
+					c_quitMasterVariableWatchDog <- true
+					c_quitMasterTimeManager <- true
 					c_nodeIsSlave <- true
-					close(c_quitMasterRoutines)
 					assignState = ASSIGN
 				}
 
@@ -870,7 +875,8 @@ func F_RunNode() {
 
 				if newNodeInfo.Role == MASTER {
 					c_nodeIsMaster <- true
-					close(c_quitSlaveRoutines)
+					c_quitSlaveVariableWatchDog <- true
+					c_quitSlaveTimeManager <- true
 				}
 			}
 		}

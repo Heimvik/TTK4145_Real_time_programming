@@ -23,10 +23,10 @@ const (
 //Keeping this in case of future improvements regarding secondary requirements,
 //see single-elevator/elevator.go for inspiration
 
-type T_Elevator struct { 
+type T_Elevator struct {
 	CurrentID      int
-	Obstructed	   bool
-	StopButton	   bool
+	Obstructed     bool
+	StopButton     bool
 	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
 	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
 }
@@ -66,17 +66,10 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 		case <-c_quit:
 			return
 		case <-getSetTimer.C:
-			fmt.Println("Elevator deadlock")
+			fmt.Println("Elevator deadlock upon getset")
 			// getSetTimer.Stop() //lurer på om den kanskje bør stoppes en gang? hvis ikke vil den melde deadlock hvert andre sekund
 			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
 		}
-	}
-}
-//might delete this function, as elevator is initialized outside of this package
-func Init_Elevator() T_Elevator {
-	return T_Elevator{
-		P_info:         &T_ElevatorInfo{Direction: NONE, Floor: -1, State: IDLE},
-		P_serveRequest: nil,
 	}
 }
 
@@ -84,8 +77,9 @@ func F_shouldStop(elevator T_Elevator) bool {
 	return (elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
-//her sender jeg ut (fiks deadlock)
-func F_clearRequest(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
+// her sender jeg ut (fiks deadlock)
+// COMMENT: Enig her, funksjonen heter det den skal gjøre
+func F_clearRequest(elevator T_Elevator) T_Elevator {
 	if elevator.P_serveRequest == nil {
 		return elevator
 	} else {
@@ -95,7 +89,7 @@ func F_clearRequest(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator
 	return elevator
 }
 
-func F_chooseDirection(elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
+func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
 	if elevator.P_serveRequest == nil {
 		return elevator
 	} else if elevator.StopButton {
@@ -115,7 +109,7 @@ func F_chooseDirection(elevator T_Elevator, c_requestOut chan T_Request) T_Eleva
 	} else {
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
-		elevator = F_clearRequest(elevator, c_requestOut)
+		elevator = F_clearRequest(elevator)
 	}
 	return elevator
 }
