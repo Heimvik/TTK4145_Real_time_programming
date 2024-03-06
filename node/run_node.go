@@ -99,6 +99,9 @@ func f_InitNode(config T_Config) T_Node {
 	thisElevator := elevator.T_Elevator{
 		P_info:         &thisElevatorInfo,
 		P_serveRequest: &elevator.T_Request{},
+		CurrentID:      0,
+		Obstructed:     false,
+		StopButton:     false,
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
@@ -223,20 +226,18 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 	logStr := fmt.Sprintf("Node: | %d | %s | received MM from | %d | %s | GlobalQueue: [",
 		thisNode.PRIORITY, roleStr, masterMessage.Transmitter.PRIORITY, transmitterRoleStr)
 
-	// Iterate over the GlobalQueue to add details for each entry
 	for i, entry := range masterMessage.GlobalQueue {
 		entryStr := fmt.Sprintf("Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %d | Requested node: | %d | Assigned node: | %d |",
 			entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), int(entry.Request.Floor),
 			f_DirectionToString(entry.Request.Direction), int(entry.TimeUntilReassign),
 			int(entry.RequestedNode), int(entry.AssignedNode))
 
-		// Append this entry's details to the log string
 		logStr += entryStr
 		if i < len(masterMessage.GlobalQueue)-1 {
-			logStr += ", " // Add a comma separator between entries, except after the last one
+			logStr += ", " 
 		}
 	}
-	logStr += "]" // Close the GlobalQueue information
+	logStr += "]"
 
 	F_WriteLog(logStr)
 }
@@ -255,14 +256,6 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 		ElevatorInfo:        thisNodeInfo.ElevatorInfo,
 	}
 	return newNodeInfo
-}
-func f_RemoveNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
-	for i, nodeInfo := range nodes {
-		if nodeInfo.PRIORITY == nodeToRemove.PRIORITY {
-			return append(nodes[:i], nodes[i+1:]...)
-		}
-	}
-	return nodes
 }
 func f_FindNodeInfo(node uint8, connectedNodes []T_NodeInfo) T_NodeInfo {
 	returnNode := T_NodeInfo{}
@@ -704,7 +697,6 @@ func F_RunNode() {
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
 	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond) //Test function
 	assignState := ASSIGN
-	ackinc := 0
 	nodeRole := f_GetNodeInfo(nodeOperations).Role
 	if nodeRole == MASTER {
 		c_nodeIsMaster <- true
@@ -725,7 +717,6 @@ func F_RunNode() {
 				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
 					f_UpdateGlobalQueueMaster(nodeOperations, masterMessage)
 				}
-				//IMPORTANT: cannot really propagate to slave until it knows that the other master has received its GQ
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 
@@ -817,21 +808,10 @@ func F_RunNode() {
 				case WAITFORACK:
 					select {
 					case assigmentWasSucessFull := <-c_assignmentWasSucessFull:
-						ackinc = 0
 						if assigmentWasSucessFull {
 							assignState = ASSIGN
-						} else {
-							//assignState = ASSIGN
-							//An entry, assigned but not resent and confirmed will be reassigned by VairableWatchdog
-							//However, if it never leaves IDLE, but somehow is not ready (i.e. local elevator is not in idle)
-							//it can lead to deadlock. Unsure of what to do
-							//The connectiontime is less than the breakouttime, meaning we will disconnect if elevator.state is not updated
 						}
 					default:
-						ackinc++
-						if ackinc < 10 {
-							fmt.Println("Waiting for ACK...")
-						}
 					}
 				}
 
