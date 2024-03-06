@@ -5,7 +5,7 @@ func F_fsmFloorArrival(newFloor int8, elevator T_Elevator, c_requestOut chan T_R
 	switch elevator.P_info.State {
 	case MOVING:
 		if F_shouldStop(elevator) {
-			elevator = F_clearRequest(elevator, c_requestOut)
+			elevator = F_chooseDirection(elevator, c_requestOut)
 		}
 	case IDLE: //should only happen when initializing, when the elevator first reaches a floor
 		F_SetMotorDirection(NONE)

@@ -113,6 +113,7 @@ func F_chooseDirection(elevator T_Elevator, c_requestOut chan T_Request) T_Eleva
 
 	} else {
 		elevator.P_info.Direction = NONE
+		F_SetMotorDirection(NONE)
 		elevator = F_clearRequest(elevator, c_requestOut)
 	}
 	return elevator
