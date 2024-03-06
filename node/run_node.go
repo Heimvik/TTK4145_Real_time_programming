@@ -234,7 +234,7 @@ func f_WriteLogMasterMessage(ops T_NodeOperations, masterMessage T_MasterMessage
 
 		logStr += entryStr
 		if i < len(masterMessage.GlobalQueue)-1 {
-			logStr += ", " 
+			logStr += ", "
 		}
 	}
 	logStr += "]"
@@ -301,6 +301,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 						assignBreakoutTimer.Stop()
 						break PollLastAssigned
 					case <-c_quit:
+						fmt.Println("Quitted")
 						return
 					default:
 						connectedNodes := f_GetConnectedNodes(ops)
@@ -666,14 +667,18 @@ func F_RunNode() {
 		for {
 			select {
 			case <-c_nodeIsMaster:
-				close(c_quitSlaveRoutines)
+				if c_quitSlaveRoutines != nil {
+					close(c_quitSlaveRoutines)
+				}
 				c_quitMasterRoutines = make(chan bool)
 				c_quitSlaveRoutines = make(chan bool)
 				go f_MasterVariableWatchDog(nodeOperations, c_lastAssignedEntry, c_assignmentWasSucessFull, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
 				go f_MasterTimeManager(nodeOperations, c_quitMasterRoutines)
 			case <-c_nodeIsSlave:
-				close(c_quitMasterRoutines)
-				c_quitMasterRoutines = make(chan bool)
+				if c_quitSlaveRoutines != nil {
+					close(c_quitMasterRoutines)
+				}
+				c_quitMasterRoutines = make(chan bool) //Updated, should work
 				c_quitSlaveRoutines = make(chan bool)
 				go f_SlaveVariableWatchDog(nodeOperations, c_quitSlaveRoutines)
 				go f_SlaveTimeManager(nodeOperations, c_quitSlaveRoutines)
