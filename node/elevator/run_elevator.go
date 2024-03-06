@@ -43,7 +43,6 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 	c_floors := make(chan int)
 	c_obstr := make(chan bool)
 	c_stop := make(chan bool)
-	
 
 	go F_PollButtons(c_buttons)
 	go F_PollFloorSensor(c_floors)
@@ -64,17 +63,16 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			newElevator := F_fsmFloorArrival(int8(a), oldElevator, c_requestOut)
-			
+
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 			if newElevator.P_info.State == DOOROPEN {
 				go F_Timer(c_timerStop, c_timerTimeout)
 			}
-			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil{
+			if oldElevator.P_serveRequest.Floor == int8(a) { //newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
 				oldElevator.P_serveRequest.State = DONE
 				c_requestOut <- *oldElevator.P_serveRequest
 			}
-
 
 		case a := <-c_obstr:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
@@ -93,7 +91,7 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			if newElevator.P_info.State == DOOROPEN {
 				go F_Timer(c_timerStop, c_timerTimeout)
 			}
-			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil{
+			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
 				oldElevator.P_serveRequest.State = DONE
 				c_requestOut <- *oldElevator.P_serveRequest
 			}
@@ -104,9 +102,9 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			newElevator, newReq := F_fsmDoorTimeout(oldElevator, c_requestOut)
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
-			if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil{
+			if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil {
 				c_requestOut <- newReq
-			} else if newElevator.P_info.State == IDLE{
+			} else if newElevator.P_info.State == IDLE {
 				c_timerStop <- true
 			}
 
@@ -121,7 +119,7 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			}
 			a.State = ACTIVE
 			c_requestOut <- a
-			if newElevator.P_serveRequest == nil{
+			if newElevator.P_serveRequest == nil {
 				a.State = DONE
 				c_requestOut <- a
 			}

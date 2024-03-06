@@ -651,13 +651,11 @@ func F_RunNode() {
 	c_assignmentWasSucessFull := make(chan bool)
 	c_shouldCheckIfAssigned := make(chan bool)
 	c_nodeIsMaster := make(chan bool)
+	c_quitMasterRoutines := make(chan bool)
 	c_nodeIsSlave := make(chan bool)
+	c_quitSlaveRoutines := make(chan bool)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
-	c_quitMasterVariableWatchDog := make(chan bool)
-	c_quitMasterTimeManager := make(chan bool)
-	c_quitSlaveVariableWatchDog := make(chan bool)
-	c_quitSlaveTimeManager := make(chan bool)
 
 	go func() {
 		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
