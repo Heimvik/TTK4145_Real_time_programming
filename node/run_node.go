@@ -568,8 +568,8 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator)
-	go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
+	go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	//go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo(nodeOps)
 	globalQueue := f_GetGlobalQueue(nodeOps)
