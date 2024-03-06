@@ -24,7 +24,7 @@ func F_fsmDoorTimeout(elevator T_Elevator, c_requestOut chan T_Request) (T_Eleva
 		resendReq.State = UNASSIGNED
 		return elevator, resendReq
 	}
-	return elevator, T_Request{} //COMMENT:returnerer T_Request{} uansett
+	return elevator, T_Request{} 
 }
 
 // her mottar jeg (kan oppstå deadlock)

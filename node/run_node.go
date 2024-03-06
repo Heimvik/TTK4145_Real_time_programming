@@ -307,7 +307,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 						globalQueue := f_GetGlobalQueue(ops)
 						updatedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
 						updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
-						if updatedAssignedNode.ElevatorInfo.State != elevator.IDLE || updatedEntry.Request.State != elevator.ASSIGNED {
+						if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING || updatedEntry.Request.State == elevator.ACTIVE {
 							c_assignmentSuccessfull <- true
 							F_WriteLog("Found ack")
 							assignBreakoutTimer.Stop()
@@ -802,6 +802,8 @@ func F_RunNode() {
 					case assigmentWasSucessFull := <-c_assignmentWasSucessFull:
 						if assigmentWasSucessFull {
 							assignState = ASSIGN
+						} else {
+							assignState = ASSIGN //Start reassigning after 10 secs anyways
 						}
 					default:
 					}
