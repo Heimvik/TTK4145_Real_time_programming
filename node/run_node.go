@@ -667,8 +667,8 @@ func F_RunNode() {
 	go func() {
 		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
 		go f_ElevatorManager(nodeOperations, elevatorOperations, c_shouldCheckIfAssigned, c_entryFromElevator)
-		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOperations, SLAVEPORT)
-		go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOperations, MASTERPORT)
+		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT)
+		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
 		go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
 		for {
