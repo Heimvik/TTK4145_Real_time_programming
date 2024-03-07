@@ -67,7 +67,6 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 			return
 		case <-getSetTimer.C:
 			fmt.Println("Elevator deadlock upon getset")
-			// getSetTimer.Stop() //lurer på om den kanskje bør stoppes en gang? hvis ikke vil den melde deadlock hvert andre sekund
 			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
 		}
 	}
