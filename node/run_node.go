@@ -10,7 +10,8 @@ import (
 	"the-elevator/node/elevator"
 	"time"
 )
-/* 
+
+/*
 Kjappe kommentarer fra sia:
 - Flytte testfunksjoner til eget dokument
 - Flytte alt som har med å skrive til log til et eget dokument
@@ -263,8 +264,8 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 	return newNodeInfo
 }
 
-//JONASCOMMENT: bytte ut 'node' med et mer besrkivende navn (info kanskje)? har også forslag til å gjøre denne mer simpel (og kanskje mer oversiktlig, du kan vurdere det sjæl, det som er kommentert vekk er det som var fra før)
-func f_FindNodeInfo(node uint8, connectedNodes []T_NodeInfo) T_NodeInfo { 
+// JONASCOMMENT: bytte ut 'node' med et mer besrkivende navn (info kanskje)? har også forslag til å gjøre denne mer simpel (og kanskje mer oversiktlig, du kan vurdere det sjæl, det som er kommentert vekk er det som var fra før)
+func f_FindNodeInfo(node uint8, connectedNodes []T_NodeInfo) T_NodeInfo {
 	// returnNode := T_NodeInfo{}
 	for _, nodeInfo := range connectedNodes {
 		if node == nodeInfo.PRIORITY {
@@ -285,7 +286,7 @@ func f_GetAvalibaleNodes(connectedNodes []T_NodeInfo) []T_NodeInfo {
 	return avalibaleNodes
 }
 
-//JONASCOMMENT: syns 'id' er nice navn, er litt det jeg tenkte når jeg kommente i FindNodeInfo. Kan forenkles på nesten samme måte som FindNodeInfo, hvis du syns det funker
+// JONASCOMMENT: syns 'id' er nice navn, er litt det jeg tenkte når jeg kommente i FindNodeInfo. Kan forenkles på nesten samme måte som FindNodeInfo, hvis du syns det funker
 func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntry) T_GlobalQueueEntry {
 	returnEntry := T_GlobalQueueEntry{}
 	for _, entry := range globalQueue {
@@ -296,10 +297,10 @@ func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntr
 	return returnEntry
 }
 
-//JONASCOMMENT: den her er for lang, har ikke noe umiddelbart fiks på hvordan den kan deles opp men en funksjon på 103 linjer er litt mye, har hørt snakk om at de ideelt skal ligge på 20-30 linjer
-//JONASCOMMENT: legger til no halvveis tips om hvor du kan dele opp, ta med en klype salt
-//JONASCOMMENT: kanskje også flytte ut alt som har med globalQueue til request_distrubutor.go? 
-//JONASCOMMENT: hva menes egentlig med variable watchdog? er det en watchdog for variabler?
+// JONASCOMMENT: den her er for lang, har ikke noe umiddelbart fiks på hvordan den kan deles opp men en funksjon på 103 linjer er litt mye, har hørt snakk om at de ideelt skal ligge på 20-30 linjer
+// JONASCOMMENT: legger til no halvveis tips om hvor du kan dele opp, ta med en klype salt
+// JONASCOMMENT: kanskje også flytte ut alt som har med globalQueue til request_distrubutor.go?
+// JONASCOMMENT: hva menes egentlig med variable watchdog? er det en watchdog for variabler?
 func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_GlobalQueueEntry, c_assignmentSuccessfull chan bool, c_ackSentEntryToSlave chan T_AckObject, c_quit chan bool) {
 	c_quitSlaveVariableWatchdog := make(chan bool)
 	go f_SlaveVariableWatchDog(ops, c_quitSlaveVariableWatchdog)
@@ -412,7 +413,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 	}
 }
 
-//JONASCOMMENT: denne kan også deles tror jeg
+// JONASCOMMENT: denne kan også deles tror jeg
 func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
@@ -447,7 +448,7 @@ func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 	}
 }
 
-//JONASCOMMENT: Generelt sett ganske nice, har en liten bit jeg ville gjort til funksjon bare
+// JONASCOMMENT: Generelt sett ganske nice, har en liten bit jeg ville gjort til funksjon bare
 func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	c_quitSlaveTimeManager := make(chan bool)
 	go f_SlaveTimeManager(ops, c_quitSlaveTimeManager)
@@ -462,14 +463,14 @@ func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
 			c_quitGetSetGlobalQueue := make(chan bool)
 			go f_GetAndSetGlobalQueue(ops, c_readGlobalQueue, c_writeGlobalQueue, c_quitGetSetGlobalQueue)
 			globalQueue := <-c_readGlobalQueue
-			
+
 			//JOANSCOMMENT: tror dette passer bra som egen funksjon, decrementTimeAllEntries, decrementReassignTime, et eller annet
 			for i, entry := range globalQueue {
 				if entry.TimeUntilReassign > 0 && entry.Request.State != elevator.UNASSIGNED {
 					globalQueue[i].TimeUntilReassign -= 1
 				}
 			}
-			
+
 			//remove all entries being DONE and
 			c_writeGlobalQueue <- globalQueue
 			c_quitGetSetGlobalQueue <- true
@@ -479,7 +480,7 @@ func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	}
 }
 
-//JONASCOMMENT: nesten samme som i mastertimemanager
+// JONASCOMMENT: nesten samme som i mastertimemanager
 func f_SlaveTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
@@ -592,7 +593,8 @@ func f_UpdateGlobalQueueSlave(nodeOps T_NodeOperations, masterMessage T_MasterMe
 	c_quit <- true
 
 }
-//JONASCOMMENT: igjen, denne kan nok kuttes ned, synes at 50 linjer er litt mye
+
+// JONASCOMMENT: igjen, denne kan nok kuttes ned, synes at 50 linjer er litt mye
 func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_ElevatorOperations, c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry) {
 	c_requestFromElevator := make(chan elevator.T_Request)
 	c_requestToElevator := make(chan elevator.T_Request)
