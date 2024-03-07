@@ -57,30 +57,3 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOp
 		}
 	}
 }
-
-//
-
-/*What do the studasser tenker om å ha en hel FMS som løsning?
-func f_ReceiveFSM(c_receiveMessage chan T_Message, c_transmitMessage chan T_Message, connectedNodes []*Node){
-	//receive fsm
-	//should handle the whole UDP transaction
-
-
-	var step int = 0
-	switch step{
-	case 0: //check for messages and acceptance test on them
-		receivedMessage := <- c_receiveMessage
-		if f_AcceptancetestReceive(receivedMessage){
-			step +=1
-		}else{
-			//kys or remove node from connectednodes
-		}
-	case 1: //readback to the node that sent it
-		readbackMessage := {
-
-		}
-		c_transmitMessage <- c_transmitMessage
-	}
-	//adding/removing from connected nodes, taking in message
-}
-*/
