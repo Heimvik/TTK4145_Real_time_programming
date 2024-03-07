@@ -301,7 +301,8 @@ func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntr
 //JONASCOMMENT: kanskje også flytte ut alt som har med globalQueue til request_distrubutor.go? 
 //JONASCOMMENT: hva menes egentlig med variable watchdog? er det en watchdog for variabler?
 func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_GlobalQueueEntry, c_assignmentSuccessfull chan bool, c_ackSentEntryToSlave chan T_AckObject, c_quit chan bool) {
-	go f_SlaveVariableWatchDog(ops, c_quit)
+	c_quitSlaveVariableWatchdog := make(chan bool)
+	go f_SlaveVariableWatchDog(ops, c_quitSlaveVariableWatchdog)
 	go func() { //JONASCOMMENT: dette kan feks være en egen funksjon
 		for {
 		PollLastAssigned:
@@ -597,8 +598,8 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
-	go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
+	go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	//go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo(nodeOps)
 	globalQueue := f_GetGlobalQueue(nodeOps)

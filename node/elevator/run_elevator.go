@@ -62,18 +62,18 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 	*/
 	for {
 		select {
-		case a := <-c_buttons:
+		case button := <-c_buttons:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
 			oldElevator.CurrentID++
 			c_writeElevator <- oldElevator
 			c_quitGetSetElevator <- true
-			F_sendRequest(a, c_requestOut, oldElevator) //COMMENT: legg ut
+			F_SendRequest(button, c_requestOut, oldElevator) //COMMENT: legg ut
 
-		case a := <-c_floors: //COMMENT: a
+		case newFloor := <-c_floors: 
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
-			newElevator := F_fsmFloorArrival(int8(a), oldElevator)
+			newElevator := F_FloorArrival(int8(newFloor), oldElevator)
 
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
@@ -81,37 +81,39 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 				go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: Hva slags timer? Hva timer den?
 			}
 			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
-				fmt.Println(strconv.Itoa(int(oldElevator.P_serveRequest.Floor)) + " | " + strconv.Itoa(int(a)))
+				fmt.Println(strconv.Itoa(int(oldElevator.P_serveRequest.Floor)) + " | " + strconv.Itoa(int(newFloor)))
 				oldElevator.P_serveRequest.State = DONE
 				c_requestOut <- *oldElevator.P_serveRequest
 			}
 
-		case a := <-c_obstr: //COMMENT: a
+		case obstructed := <-c_obstr: 
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
-			oldElevator.Obstructed = a
+			oldElevator.Obstructed = obstructed
 			c_writeElevator <- oldElevator
 			c_quitGetSetElevator <- true
 
-		case a := <-c_stop: //COMMENT: a
+		case stop := <-c_stop: 
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
-			oldElevator.StopButton = a
+			oldElevator.StopButton = stop
 			newElevator := F_SetElevatorDirection(oldElevator)
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
-			if newElevator.P_info.State == DOOROPEN {
-				go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: samme her
-			}
-			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
-				oldElevator.P_serveRequest.State = DONE
-				c_requestOut <- *oldElevator.P_serveRequest
-			}
+			//JONASCOMMENT: kommenterte ut dette siden jeg ikke ser poenget med å ha det med
+			// if newElevator.P_info.State == DOOROPEN {
+			// 	go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: samme her
+			// }
+			// //JONASCOMMENT: la jeg til dette? ser ikke poenget
+			// if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
+			// 	oldElevator.P_serveRequest.State = DONE
+			// 	c_requestOut <- *oldElevator.P_serveRequest
+			// }
 
 		case <-c_timerTimeout: //COMMENT: timerTimeout? hva er timeren på?
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
-			newElevator, newReq := F_fsmDoorTimeout(oldElevator, c_requestOut) //COMMENT: Tydeliggjør hva den skal returnere gjennom funksjonsnavnet gjør selve endringen på elevator på utsiden?
+			newElevator, newReq := F_DoorTimeout(oldElevator, c_requestOut) //COMMENT: Tydeliggjør hva den skal returnere gjennom funksjonsnavnet gjør selve endringen på elevator på utsiden?
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 			if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil {
@@ -120,18 +122,23 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 				c_timerStop <- true
 			}
 
-		case a := <-c_requestIn:
+		case newRequest := <-c_requestIn:
 			go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
 			oldElevator := <-c_readElevator
-			newElevator := F_ReceiveRequest(a, oldElevator, c_requestOut) //COMMENT:ReceiveRequest og returnerer en elevator, og tar inn requestOut?
+			newElevator := F_ReceiveRequest(newRequest, oldElevator, c_requestOut) //COMMENT:ReceiveRequest og returnerer en elevator, og tar inn requestOut?
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
+			
 			if newElevator.P_info.State == DOOROPEN {
+				newRequest.State = ACTIVE
+				c_requestOut <- newRequest
+				newRequest.State = DONE
+				c_requestOut <- newRequest
 				go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: Timer
-			} else if newElevator.P_info.State == MOVING {
-				a.State = ACTIVE
-				c_requestOut <- a
+			} else {
+				c_requestOut <- *newElevator.P_serveRequest
 			}
+			
 		}
 	}
 }
