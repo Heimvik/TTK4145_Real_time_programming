@@ -8,7 +8,6 @@ import (
 /*
 05.03.2024
 TODO:
-- Brief heimvik på initialisering av heis (fjerna channels, la til ID, obstructed og stop variabler, start på floor -1)
 - Fikse alt av lampegreier (ÆSJ!!!)
 - Finn ut av hva som skal skje med ID
 - Fjerne unødvendige variabler og funksjoner (ongoing)
@@ -26,16 +25,6 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 	c_readElevator := make(chan T_Elevator)
 	c_writeElevator := make(chan T_Elevator)
 	c_quitGetSetElevator := make(chan bool)
-
-	// //might delete if elevator is initialized outside of this function *
-	// go F_GetAndSetElevator(ops, c_readElevator, c_writeElevator, c_quitGetSetElevator)
-	// //initialize elevator
-	// oldElevator := <-c_readElevator
-	// oldElevator = Init_Elevator() //mulig denne droppes
-	// oldElevator.P_info.State = IDLE
-	// c_writeElevator <- oldElevator
-	// c_quitGetSetElevator <- true
-	// // *
 
 	//channels
 	c_timerStop := make(chan bool)
@@ -101,7 +90,8 @@ func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requ
 			c_writeElevator <- newElevator
 			c_quitGetSetElevator <- true
 			if newElevator.P_info.State == DOOROPEN {
-				go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: samme her
+				// go F_Timer(c_timerStop, c_timerTimeout) //COMMENT: samme her
+				go F_doorTimer(c_timerStop, c_timerTimeout) //JONASCOMMENT: bedre timer?
 			}
 			if newElevator.P_info.Direction == NONE && !newElevator.StopButton && oldElevator.P_serveRequest != nil {
 				oldElevator.P_serveRequest.State = DONE

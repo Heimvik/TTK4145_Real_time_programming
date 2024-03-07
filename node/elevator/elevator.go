@@ -43,6 +43,34 @@ type T_ElevatorOperations struct {
 	C_readAndWriteElevator chan chan T_Elevator
 }
 
+type T_ElevatorChannels struct {
+	C_readElevator  chan T_Elevator
+	C_writeElevator chan T_Elevator
+	C_quitGetSet          chan bool
+	// C_timerStart  chan bool
+	C_timerStop chan bool
+	C_timerTimeout chan bool
+	C_buttonPress chan T_ButtonEvent
+	C_floorSensor chan int
+	C_obstr       chan bool
+	C_stop        chan bool
+}
+
+func F_InitElevatorChannels() T_ElevatorChannels {
+	return T_ElevatorChannels{
+		C_readElevator:  make(chan T_Elevator),
+		C_writeElevator: make(chan T_Elevator),
+		C_quit:          make(chan bool),
+		// C_timerStart:  make(chan bool),
+		C_timerStop: make(chan bool),
+		C_timerTimeout: make(chan bool),
+		C_buttonPress: make(chan T_ButtonEvent),
+		C_floorSensor: make(chan int),
+		C_obstr:       make(chan bool),
+		C_stop:        make(chan bool),
+	}
+}
+
 func F_GetElevator(ops T_ElevatorOperations) T_Elevator {
 	c_responseChan := make(chan T_Elevator)
 	ops.C_readElevator <- c_responseChan // Send the response channel to the NodeOperationManager
@@ -72,19 +100,15 @@ func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevato
 	}
 }
 
-func F_shouldStop(elevator T_Elevator) bool {
-	return (elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
+func F_ShouldElevatorStop(elevator T_Elevator) bool {
+	return ((elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)) || elevator.StopButton
 }
 
 // her sender jeg ut (fiks deadlock)
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 func F_clearRequest(elevator T_Elevator) T_Elevator {
-	if elevator.P_serveRequest == nil {
-		return elevator
-	} else {
-		elevator.P_serveRequest = nil
-		elevator.P_info.State = DOOROPEN
-	}
+	elevator.P_serveRequest = nil
+	elevator.P_info.State = DOOROPEN
 	return elevator
 }
 
