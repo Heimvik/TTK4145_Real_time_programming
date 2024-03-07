@@ -88,12 +88,8 @@ func F_shouldStop(elevator T_Elevator) bool {
 // her sender jeg ut (fiks deadlock)
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 func F_clearRequest(elevator T_Elevator) T_Elevator {
-	if elevator.P_serveRequest == nil {
-		return elevator
-	} else {
-		elevator.P_serveRequest = nil
-		elevator.P_info.State = DOOROPEN
-	}
+	elevator.P_serveRequest = nil
+	elevator.P_info.State = DOOROPEN
 	return elevator
 }
 
