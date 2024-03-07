@@ -87,7 +87,7 @@ func f_simulateRequest(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 func f_InitNode(config T_Config) T_Node {
 	thisElevatorInfo := elevator.T_ElevatorInfo{
 		Direction: elevator.NONE,
-		Floor:     -1,
+		Floor:     1, //-1, 1 for test purposes only!
 		State:     elevator.IDLE,
 	}
 	thisNodeInfo := T_NodeInfo{
@@ -286,7 +286,8 @@ func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntr
 	return returnEntry
 }
 func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_GlobalQueueEntry, c_assignmentSuccessfull chan bool, c_ackSentEntryToSlave chan T_AckObject, c_quit chan bool) {
-	go f_SlaveVariableWatchDog(ops, c_quit)
+	c_quitSlaveVariableWatchdog := make(chan bool)
+	go f_SlaveVariableWatchDog(ops, c_quitSlaveVariableWatchdog)
 	go func() {
 		for {
 		PollLastAssigned:
@@ -324,7 +325,7 @@ func f_MasterVariableWatchDog(ops T_NodeOperations, c_lastAssignedEntry chan T_G
 	for {
 		select {
 		case <-c_quit:
-			F_WriteLog("Exited Master Variable Watchdog")
+			c_quitSlaveVariableWatchdog <- true
 			return
 		default:
 			thisNodeInfo := f_GetNodeInfo(ops)
@@ -392,7 +393,6 @@ func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
 		case <-c_quit:
-			F_WriteLog("Exited Slave Variable Watchdog")
 			return
 		default:
 			c_readConnectedNodes := make(chan []T_NodeInfo)
@@ -422,11 +422,12 @@ func f_SlaveVariableWatchDog(ops T_NodeOperations, c_quit chan bool) {
 	}
 }
 func f_MasterTimeManager(ops T_NodeOperations, c_quit chan bool) {
-	go f_SlaveTimeManager(ops, c_quit)
+	c_quitSlaveTimeManager := make(chan bool)
+	go f_SlaveTimeManager(ops, c_quitSlaveTimeManager)
 	for {
 		select {
 		case <-c_quit:
-			F_WriteLog("Exited master TimeManager")
+			c_quitSlaveTimeManager <- true
 			return
 		default:
 			c_readGlobalQueue := make(chan []T_GlobalQueueEntry)
@@ -452,7 +453,6 @@ func f_SlaveTimeManager(ops T_NodeOperations, c_quit chan bool) {
 	for {
 		select {
 		case <-c_quit:
-			F_WriteLog("Exited slave TimeManager")
 			return
 		default:
 			c_readConnectedNodes := make(chan []T_NodeInfo)
@@ -564,8 +564,8 @@ func f_ElevatorManager(nodeOps T_NodeOperations, elevatorOps elevator.T_Elevator
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
-	//go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
+	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	go f_simulateRequest(nodeOps, elevatorOps, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo(nodeOps)
 	globalQueue := f_GetGlobalQueue(nodeOps)
