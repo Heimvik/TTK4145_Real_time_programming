@@ -5,128 +5,191 @@ import (
 	"time"
 )
 
-func f_NodeOperationManager(node *T_Node, nodeOps T_NodeOperations, elevatorOps elevator.T_ElevatorOperations) {
+var nodeOperations = T_NodeOperations{
+	c_getNodeInfo:          make(chan chan T_NodeInfo),
+	c_setNodeInfo:          make(chan T_NodeInfo),
+	c_getSetNodeInfo:       make(chan chan T_NodeInfo),
+	c_getGlobalQueue:       make(chan chan []T_GlobalQueueEntry),
+	c_setGlobalQueue:       make(chan []T_GlobalQueueEntry),
+	c_getSetGlobalQueue:    make(chan chan []T_GlobalQueueEntry),
+	c_getConnectedNodes:    make(chan chan []T_NodeInfo),
+	c_setConnectedNodes:    make(chan []T_NodeInfo),
+	c_getSetConnectedNodes: make(chan chan []T_NodeInfo),
+}
+var elevatorOperations = elevator.T_ElevatorOperations{
+	C_getElevator:    make(chan chan elevator.T_Elevator),
+	C_setElevator:    make(chan elevator.T_Elevator),
+	C_getSetElevator: make(chan chan elevator.T_Elevator),
+}
+
+func f_NodeOperationManager(node *T_Node) {
 	for {
 		select {
-		case responseChan := <-nodeOps.c_readNodeInfo:
+		case responseChan := <-nodeOperations.c_getNodeInfo:
+			//fmt.Println("11")
 			responseChan <- node.NodeInfo
-		case newNodeInfo := <-nodeOps.c_writeNodeInfo:
+			//fmt.Println("12")
+		case newNodeInfo := <-nodeOperations.c_setNodeInfo:
+			//fmt.Println("21")
 			node.NodeInfo = newNodeInfo
 			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
-		case responseChan := <-nodeOps.c_readAndWriteNodeInfo:
+			//fmt.Println("22")
+		case responseChan := <-nodeOperations.c_getSetNodeInfo:
+			//fmt.Println("31")
 			responseChan <- node.NodeInfo
 			node.NodeInfo = <-responseChan
 			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
+			//fmt.Println("32")
 
-		case responseChan := <-nodeOps.c_readGlobalQueue:
+		case responseChan := <-nodeOperations.c_getGlobalQueue:
+			//fmt.Println("41")
 			responseChan <- node.GlobalQueue
-		case newGlobalQueue := <-nodeOps.c_writeGlobalQueue:
+			//fmt.Println("42")
+		case newGlobalQueue := <-nodeOperations.c_setGlobalQueue:
+			//fmt.Println("51")
 			node.GlobalQueue = newGlobalQueue
-		case responseChan := <-nodeOps.c_readAndWriteGlobalQueue:
+			//fmt.Println("52")
+		case responseChan := <-nodeOperations.c_getSetGlobalQueue:
+			//fmt.Println("61")
 			responseChan <- node.GlobalQueue
 			node.GlobalQueue = <-responseChan
+			//fmt.Println("62")
 
-		case responseChan := <-nodeOps.c_readConnectedNodes:
+		case responseChan := <-nodeOperations.c_getConnectedNodes:
+			//fmt.Println("71")
 			responseChan <- node.ConnectedNodes
-		case newConnectedNodes := <-nodeOps.c_writeConnectedNodes:
+			//fmt.Println("72")
+		case newConnectedNodes := <-nodeOperations.c_setConnectedNodes:
+			//fmt.Println("81")
 			node.ConnectedNodes = newConnectedNodes
-		case responseChan := <-nodeOps.c_readAndWriteConnectedNodes:
+			//fmt.Println("82")
+
+		case responseChan := <-nodeOperations.c_getSetConnectedNodes:
+			//fmt.Println("91")
 			responseChan <- node.ConnectedNodes
 			node.ConnectedNodes = <-responseChan
+			//fmt.Println("92")
 
-		case responseChan := <-elevatorOps.C_readElevator:
+		case responseChan := <-elevatorOperations.C_getElevator:
+			//fmt.Println("101")
 			responseChan <- node.Elevator
-		case newElevator := <-elevatorOps.C_writeElevator:
+			//fmt.Println("102")
+		case newElevator := <-elevatorOperations.C_setElevator:
+			//fmt.Println("111")
 			node.Elevator = newElevator
-		case responseChan := <-elevatorOps.C_readAndWriteElevator:
+			//fmt.Println("112")
+		case responseChan := <-elevatorOperations.C_getSetElevator:
+			//fmt.Println("121")
 			responseChan <- node.Elevator
 			node.Elevator = <-responseChan
+			//fmt.Println("122")
+
 		default:
-			//No sleep, this has to be fastest of them all
+			//fmt.Println("Runs")
 		}
 	}
 }
-func f_GetNodeInfo(ops T_NodeOperations) T_NodeInfo {
+
+func f_GetNodeInfo() T_NodeInfo {
 	c_responseChan := make(chan T_NodeInfo)
-	ops.c_readNodeInfo <- c_responseChan // Send the response channel to the NodeOperationManager
-	nodeInfo := <-c_responseChan         // Receive the node info from the response channel
+	//fmt.Println("G1")
+	nodeOperations.c_getNodeInfo <- c_responseChan // Send the response channel to the NodeOperationManager
+	//fmt.Println("G2")
+	nodeInfo := <-c_responseChan // Receive the node info from the response channel
+	//fmt.Println("G3")
 	return nodeInfo
 }
-func f_SetNodeInfo(ops T_NodeOperations, nodeInfo T_NodeInfo) {
-	ops.c_writeNodeInfo <- nodeInfo // Send the nodeInfo directly to be written
+func f_SetNodeInfo(nodeInfo T_NodeInfo) {
+	nodeOperations.c_setNodeInfo <- nodeInfo // Send the nodeInfo directly to be written
 }
-func f_GetAndSetNodeInfo(ops T_NodeOperations, c_readConnectedNodes chan T_NodeInfo, c_writeConnectedNodes chan T_NodeInfo, c_quit chan bool) { //let run in a sepreate goroutine
-	getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
-	c_responsChan := make(chan T_NodeInfo)
 
-	ops.c_readAndWriteNodeInfo <- c_responsChan
+func f_GetSetNodeInfo(c_getSetNodeInfoInterface chan T_GetSetNodeInfoInterface) {
 	for {
+	WAITFORINTERFACE:
 		select {
-		case oldNodeInfo := <-c_responsChan:
-			c_readConnectedNodes <- oldNodeInfo
-		case newNodeInfo := <-c_writeConnectedNodes:
-			c_responsChan <- newNodeInfo
-		case <-c_quit:
-			return
-		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of NI because of deadlock")
+		case nodeInfoInterface := <-c_getSetNodeInfoInterface:
+			c_responsChan := make(chan T_NodeInfo)
+			nodeOperations.c_getSetNodeInfo <- c_responsChan
+			getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
+			for {
+				select {
+				case oldNodeInfo := <-c_responsChan:
+					nodeInfoInterface.c_get <- oldNodeInfo
+				case newNodeInfo := <-nodeInfoInterface.c_set:
+					c_responsChan <- newNodeInfo
+					break WAITFORINTERFACE
+				case <-getSetTimer.C:
+					F_WriteLog("Ended GetSet goroutine of NI because of deadlock")
+					break WAITFORINTERFACE
+				}
+			}
 		}
-		//No sleep
 	}
 }
-func f_GetGlobalQueue(ops T_NodeOperations) []T_GlobalQueueEntry {
+
+func f_GetGlobalQueue() []T_GlobalQueueEntry {
 	c_responseChan := make(chan []T_GlobalQueueEntry)
-	ops.c_readGlobalQueue <- c_responseChan // Send the response channel to the NodeOperationManager
-	globalQueue := <-c_responseChan         // Receive the global queue from the response channel
+	nodeOperations.c_getGlobalQueue <- c_responseChan // Send the response channel to the NodeOperationManager
+	globalQueue := <-c_responseChan                   // Receive the global queue from the response channel
 	return globalQueue
 }
-func f_SetGlobalQueue(ops T_NodeOperations, globalQueue []T_GlobalQueueEntry) {
-	ops.c_writeGlobalQueue <- globalQueue // Send the globalQueue directly to be written
+func f_SetGlobalQueue(globalQueue []T_GlobalQueueEntry) {
+	nodeOperations.c_setGlobalQueue <- globalQueue // Send the globalQueue directly to be written
 }
-func f_GetAndSetGlobalQueue(ops T_NodeOperations, c_readGlobalQueue chan []T_GlobalQueueEntry, c_writeGlobalQueue chan []T_GlobalQueueEntry, c_quit chan bool) { //let run in a sepreate goroutine
-	getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
-	c_responsChan := make(chan []T_GlobalQueueEntry)
 
-	ops.c_readAndWriteGlobalQueue <- c_responsChan
+func f_GetSetGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface) {
 	for {
+	WAITFORINTERFACE:
 		select {
-		case oldGlobalQueue := <-c_responsChan:
-			c_readGlobalQueue <- oldGlobalQueue
-		case newGlobalQueue := <-c_writeGlobalQueue:
-			c_responsChan <- newGlobalQueue
-		case <-c_quit:
-			return
-		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of GQ because of deadlock")
+		case globalQueueInterface := <-c_getSetGlobalQueueInterface:
+			c_responsChan := make(chan []T_GlobalQueueEntry)
+			nodeOperations.c_getSetGlobalQueue <- c_responsChan
+			getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
+			for {
+				select {
+				case oldGlobalQueue := <-c_responsChan:
+					globalQueueInterface.c_get <- oldGlobalQueue
+				case newGlobalQueue := <-globalQueueInterface.c_set:
+					c_responsChan <- newGlobalQueue
+					break WAITFORINTERFACE
+				case <-getSetTimer.C:
+					F_WriteLog("Ended GetSet goroutine of GQ because of deadlock")
+					break WAITFORINTERFACE
+				}
+			}
 		}
-		//No sleep
 	}
 }
-func f_GetConnectedNodes(ops T_NodeOperations) []T_NodeInfo {
+
+func f_GetConnectedNodes() []T_NodeInfo {
 	c_responseChan := make(chan []T_NodeInfo)
-	ops.c_readConnectedNodes <- c_responseChan // Send the response channel to the NodeOperationManager
-	connectedNodes := <-c_responseChan         // Receive the connected nodes from the response channel
+	nodeOperations.c_getConnectedNodes <- c_responseChan // Send the response channel to the NodeOperationManager
+	connectedNodes := <-c_responseChan                   // Receive the connected nodes from the response channel
 	return connectedNodes
 }
-func f_SetConnectedNodes(ops T_NodeOperations, connectedNodes []T_NodeInfo) {
-	ops.c_writeConnectedNodes <- connectedNodes // Send the connectedNodes directly to be written
+func f_SetConnectedNodes(connectedNodes []T_NodeInfo) {
+	nodeOperations.c_setConnectedNodes <- connectedNodes // Send the connectedNodes directly to be written
 }
-func f_GetAndSetConnectedNodes(ops T_NodeOperations, c_readConnectedNodes chan []T_NodeInfo, c_writeConnectedNodes chan []T_NodeInfo, c_quit chan bool) { //let run in a sepreate goroutine
-	getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
-	c_responsChan := make(chan []T_NodeInfo)
-
-	ops.c_readAndWriteConnectedNodes <- c_responsChan
+func f_GetSetConnectedNodes(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface) {
 	for {
+	WAITFORINTERFACE:
 		select {
-		case oldConnectedNodes := <-c_responsChan:
-			c_readConnectedNodes <- oldConnectedNodes
-		case newConnectedNodes := <-c_writeConnectedNodes:
-			c_responsChan <- newConnectedNodes
-		case <-c_quit:
-			return
-		case <-getSetTimer.C:
-			F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
+		case globalQueueInterface := <-c_getSetConnectedNodesInterface:
+			c_responsChan := make(chan []T_NodeInfo)
+			nodeOperations.c_getSetConnectedNodes <- c_responsChan
+			getSetTimer := time.NewTicker(time.Duration(GETSETPERIOD) * time.Second)
+			for {
+				select {
+				case oldConnectedNodes := <-c_responsChan:
+					globalQueueInterface.c_get <- oldConnectedNodes
+				case newConnectedNodes := <-globalQueueInterface.c_set:
+					c_responsChan <- newConnectedNodes
+					break WAITFORINTERFACE
+				case <-getSetTimer.C:
+					F_WriteLog("Ended GetSet goroutine of GQ because of deadlock")
+					break WAITFORINTERFACE
+				}
+			}
 		}
-		//No sleep
 	}
 }

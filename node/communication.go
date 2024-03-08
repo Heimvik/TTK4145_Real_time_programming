@@ -30,7 +30,7 @@ func F_TransmitMasterMessage(c_transmitMessage chan T_MasterMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
 
-func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOperations, port int) {
+func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int) {
 	c_receive := make(chan T_SlaveMessage)
 
 	go bcast.Receiver(port, c_receive)
@@ -44,7 +44,7 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, ops T_NodeOper
 	}
 }
 
-func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, ops T_NodeOperations, port int) {
+func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int) {
 	c_receive := make(chan T_MasterMessage)
 
 	go bcast.Receiver(port, c_receive)

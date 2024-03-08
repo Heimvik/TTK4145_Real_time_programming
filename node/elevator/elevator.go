@@ -37,37 +37,46 @@ type T_ElevatorInfo struct {
 	State     T_ElevatorState
 }
 
+type T_GetSetElevatorInterface struct {
+	C_get chan T_Elevator
+	C_set chan T_Elevator
+}
+
 type T_ElevatorOperations struct {
-	C_readElevator         chan chan T_Elevator
-	C_writeElevator        chan T_Elevator
-	C_readAndWriteElevator chan chan T_Elevator
+	C_getElevator    chan chan T_Elevator
+	C_setElevator    chan T_Elevator
+	C_getSetElevator chan chan T_Elevator
 }
 
 func F_GetElevator(ops T_ElevatorOperations) T_Elevator {
 	c_responseChan := make(chan T_Elevator)
-	ops.C_readElevator <- c_responseChan // Send the response channel to the NodeOperationManager
-	elevator := <-c_responseChan         // Receive the connected nodes from the response channel
+	ops.C_getElevator <- c_responseChan // Send the response channel to the NodeOperationManager
+	elevator := <-c_responseChan        // Receive the connected nodes from the response channel
 	return elevator
 }
 func F_SetElevator(ops T_ElevatorOperations, elevator T_Elevator) {
-	ops.C_writeElevator <- elevator // Send the connectedNodes directly to be written
+	ops.C_setElevator <- elevator // Send the connectedNodes directly to be written
 }
-func F_GetAndSetElevator(ops T_ElevatorOperations, c_readElevator chan T_Elevator, c_writeElevator chan T_Elevator, c_quit chan bool) { //let run in a sepreate goroutine
-	getSetTimer := time.NewTicker(time.Duration(2) * time.Second) //Hardkode 2 inntil videre, sync med initfil
-	c_responsChan := make(chan T_Elevator)
-
-	ops.C_readAndWriteElevator <- c_responsChan
+func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface) { //let run in a sepreate goroutine
 	for {
+	WAITFORINTERFACE:
 		select {
-		case oldElevator := <-c_responsChan:
-			c_readElevator <- oldElevator
-		case newElevator := <-c_writeElevator:
-			c_responsChan <- newElevator
-		case <-c_quit:
-			return
-		case <-getSetTimer.C:
-			fmt.Println("Elevator deadlock upon getset")
-			//F_WriteLog("Ended GetSet goroutine of CN because of deadlock")
+		case elevatorInterface := <-c_getSetElevatorInterface:
+			c_responsChan := make(chan T_Elevator)
+			elevatorOperations.C_getSetElevator <- c_responsChan
+			getSetTimer := time.NewTicker(time.Duration(5) * time.Second)
+			for {
+				select {
+				case oldElevator := <-c_responsChan:
+					elevatorInterface.C_get <- oldElevator
+				case newElevator := <-elevatorInterface.C_set:
+					c_responsChan <- newElevator
+					break WAITFORINTERFACE
+				case <-getSetTimer.C:
+					fmt.Println("Ended GetSet goroutine of NI because of deadlock")
+					break WAITFORINTERFACE
+				}
+			}
 		}
 	}
 }
