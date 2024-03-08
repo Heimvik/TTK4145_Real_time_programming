@@ -7,15 +7,14 @@ import (
 	"time"
 )
 
-var getSetElevatorInterface T_GetSetElevatorInterface        //Delete when no testing is needed, define only in run elevator
-var c_getSetElevatorInterface chan T_GetSetElevatorInterface //Delete when no testing is needed, define only in run elevator
-
-func F_SimulateRequest(c_requestFromElevator chan T_Request, c_requestToElevator chan T_Request) {
-	getSetElevatorInterface = T_GetSetElevatorInterface{ //make local when node Dont need acces with f_SimulateRequest() no more
+func F_SimulateRequest(elevatorOperations T_ElevatorOperations, c_requestFromElevator chan T_Request, c_requestToElevator chan T_Request) {
+	c_getSetElevatorInterface := make(chan T_GetSetElevatorInterface)
+	getSetElevatorInterface := T_GetSetElevatorInterface{
 		C_get: make(chan T_Elevator),
 		C_set: make(chan T_Elevator),
 	}
-	c_getSetElevatorInterface = make(chan T_GetSetElevatorInterface) //make local when node Dont need acces with f_SimulateRequest() no more
+
+	go F_GetAndSetElevator(elevatorOperations, c_getSetElevatorInterface)
 
 	increment := uint16(0)
 	go func() {
@@ -92,15 +91,9 @@ TODO:
 - Legge til elevatormusic.
 */
 
-var DOOROPENTIME int = 3                                     //kan kanskje flyttes men foreløpig kan den bli
+var DOOROPENTIME int = 3 //kan kanskje flyttes men foreløpig kan den bli
 
 func F_RunElevator(ops T_ElevatorOperations, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
-	getSetElevatorInterface = T_GetSetElevatorInterface{ //make local when node Dont need acces with f_SimulateRequest() no more
-		C_get: make(chan T_Elevator),
-		C_set: make(chan T_Elevator),
-	}
-
-	c_getSetElevatorInterface = make(chan T_GetSetElevatorInterface) //make local when node Dont need acces with f_SimulateRequest() no more
 
 	F_InitDriver(fmt.Sprintf("localhost:%d", elevatorport))
 
