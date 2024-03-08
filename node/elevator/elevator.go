@@ -82,7 +82,7 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 }
 
 func F_shouldStop(elevator T_Elevator) bool {
-	return (elevator.P_info.State == MOVING) && (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
+	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
 // her sender jeg ut (fiks deadlock)
