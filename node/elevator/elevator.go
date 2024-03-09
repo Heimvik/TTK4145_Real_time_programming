@@ -90,6 +90,8 @@ func F_shouldStop(elevator T_Elevator) bool {
 func F_clearRequest(elevator T_Elevator) T_Elevator {
 	elevator.P_serveRequest = nil
 	elevator.P_info.State = DOOROPEN
+	elevator.P_serveRequest = nil
+	elevator.P_info.State = DOOROPEN
 	return elevator
 }
 
