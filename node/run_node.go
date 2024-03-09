@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-// ***	START TEST FUNCTIONS	***//
-
-// ***	END TEST FUNCTIONS	***//
-
 func init() {
 	logFile, _ := os.OpenFile("log/debug1.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	defer logFile.Close()
@@ -300,6 +296,10 @@ func F_RunNode() {
 	c_getSetConnectedNodesInterface := make(chan T_GetSetConnectedNodesInterface)
 
 	//to run the main FSM
+	c_nodeIsMaster := make(chan bool)
+	c_quitMasterRoutines := make(chan bool)
+	c_nodeIsSlave := make(chan bool)
+
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
 	c_transmitMasterMessage := make(chan T_MasterMessage)
@@ -308,21 +308,9 @@ func F_RunNode() {
 	c_entryFromElevator := make(chan T_GlobalQueueEntry)
 	c_shouldCheckIfAssigned := make(chan bool)
 
-	c_nodeIsMaster := make(chan bool)
-	c_nodeIsSlave := make(chan bool)
-
 	c_assignState := make(chan T_AssignState)
 	c_ackAssignmentSucessFull := make(chan T_AckObject)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
-
-	c_quitMasterRoutines := make(chan bool)
-
-	/*
-		c_quitDecrementTimeUntilReassign := make(chan bool)
-		c_quitCheckGlobalQueueEntryStatus := make(chan bool)
-		c_quitCheckAssignedNodeState := make(chan bool)
-		c_quitCheckForNewAssignment := make(chan bool)
-	*/
 
 	go func() {
 		go f_NodeOperationManager(&ThisNode) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
