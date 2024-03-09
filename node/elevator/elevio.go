@@ -20,28 +20,20 @@ var _numFloors int = 4
 var _mtx sync.Mutex
 var _conn net.Conn
 
-type MotorDirection int
+type T_ButtonType int
 
 const (
-	MD_Up   MotorDirection = 1
-	MD_Down MotorDirection = -1
-	MD_Stop MotorDirection = 0
+	BT_HallUp   T_ButtonType = 0
+	BT_HallDown T_ButtonType = 1
+	BT_Cab      T_ButtonType = 2
 )
 
-type ButtonType int
-
-const (
-	BT_HallUp   ButtonType = 0
-	BT_HallDown ButtonType = 1
-	BT_Cab      ButtonType = 2
-)
-
-type ButtonEvent struct {
+type T_ButtonEvent struct {
 	Floor  int
-	Button ButtonType
+	Button T_ButtonType
 }
 
-func Init(addr string) {
+func F_InitDriver(addr string) {
 	if _initialized {
 		fmt.Println("Driver already initialized!")
 		return
@@ -55,35 +47,35 @@ func Init(addr string) {
 	_initialized = true
 }
 
-func SetMotorDirection(dir MotorDirection) {
-	write([4]byte{1, byte(dir), 0, 0})
+func F_SetMotorDirection(dir T_ElevatorDirection) {
+	f_write([4]byte{1, byte(dir), 0, 0})
 }
 
-func SetButtonLamp(button ButtonType, floor int, value bool) {
-	write([4]byte{2, byte(button), byte(floor), toByte(value)})
+func F_SetButtonLamp(button T_ButtonType, floor int, value bool) {
+	f_write([4]byte{2, byte(button), byte(floor), f_toByte(value)})
 }
 
-func SetFloorIndicator(floor int) {
-	write([4]byte{3, byte(floor), 0, 0})
+func F_SetFloorIndicator(floor int) {
+	f_write([4]byte{3, byte(floor), 0, 0})
 }
 
-func SetDoorOpenLamp(value bool) {
-	write([4]byte{4, toByte(value), 0, 0})
+func F_SetDoorOpenLamp(value bool) {
+	f_write([4]byte{4, f_toByte(value), 0, 0})
 }
 
-func SetStopLamp(value bool) {
-	write([4]byte{5, toByte(value), 0, 0})
+func F_SetStopLamp(value bool) {
+	f_write([4]byte{5, f_toByte(value), 0, 0})
 }
 
-func PollButtons(receiver chan<- ButtonEvent) {
+func F_PollButtons(receiver chan<- T_ButtonEvent) {
 	prev := make([][3]bool, _numFloors)
 	for {
 		time.Sleep(_pollRate)
 		for f := 0; f < _numFloors; f++ {
-			for b := ButtonType(0); b < 3; b++ {
-				v := GetButton(b, f)
+			for b := T_ButtonType(0); b < 3; b++ {
+				v := f_GetButton(b, f)
 				if v != prev[f][b] && v {
-					receiver <- ButtonEvent{f, ButtonType(b)}
+					receiver <- T_ButtonEvent{f, T_ButtonType(b)}
 				}
 				prev[f][b] = v
 			}
@@ -91,11 +83,11 @@ func PollButtons(receiver chan<- ButtonEvent) {
 	}
 }
 
-func PollFloorSensor(receiver chan<- int) {
+func F_PollFloorSensor(receiver chan<- int) {
 	prev := -1
 	for {
 		time.Sleep(_pollRate)
-		v := GetFloor()
+		v := f_GetFloor()
 		if v != prev && v != -1 {
 			receiver <- v
 		}
@@ -103,11 +95,11 @@ func PollFloorSensor(receiver chan<- int) {
 	}
 }
 
-func PollStopButton(receiver chan<- bool) {
+func F_PollStopButton(receiver chan<- bool) {
 	prev := false
 	for {
 		time.Sleep(_pollRate)
-		v := GetStop()
+		v := f_GetStop()
 		if v != prev {
 			receiver <- v
 		}
@@ -115,11 +107,11 @@ func PollStopButton(receiver chan<- bool) {
 	}
 }
 
-func PollObstructionSwitch(receiver chan<- bool) {
+func F_PollObstructionSwitch(receiver chan<- bool) {
 	prev := false
 	for {
 		time.Sleep(_pollRate)
-		v := GetObstruction()
+		v := f_GetObstruction()
 		if v != prev {
 			receiver <- v
 		}
@@ -127,13 +119,13 @@ func PollObstructionSwitch(receiver chan<- bool) {
 	}
 }
 
-func GetButton(button ButtonType, floor int) bool {
-	a := read([4]byte{6, byte(button), byte(floor), 0})
-	return toBool(a[1])
+func f_GetButton(button T_ButtonType, floor int) bool {
+	a := f_read([4]byte{6, byte(button), byte(floor), 0})
+	return f_toBool(a[1])
 }
 
-func GetFloor() int {
-	a := read([4]byte{7, 0, 0, 0})
+func f_GetFloor() int {
+	a := f_read([4]byte{7, 0, 0, 0})
 	if a[1] != 0 {
 		return int(a[2])
 	} else {
@@ -141,17 +133,17 @@ func GetFloor() int {
 	}
 }
 
-func GetStop() bool {
-	a := read([4]byte{8, 0, 0, 0})
-	return toBool(a[1])
+func f_GetStop() bool {
+	a := f_read([4]byte{8, 0, 0, 0})
+	return f_toBool(a[1])
 }
 
-func GetObstruction() bool {
-	a := read([4]byte{9, 0, 0, 0})
-	return toBool(a[1])
+func f_GetObstruction() bool {
+	a := f_read([4]byte{9, 0, 0, 0})
+	return f_toBool(a[1])
 }
 
-func read(in [4]byte) [4]byte {
+func f_read(in [4]byte) [4]byte {
 	_mtx.Lock()
 	defer _mtx.Unlock()
 
@@ -169,7 +161,7 @@ func read(in [4]byte) [4]byte {
 	return out
 }
 
-func write(in [4]byte) {
+func f_write(in [4]byte) {
 	_mtx.Lock()
 	defer _mtx.Unlock()
 
@@ -179,7 +171,7 @@ func write(in [4]byte) {
 	}
 }
 
-func toByte(a bool) byte {
+func f_toByte(a bool) byte {
 	var b byte = 0
 	if a {
 		b = 1
@@ -187,7 +179,7 @@ func toByte(a bool) byte {
 	return b
 }
 
-func toBool(a byte) bool {
+func f_toBool(a byte) bool {
 	var b bool = false
 	if a != 0 {
 		b = true

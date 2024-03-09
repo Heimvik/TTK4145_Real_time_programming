@@ -31,9 +31,9 @@ type T_GlobalQueueEntry struct {
 }
 
 type T_AckObject struct {
-	ObjectToAcknowledge interface{}
+	ObjectToAcknowledge        interface{}
 	ObjectToSupportAcknowledge interface{}
-	C_Acknowledgement  chan bool
+	C_Acknowledgement          chan bool
 }
 
 type T_MasterMessage struct {
@@ -84,18 +84,31 @@ const (
 )
 
 // NodeOperation represents an operation to be performed on T_Node
+type T_GetSetNodeInfoInterface struct {
+	c_get chan T_NodeInfo
+	c_set chan T_NodeInfo
+}
+type T_GetSetGlobalQueueInterface struct {
+	c_get chan []T_GlobalQueueEntry
+	c_set chan []T_GlobalQueueEntry
+}
+type T_GetSetConnectedNodesInterface struct {
+	c_get chan []T_NodeInfo
+	c_set chan []T_NodeInfo
+}
+
 type T_NodeOperations struct {
-	c_readNodeInfo         chan chan T_NodeInfo
-	c_writeNodeInfo        chan T_NodeInfo
-	c_readAndWriteNodeInfo chan chan T_NodeInfo
+	c_getNodeInfo    chan chan T_NodeInfo
+	c_setNodeInfo    chan T_NodeInfo
+	c_getSetNodeInfo chan chan T_NodeInfo
 
-	c_readGlobalQueue         chan chan []T_GlobalQueueEntry
-	c_writeGlobalQueue        chan []T_GlobalQueueEntry
-	c_readAndWriteGlobalQueue chan chan []T_GlobalQueueEntry
+	c_getGlobalQueue    chan chan []T_GlobalQueueEntry
+	c_setGlobalQueue    chan []T_GlobalQueueEntry
+	c_getSetGlobalQueue chan chan []T_GlobalQueueEntry
 
-	c_readConnectedNodes         chan chan []T_NodeInfo
-	c_writeConnectedNodes        chan []T_NodeInfo
-	c_readAndWriteConnectedNodes chan chan []T_NodeInfo
+	c_getConnectedNodes    chan chan []T_NodeInfo
+	c_setConnectedNodes    chan []T_NodeInfo
+	c_getSetConnectedNodes chan chan []T_NodeInfo
 	// Add more channels for other operations as needed
 }
 
