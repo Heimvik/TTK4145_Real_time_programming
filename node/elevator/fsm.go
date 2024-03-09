@@ -1,6 +1,5 @@
 package elevator
 
-// COMMENT: EN sentral FSM med alt som skjer i alle statesa, lettere å få oversikt over feks IDLE, MOVING osv
 func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
@@ -14,12 +13,11 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	return elevator
 }
 
-// COMMENT: Er dette en FSM?
 func F_DoorTimeout(elevator T_Elevator, c_requestOut chan T_Request) (T_Elevator, T_Request) { //COMMENT: c_requestOut ute i run_elevator (her brukes den ikke da)
 	if elevator.P_info.State == DOOROPEN && !elevator.Obstructed { //hvis heisen ikke er obstructed skal den gå til IDLE
 		elevator.P_info.State = IDLE
 		return elevator, T_Request{}
-	} else if (elevator.P_info.State == DOOROPEN) && (elevator.Obstructed) && (elevator.P_serveRequest != nil) { //hvis heisen er obstructed skal den fortsette å være DOOROPEN
+	} else if (elevator.P_info.State == DOOROPEN) && (elevator.Obstructed) && (elevator.P_serveRequest != nil) {
 		resendReq := *elevator.P_serveRequest
 		resendReq.State = UNASSIGNED
 		return elevator, resendReq
@@ -29,13 +27,10 @@ func F_DoorTimeout(elevator T_Elevator, c_requestOut chan T_Request) (T_Elevator
 
 // her mottar jeg (kan oppstå deadlock)
 // COMMENT: Samle i sentral FSM
-func F_ReceiveRequest(req T_Request, elevator T_Elevator, c_requestOut chan T_Request) T_Elevator {
-	// switch elevator.P_info.State {
-	// case IDLE:
+func F_ReceiveRequest(req T_Request, elevator T_Elevator) T_Elevator {
 	elevator.P_serveRequest = &req
 	elevator.P_serveRequest.State = ACTIVE
 	elevator = F_SetElevatorDirection(elevator)
-	// }
 	return elevator
 }
 

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-func F_Timer(timerStop chan bool, timerTimeout chan bool){
+func F_DoorTimer(timerStop chan bool, timerTimeout chan bool){
 	timer := time.NewTicker(time.Duration(DOOROPENTIME) * time.Second)
 	for {
 		select {
