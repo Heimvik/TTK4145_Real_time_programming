@@ -36,7 +36,7 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int, c_qu
 	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
-		case <- c_quit:
+		case <-c_quit:
 			F_WriteLog("Closed f_ReceiveSlaveMessage")
 			return
 		case receivedMessage := <-c_receive:
@@ -53,7 +53,7 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int, c_
 	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
-		case <- c_quit:
+		case <-c_quit:
 			F_WriteLog("Closed f_ReceiveMasterMessage")
 			return
 		case receivedMessage := <-c_receive:

@@ -2,6 +2,7 @@ package node
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
@@ -291,8 +292,8 @@ func F_ProcessPairManager() {
 		if err != nil {
 			F_WriteLog("Error starting BACKUP")
 		}
-		f_RunPrimary()
 		F_WriteLog("Switched to primary")
+		f_RunPrimary()
 
 	}
 }
@@ -308,28 +309,40 @@ func f_RunBackup(c_isPrimary chan bool) {
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
 
-	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, MASTERPORT, c_quitBackupRoutines)
-	go F_ReceiveMasterMessage(c_receiveMasterMessage, SLAVEPORT, c_quitBackupRoutines)
+	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT, c_quitBackupRoutines)
+	go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT, c_quitBackupRoutines)
 
-	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Second)
+	PBTicker := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Second)
 	for {
 		select {
-		case <-PBTimer.C:
-			c_isPrimary <- true
+		case <-PBTicker.C:
+			fmt.Println("Timer ran out - initiates primary role")
 			close(c_quitBackupRoutines)
+			c_isPrimary <- true
 			return
 		case masterMessage := <-c_receiveMasterMessage:
+			fmt.Println("Backup received mastermessage")
 			thisNodeInfo := f_GetNodeInfo()
 			f_SetGlobalQueue(masterMessage.GlobalQueue)
 			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == MASTER {
-				f_SetNodeInfo(masterMessage.Transmitter)
-				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+				f_SetNodeInfo(T_NodeInfo{
+					PRIORITY:            masterMessage.Transmitter.PRIORITY,
+					MSRole:              masterMessage.Transmitter.MSRole,
+					TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
+					ElevatorInfo: elevator.T_ElevatorInfo{
+						Direction: elevator.NONE,
+						Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
+						State:     0,
+					},
+				}) //Change to f_SetNodeInfo(masterMessage.Transmitter) when not testing
+				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
 		case slaveMessage := <-c_receiveSlaveMessage:
+			fmt.Println("Backup received slavemessage")
 			thisNodeInfo := f_GetNodeInfo()
 			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == SLAVE {
 				f_SetNodeInfo(slaveMessage.Transmitter)
-				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
 		}
 	}

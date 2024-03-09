@@ -1,70 +1,18 @@
-2024/03/09 16:54:32 log_functions.go:15: Started as BACKUP
-2024/03/09 16:54:36 log_functions.go:15: Closed f_ReceiveMasterMessage
-2024/03/09 16:54:36 log_functions.go:15: Closed f_ReceiveSlaveMessage
-2024/03/09 16:54:37 log_functions.go:15: Error starting BACKUP
-2024/03/09 16:54:37 log_functions.go:15: Started all master routines
-2024/03/09 16:54:38 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:38 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:39 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:39 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:39 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:40 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:40 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:41 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:41 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:41 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:42 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:42 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:43 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:43 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:43 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:44 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:44 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:45 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:45 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:45 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:46 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:46 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:47 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:47 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:47 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:48 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:48 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:49 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:49 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:49 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:50 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:50 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:51 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:51 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:51 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:52 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:52 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:53 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:53 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:53 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:54 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:54 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:55 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:55 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:55 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:56 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:56 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:57 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:57 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:57 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:58 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:58 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:54:59 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:54:59 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:54:59 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:55:00 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:55:00 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:55:01 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:55:01 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:55:01 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:55:02 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:55:02 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/09 16:55:03 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/09 16:55:03 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
-2024/03/09 16:55:03 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:32 log_functions.go:15: Started as BACKUP
+2024/03/09 18:08:33 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:33 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:34 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/09 18:08:34 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:34 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:35 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:35 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:36 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/09 18:08:36 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:36 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:37 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:37 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:38 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/09 18:08:38 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:38 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/09 18:08:39 log_functions.go:15: Node: | 1 | MASTER | received MM from | 1 | MASTER | GlobalQueue: []
+2024/03/09 18:08:39 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
