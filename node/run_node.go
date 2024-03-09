@@ -77,19 +77,20 @@ func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_quit
 					globalQueue := f_GetGlobalQueue()
 					updatedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
 					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
-					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING || updatedEntry.Request.State == elevator.ACTIVE {
+					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && updatedEntry.Request.State == elevator.ACTIVE {
 						ackAssignmentSucessFull.C_Acknowledgement <- true
 						F_WriteLog("Found ack")
 						assignBreakoutTimer.Stop()
 						break PollLastAssigned
 					}
 				}
+				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
 		case <-c_quit:
 			F_WriteLog("Closed: f_CheckAssignedNodeState")
 			return
 		}
-		time.Sleep(time.Duration(MEDIUMRESPONSIVEPERIOD) * time.Microsecond)
+		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
 
@@ -207,6 +208,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		default:
 			switch assignState {
 			case ASSIGN:
+				//Enters upon change fom 
 				connectedNodes := f_GetConnectedNodes()
 				avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
 				c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
@@ -236,6 +238,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 			}
 
 		}
+		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
 
@@ -244,8 +247,8 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
-	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
+	//go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
 	globalQueue := f_GetGlobalQueue()
