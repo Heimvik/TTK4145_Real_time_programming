@@ -43,4 +43,7 @@ Upon having both nodes connected, disconnecting master, connecting master, we ge
 
 Aka we disallow backward information when a entry is reassigned. This fixes itself.
 
-##
+
+## Slave keeps spawning terminals when in slave
+
+Slave keeps spawning terminals when in slave. Not sure of what causes, but problem lies in f_BackupManager.
