@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-// ***	START TEST FUNCTIONS	***//
-
-// ***	END TEST FUNCTIONS	***//
-
 func init() {
 	logFile, _ := os.OpenFile("log/debug1.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 	defer logFile.Close()
@@ -59,20 +55,22 @@ func init() {
 	LEASTRESPONSIVEPERIOD = config.LeastResponsivePeriod
 }
 
-func f_CheckAssignedNodeState(c_lastAssignedEntry chan T_GlobalQueueEntry, c_assignmentSuccessfull chan bool, c_quit chan bool) {
+func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_quit chan bool) {
 	for {
 	PollLastAssigned:
 		select {
-		case lastAssignedEntry := <-c_lastAssignedEntry:
+		case ackAssignmentSucessFull := <-c_ackAssignmentSucessFull:
+			lastAssignedEntry := ackAssignmentSucessFull.ObjectToAcknowledge.(T_GlobalQueueEntry)
 			F_WriteLog("Getting ack from last assinged...")
 			assignBreakoutTimer := time.NewTicker(time.Duration(ASSIGNBREAKOUTPERIOD) * time.Second)
 			for {
 				select {
 				case <-assignBreakoutTimer.C:
-					c_assignmentSuccessfull <- false
+					ackAssignmentSucessFull.C_Acknowledgement <- false
 					assignBreakoutTimer.Stop()
 					break PollLastAssigned
 				case <-c_quit:
+					F_WriteLog("Closed: f_CheckAssignedNodeState")
 					return
 				default:
 					connectedNodes := f_GetConnectedNodes()
@@ -80,7 +78,7 @@ func f_CheckAssignedNodeState(c_lastAssignedEntry chan T_GlobalQueueEntry, c_ass
 					updatedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
 					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
 					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING || updatedEntry.Request.State == elevator.ACTIVE {
-						c_assignmentSuccessfull <- true
+						ackAssignmentSucessFull.C_Acknowledgement <- true
 						F_WriteLog("Found ack")
 						assignBreakoutTimer.Stop()
 						break PollLastAssigned
@@ -88,6 +86,7 @@ func f_CheckAssignedNodeState(c_lastAssignedEntry chan T_GlobalQueueEntry, c_ass
 				}
 			}
 		case <-c_quit:
+			F_WriteLog("Closed: f_CheckAssignedNodeState")
 			return
 		}
 		time.Sleep(time.Duration(MEDIUMRESPONSIVEPERIOD) * time.Microsecond)
@@ -98,6 +97,7 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Closed: f_CheckGlobalQueueEntryStatus")
 			return
 		default:
 			thisNodeInfo := f_GetNodeInfo()
@@ -157,6 +157,7 @@ func f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface chan T_GetSetGlob
 	for {
 		select {
 		case <-c_quit:
+			F_WriteLog("Closed: f_DecrementTimeUntilReassign")
 			return
 		default:
 			c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
@@ -187,6 +188,53 @@ func f_DecrementTimeUntilDisconnect(c_getSetConnectedNodesInterface chan T_GetSe
 			getSetConnectedNodesInterface.c_set <- connectedNodes
 
 			time.Sleep(1 * time.Second)
+		}
+	}
+}
+
+func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackAssignmentSucessFull chan T_AckObject, c_assignState chan T_AssignState, c_quit chan bool) {
+	assignState := ASSIGN
+	c_assignmentSuccessfull := make(chan bool)
+	ackAssignmentSucessFull := T_AckObject{
+		C_Acknowledgement: c_assignmentSuccessfull,
+	}
+	for {
+		select {
+		case assignState = <-c_assignState:
+		case <-c_quit:
+			F_WriteLog("Closed: f_CheckIfShouldAssign")
+			return
+		default:
+			switch assignState {
+			case ASSIGN:
+				connectedNodes := f_GetConnectedNodes()
+				avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
+				c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
+				globalQueue := <-getSetGlobalQueueInterface.c_get
+
+				assignedEntry, assignedEntryIndex := F_AssignNewEntry(globalQueue, connectedNodes, avalibaleNodes)
+				if (assignedEntry != T_GlobalQueueEntry{}) {
+					globalQueue[assignedEntryIndex] = assignedEntry
+					ackAssignmentSucessFull.ObjectToAcknowledge = assignedEntry
+					c_ackAssignmentSucessFull <- ackAssignmentSucessFull
+					F_WriteLog("Assigned request with ID: " + strconv.Itoa(int(assignedEntry.Request.Id)) + " assigned to node " + strconv.Itoa(int(assignedEntry.AssignedNode)))
+					assignState = WAITFORACK
+				}
+
+				getSetGlobalQueueInterface.c_set <- globalQueue
+
+			case WAITFORACK:
+				select {
+				case assigmentWasSucessFull := <-ackAssignmentSucessFull.C_Acknowledgement:
+					if assigmentWasSucessFull {
+						assignState = ASSIGN
+					} else {
+						assignState = ASSIGN //Start reassigning after 10 secs anyways
+					}
+				default:
+				}
+			}
+
 		}
 	}
 }
@@ -248,22 +296,21 @@ func F_RunNode() {
 	c_getSetConnectedNodesInterface := make(chan T_GetSetConnectedNodesInterface)
 
 	//to run the main FSM
+	c_nodeIsMaster := make(chan bool)
+	c_quitMasterRoutines := make(chan bool)
+	c_nodeIsSlave := make(chan bool)
+
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
 	c_transmitMasterMessage := make(chan T_MasterMessage)
 	c_transmitSlaveMessage := make(chan T_SlaveMessage)
 
 	c_entryFromElevator := make(chan T_GlobalQueueEntry)
-	c_lastAssignedEntry := make(chan T_GlobalQueueEntry)
-	c_assignmentWasSucessFull := make(chan bool)
 	c_shouldCheckIfAssigned := make(chan bool)
-	c_nodeIsMaster := make(chan bool)
-	c_nodeIsSlave := make(chan bool)
-	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
-	c_quitDecrementTimeUntilReassign := make(chan bool)
-	c_quitCheckGlobalQueueEntryStatus := make(chan bool)
-	c_quitCheckAssignedNodeState := make(chan bool)
+	c_assignState := make(chan T_AssignState)
+	c_ackAssignmentSucessFull := make(chan T_AckObject)
+	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
 	go func() {
 		go f_NodeOperationManager(&ThisNode) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
@@ -283,9 +330,16 @@ func F_RunNode() {
 		for {
 			select {
 			case <-c_nodeIsMaster:
-				go f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_quitDecrementTimeUntilReassign)
-				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_quitCheckGlobalQueueEntryStatus)
-				go f_CheckAssignedNodeState(c_lastAssignedEntry, c_assignmentWasSucessFull, c_quitCheckAssignedNodeState)
+				go f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_quitMasterRoutines)
+				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
+				go f_CheckIfShouldAssign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackAssignmentSucessFull, c_assignState, c_quitMasterRoutines)
+				go f_CheckAssignedNodeState(c_ackAssignmentSucessFull, c_quitMasterRoutines)
+				c_assignState <- ASSIGN
+				F_WriteLog("Started all master routines")
+
+			case <-c_nodeIsSlave:
+				close(c_quitMasterRoutines)
+				c_quitMasterRoutines = make(chan bool)
 
 			default:
 				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
@@ -294,18 +348,12 @@ func F_RunNode() {
 	}()
 
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
-	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond) //Test function
-	assignState := ASSIGN
+	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond)
 
-	nodeRole := f_GetNodeInfo().Role
-	if nodeRole == MASTER {
-		c_nodeIsMaster <- true
-	} else {
-		c_nodeIsSlave <- true
-	}
+	c_nodeIsMaster <- true
 
 	for {
-		nodeRole = f_GetNodeInfo().Role
+		nodeRole := f_GetNodeInfo().Role
 		switch nodeRole {
 		case MASTER:
 			select {
@@ -338,18 +386,14 @@ func F_RunNode() {
 				F_WriteLogGlobalQueueEntry(entryFromElevator)
 
 			case ackSentGlobalQueueToSlave := <-c_ackSentGlobalQueueToSlave:
-				transmitterNodeInfo, nodeInfoTypeOk := ackSentGlobalQueueToSlave.ObjectToSupportAcknowledge.(T_NodeInfo)
-				globalQueue, globalQueueTypeOk := ackSentGlobalQueueToSlave.ObjectToAcknowledge.([]T_GlobalQueueEntry)
-				if !globalQueueTypeOk || !nodeInfoTypeOk {
-					F_WriteLog("Ack operation failed in sending to slave, wrong type")
-				} else {
-					masterMessage := T_MasterMessage{
-						Transmitter: transmitterNodeInfo,
-						GlobalQueue: globalQueue,
-					}
-					c_transmitMasterMessage <- masterMessage
-					ackSentGlobalQueueToSlave.C_Acknowledgement <- true
+				transmitterNodeInfo := ackSentGlobalQueueToSlave.ObjectToSupportAcknowledge.(T_NodeInfo)
+				globalQueue := ackSentGlobalQueueToSlave.ObjectToAcknowledge.([]T_GlobalQueueEntry)
+				masterMessage := T_MasterMessage{
+					Transmitter: transmitterNodeInfo,
+					GlobalQueue: globalQueue,
 				}
+				c_transmitMasterMessage <- masterMessage
+				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
 			case <-sendTimer.C:
 				transmitterNodeInfo := f_GetNodeInfo()
@@ -363,7 +407,6 @@ func F_RunNode() {
 			case <-printGQTimer.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
-				F_WriteLog("Assignstate: | " + strconv.Itoa(int(assignState)) + " |")
 				F_WriteLog("Node: | " + strconv.Itoa(int(nodeInfo.PRIORITY)) + " | MASTER | has GQ:\n")
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
@@ -379,45 +422,11 @@ func F_RunNode() {
 				getSetNodeInfoInterface.c_set <- newNodeInfo
 
 				thisNodeInfo := newNodeInfo
-				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo) //Update connected nodes with newnodeinfo
-
-				//Need to be in own FSM
-				switch assignState {
-				case ASSIGN:
-					connectedNodes := f_GetConnectedNodes()
-					avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
-					c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
-					globalQueue := <-getSetGlobalQueueInterface.c_get
-
-					assignedEntry, assignedEntryIndex := F_AssignNewEntry(globalQueue, connectedNodes, avalibaleNodes)
-					if (assignedEntry != T_GlobalQueueEntry{}) {
-						globalQueue[assignedEntryIndex] = assignedEntry
-						c_lastAssignedEntry <- assignedEntry
-						F_WriteLog("Assigned request with ID: " + strconv.Itoa(int(assignedEntry.Request.Id)) + " assigned to node " + strconv.Itoa(int(assignedEntry.AssignedNode)))
-						assignState = WAITFORACK
-					}
-
-					getSetGlobalQueueInterface.c_set <- globalQueue
-
-				case WAITFORACK:
-					select {
-					case assigmentWasSucessFull := <-c_assignmentWasSucessFull:
-						if assigmentWasSucessFull {
-							assignState = ASSIGN
-						} else {
-							assignState = ASSIGN //Start reassigning after 10 secs anyways
-						}
-					default:
-					}
-				}
+				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 
 				if newNodeInfo.Role == SLAVE {
-					c_quitDecrementTimeUntilReassign <- true
-					c_quitCheckGlobalQueueEntryStatus <- true
-					c_quitCheckAssignedNodeState <- true
-					assignState = ASSIGN
+					c_nodeIsSlave <- true
 				}
-
 			}
 
 		case SLAVE:
