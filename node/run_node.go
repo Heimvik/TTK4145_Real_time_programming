@@ -239,13 +239,13 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 }
 
-func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry) {
+func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry, c_getSetElevatorInterface chan elevator.T_GetSetElevatorInterface) {
 	c_requestFromElevator := make(chan elevator.T_Request)
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOps, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
-	go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
+	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
 	globalQueue := f_GetGlobalQueue()
@@ -275,6 +275,84 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 
 //IMPORTANT:
 //-global variables should ALWAYS be handled by server to operate onn good data
+/*
+func F_ProcessPairManager() {
+	//has init
+	nodeOperations := T_NodeOperations{
+		c_readNodeInfo:         make(chan chan T_NodeInfo),
+		c_writeNodeInfo:        make(chan T_NodeInfo),
+		c_readAndWriteNodeInfo: make(chan chan T_NodeInfo),
+
+		c_readGlobalQueue:         make(chan chan []T_GlobalQueueEntry),
+		c_writeGlobalQueue:        make(chan []T_GlobalQueueEntry),
+		c_readAndWriteGlobalQueue: make(chan chan []T_GlobalQueueEntry),
+
+		c_readConnectedNodes:         make(chan chan []T_NodeInfo),
+		c_writeConnectedNodes:        make(chan []T_NodeInfo),
+		c_readAndWriteConnectedNodes: make(chan chan []T_NodeInfo),
+	}
+	getSetGlobalQueueInterface := T_GetSetGlobalQueueInterface{
+		c_get: make(chan []T_GlobalQueueEntry),
+		c_set: make(chan []T_GlobalQueueEntry),
+	}
+	getSetConnectedNodesInterface := T_GetSetConnectedNodesInterface{
+		c_get: make(chan []T_NodeInfo),
+		c_set: make(chan []T_NodeInfo),
+	}
+
+	go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
+
+	c_isPrimary := make(chan bool)
+	go F_RunBackup(nodeOperations, c_isPrimary)
+	select {
+	case <-c_isPrimary:
+		err := exec.Command("gnome-terminal", "--", "go", "run", "main.go").Run()
+		if err != nil {
+			fmt.Println("Error starting BACKUP")
+		}
+		F_RunPrimary(nodeOperations, elevatorOperations)
+	}
+}
+
+//IMPORTANT:
+//-global variables should ALWAYS be handled by server to operate onn good data
+//-all receive from channles should be organized in for-select!!! -> walk trough code and do
+
+func F_RunBackup(nodeOps T_NodeOperations, c_isPrimary chan bool) {
+	//constantly check if we receive messages
+	F_WriteLog("Started as BACKUP")
+	c_quitBackupRoutines := make(chan bool)
+	c_receiveSlaveMessage := make(chan T_SlaveMessage)
+	c_receiveMasterMessage := make(chan T_MasterMessage)
+
+	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOps, MASTERPORT, c_quitBackupRoutines)
+	go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOps, SLAVEPORT, c_quitBackupRoutines)
+
+	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Second)
+	for {
+		select {
+		case <-PBTimer.C:
+			F_WriteLog("Switched to PRIMARY")
+			c_isPrimary <- true
+			close(c_quitBackupRoutines)
+			return
+		case masterMessage := <-c_receiveMasterMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOps)
+			f_SetGlobalQueue(nodeOps, masterMessage.GlobalQueue)
+			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == MASTER {
+				f_SetNodeInfo(nodeOps, masterMessage.Transmitter)
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+			}
+		case slaveMessage := <-c_receiveSlaveMessage:
+			thisNodeInfo := f_GetNodeInfo(nodeOps)
+			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == SLAVE {
+				f_SetNodeInfo(nodeOps, slaveMessage.Transmitter)
+				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
+			}
+		}
+	}
+}
+*/
 
 func F_RunNode() {
 
@@ -294,6 +372,7 @@ func F_RunNode() {
 	c_getSetNodeInfoInterface := make(chan T_GetSetNodeInfoInterface)
 	c_getSetGlobalQueueInterface := make(chan T_GetSetGlobalQueueInterface)
 	c_getSetConnectedNodesInterface := make(chan T_GetSetConnectedNodesInterface)
+	c_getSetElevatorInterface := make(chan elevator.T_GetSetElevatorInterface)
 
 	//to run the main FSM
 	c_nodeIsMaster := make(chan bool)
@@ -319,7 +398,7 @@ func F_RunNode() {
 		go f_GetSetGlobalQueue(c_getSetGlobalQueueInterface)
 		go f_GetSetConnectedNodes(c_getSetConnectedNodesInterface)
 
-		go f_ElevatorManager(c_shouldCheckIfAssigned, c_entryFromElevator)
+		go f_ElevatorManager(c_shouldCheckIfAssigned, c_entryFromElevator, c_getSetElevatorInterface)
 		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT)
 		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
