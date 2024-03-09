@@ -208,7 +208,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		default:
 			switch assignState {
 			case ASSIGN:
-				//Enters upon change fom 
+				//Enters upon change fom
 				connectedNodes := f_GetConnectedNodes()
 				avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
 				c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
@@ -445,7 +445,7 @@ func F_RunNode() {
 				f_WriteLogConnectedNodes(f_GetConnectedNodes())
 				thisNode := f_GetNodeInfo()
 				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
-					f_UpdateGlobalQueueMaster(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				}
 
 			case slaveMessage := <-c_receiveSlaveMessage:
@@ -515,7 +515,7 @@ func F_RunNode() {
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_WriteLogMasterMessage(masterMessage)
-				f_UpdateGlobalQueueSlave(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
