@@ -116,13 +116,6 @@ func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntr
 	return T_GlobalQueueEntry{}
 }
 
-/*
-	func f_UpdateGlobalQueueMaster(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
-		for _, remoteEntry := range masterMessage.GlobalQueue {
-			f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, remoteEntry)
-		}
-	}
-*/
 func f_UpdateGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {

@@ -46,7 +46,7 @@ func Transmitter(port int, chans ...interface{}) {
 
 // Matches type-tagged JSON received on `port` to element types of `chans`, then
 // sends the decoded value on the corresponding channel
-func Receiver(port int, chans ...interface{}) {
+func Receiver(port int, c_quit chan bool, chans ...interface{}) {
 	checkArgs(chans...)
 	chansMap := make(map[string]interface{})
 	for _, ch := range chans {
@@ -56,24 +56,29 @@ func Receiver(port int, chans ...interface{}) {
 	var buf [bufSize]byte
 	conn := conn.DialBroadcastUDP(port)
 	for {
-		n, _, e := conn.ReadFrom(buf[0:])
-		if e != nil {
-			fmt.Printf("bcast.Receiver(%d, ...):ReadFrom() failed: \"%+v\"\n", port, e)
-		}
+		select{
+		case <- c_quit:
+			return
+		default:
+			n, _, e := conn.ReadFrom(buf[0:])
+			if e != nil {
+				fmt.Printf("bcast.Receiver(%d, ...):ReadFrom() failed: \"%+v\"\n", port, e)
+			}
 
-		var ttj typeTaggedJSON
-		json.Unmarshal(buf[0:n], &ttj)
-		ch, ok := chansMap[ttj.TypeId]
-		if !ok {
-			continue
+			var ttj typeTaggedJSON
+			json.Unmarshal(buf[0:n], &ttj)
+			ch, ok := chansMap[ttj.TypeId]
+			if !ok {
+				continue
+			}
+			v := reflect.New(reflect.TypeOf(ch).Elem())
+			json.Unmarshal(ttj.JSON, v.Interface())
+			reflect.Select([]reflect.SelectCase{{
+				Dir:  reflect.SelectSend,
+				Chan: reflect.ValueOf(ch),
+				Send: reflect.Indirect(v),
+			}})
 		}
-		v := reflect.New(reflect.TypeOf(ch).Elem())
-		json.Unmarshal(ttj.JSON, v.Interface())
-		reflect.Select([]reflect.SelectCase{{
-			Dir:  reflect.SelectSend,
-			Chan: reflect.ValueOf(ch),
-			Send: reflect.Indirect(v),
-		}})
 	}
 }
 

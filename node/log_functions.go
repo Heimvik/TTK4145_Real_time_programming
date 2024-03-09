@@ -15,7 +15,7 @@ func F_WriteLog(text string) bool {
 	log.Print(text)
 	return true
 }
-func f_NodeRoleToString(role T_NodeRole) string {
+func f_NodeRoleToString(role T_MSNodeRole) string {
 	switch role {
 	case MASTER:
 		return "MASTER"
@@ -25,10 +25,10 @@ func f_NodeRoleToString(role T_NodeRole) string {
 }
 func f_WriteLogConnectedNodes(connectedNodes []T_NodeInfo) {
 	thisNode := f_GetNodeInfo()
-	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.Role))
+	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.MSRole))
 	for _, info := range connectedNodes {
 		logStr += fmt.Sprintf("%d (Role: %s, ElevatorInfo: %+v, TimeUntilDisconnect: %d) | ",
-			info.PRIORITY, f_NodeRoleToString(info.Role), info.ElevatorInfo, info.TimeUntilDisconnect)
+			info.PRIORITY, f_NodeRoleToString(info.MSRole), info.ElevatorInfo, info.TimeUntilDisconnect)
 	}
 	F_WriteLog(logStr)
 }
@@ -84,13 +84,13 @@ func f_WriteLogSlaveMessage(slaveMessage T_SlaveMessage) {
 	request := slaveMessage.Entry.Request
 	thisNode := f_GetNodeInfo()
 	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s |",
-		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.Role), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
+		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.MSRole), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
 	F_WriteLog(logStr)
 }
 func f_WriteLogMasterMessage(masterMessage T_MasterMessage) {
 	thisNode := f_GetNodeInfo()
-	roleStr := f_NodeRoleToString(thisNode.Role)
-	transmitterRoleStr := f_NodeRoleToString(masterMessage.Transmitter.Role)
+	roleStr := f_NodeRoleToString(thisNode.MSRole)
+	transmitterRoleStr := f_NodeRoleToString(masterMessage.Transmitter.MSRole)
 
 	logStr := fmt.Sprintf("Node: | %d | %s | received MM from | %d | %s | GlobalQueue: [",
 		thisNode.PRIORITY, roleStr, masterMessage.Transmitter.PRIORITY, transmitterRoleStr)

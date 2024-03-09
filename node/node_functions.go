@@ -13,7 +13,7 @@ func f_InitNode(config T_Config) T_Node {
 	thisNodeInfo := T_NodeInfo{
 		PRIORITY:     config.Priority,
 		ElevatorInfo: thisElevatorInfo,
-		Role:         MASTER,
+		MSRole:       MASTER,
 	}
 
 	thisElevator := elevator.T_Elevator{
@@ -25,13 +25,14 @@ func f_InitNode(config T_Config) T_Node {
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
+		PBRole:   BACKUP,
 		Elevator: thisElevator,
 	}
 	return thisNode
 }
 
 func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_NodeInfo {
-	var returnRole T_NodeRole = MASTER
+	var returnRole T_MSNodeRole = MASTER
 	for _, remoteNodeInfo := range connectedNodes {
 		if remoteNodeInfo.PRIORITY < thisNodeInfo.PRIORITY {
 			returnRole = SLAVE
@@ -39,7 +40,7 @@ func f_AssignNewRole(thisNodeInfo T_NodeInfo, connectedNodes []T_NodeInfo) T_Nod
 	}
 	newNodeInfo := T_NodeInfo{
 		PRIORITY:            thisNodeInfo.PRIORITY,
-		Role:                returnRole,
+		MSRole:              returnRole,
 		TimeUntilDisconnect: thisNodeInfo.TimeUntilDisconnect,
 		ElevatorInfo:        thisNodeInfo.ElevatorInfo,
 	}

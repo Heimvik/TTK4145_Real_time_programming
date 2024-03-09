@@ -3,6 +3,7 @@ package node
 import (
 	"encoding/json"
 	"os"
+	"os/exec"
 	"strconv"
 	"the-elevator/node/elevator"
 	"time"
@@ -278,42 +279,21 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 
 //IMPORTANT:
 //-global variables should ALWAYS be handled by server to operate onn good data
-/*
+
 func F_ProcessPairManager() {
-	//has init
-	nodeOperations := T_NodeOperations{
-		c_readNodeInfo:         make(chan chan T_NodeInfo),
-		c_writeNodeInfo:        make(chan T_NodeInfo),
-		c_readAndWriteNodeInfo: make(chan chan T_NodeInfo),
-
-		c_readGlobalQueue:         make(chan chan []T_GlobalQueueEntry),
-		c_writeGlobalQueue:        make(chan []T_GlobalQueueEntry),
-		c_readAndWriteGlobalQueue: make(chan chan []T_GlobalQueueEntry),
-
-		c_readConnectedNodes:         make(chan chan []T_NodeInfo),
-		c_writeConnectedNodes:        make(chan []T_NodeInfo),
-		c_readAndWriteConnectedNodes: make(chan chan []T_NodeInfo),
-	}
-	getSetGlobalQueueInterface := T_GetSetGlobalQueueInterface{
-		c_get: make(chan []T_GlobalQueueEntry),
-		c_set: make(chan []T_GlobalQueueEntry),
-	}
-	getSetConnectedNodesInterface := T_GetSetConnectedNodesInterface{
-		c_get: make(chan []T_NodeInfo),
-		c_set: make(chan []T_NodeInfo),
-	}
-
-	go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
+	go f_NodeOperationManager(&ThisNode)
 
 	c_isPrimary := make(chan bool)
-	go F_RunBackup(nodeOperations, c_isPrimary)
+	go f_RunBackup(c_isPrimary)
 	select {
 	case <-c_isPrimary:
 		err := exec.Command("gnome-terminal", "--", "go", "run", "main.go").Run()
 		if err != nil {
-			fmt.Println("Error starting BACKUP")
+			F_WriteLog("Error starting BACKUP")
 		}
-		F_RunPrimary(nodeOperations, elevatorOperations)
+		f_RunPrimary()
+		F_WriteLog("Switched to primary")
+
 	}
 }
 
@@ -321,43 +301,41 @@ func F_ProcessPairManager() {
 //-global variables should ALWAYS be handled by server to operate onn good data
 //-all receive from channles should be organized in for-select!!! -> walk trough code and do
 
-func F_RunBackup(nodeOps T_NodeOperations, c_isPrimary chan bool) {
+func f_RunBackup(c_isPrimary chan bool) {
 	//constantly check if we receive messages
 	F_WriteLog("Started as BACKUP")
 	c_quitBackupRoutines := make(chan bool)
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
 
-	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, nodeOps, MASTERPORT, c_quitBackupRoutines)
-	go F_ReceiveMasterMessage(c_receiveMasterMessage, nodeOps, SLAVEPORT, c_quitBackupRoutines)
+	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, MASTERPORT, c_quitBackupRoutines)
+	go F_ReceiveMasterMessage(c_receiveMasterMessage, SLAVEPORT, c_quitBackupRoutines)
 
 	PBTimer := time.NewTicker(time.Duration(CONNECTIONTIME) * time.Second)
 	for {
 		select {
 		case <-PBTimer.C:
-			F_WriteLog("Switched to PRIMARY")
 			c_isPrimary <- true
 			close(c_quitBackupRoutines)
 			return
 		case masterMessage := <-c_receiveMasterMessage:
-			thisNodeInfo := f_GetNodeInfo(nodeOps)
-			f_SetGlobalQueue(nodeOps, masterMessage.GlobalQueue)
+			thisNodeInfo := f_GetNodeInfo()
+			f_SetGlobalQueue(masterMessage.GlobalQueue)
 			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == MASTER {
-				f_SetNodeInfo(nodeOps, masterMessage.Transmitter)
+				f_SetNodeInfo(masterMessage.Transmitter)
 				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
 			}
 		case slaveMessage := <-c_receiveSlaveMessage:
-			thisNodeInfo := f_GetNodeInfo(nodeOps)
+			thisNodeInfo := f_GetNodeInfo()
 			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == SLAVE {
-				f_SetNodeInfo(nodeOps, slaveMessage.Transmitter)
+				f_SetNodeInfo(slaveMessage.Transmitter)
 				PBTimer.Reset(time.Duration(CONNECTIONTIME) * time.Millisecond)
 			}
 		}
 	}
 }
-*/
 
-func F_RunNode() {
+func f_RunPrimary() {
 
 	getSetNodeInfoInterface := T_GetSetNodeInfoInterface{
 		c_get: make(chan T_NodeInfo),
@@ -380,6 +358,7 @@ func F_RunNode() {
 	//to run the main FSM
 	c_nodeIsMaster := make(chan bool)
 	c_quitMasterRoutines := make(chan bool)
+	c_quitReceive := make(chan bool)
 	c_nodeIsSlave := make(chan bool)
 
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
@@ -402,8 +381,8 @@ func F_RunNode() {
 		go f_GetSetConnectedNodes(c_getSetConnectedNodesInterface)
 
 		go f_ElevatorManager(c_shouldCheckIfAssigned, c_entryFromElevator, c_getSetElevatorInterface)
-		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT)
-		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
+		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT, c_quitReceive)
+		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT, c_quitReceive)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
 		go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
 
@@ -435,7 +414,7 @@ func F_RunNode() {
 	c_nodeIsMaster <- true
 
 	for {
-		nodeRole := f_GetNodeInfo().Role
+		nodeRole := f_GetNodeInfo().MSRole
 		switch nodeRole {
 		case MASTER:
 			select {
@@ -506,7 +485,7 @@ func F_RunNode() {
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 
-				if newNodeInfo.Role == SLAVE {
+				if newNodeInfo.MSRole == SLAVE {
 					c_nodeIsSlave <- true
 				}
 			}
@@ -564,7 +543,7 @@ func F_RunNode() {
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 
-				if newNodeInfo.Role == MASTER {
+				if newNodeInfo.MSRole == MASTER {
 					c_nodeIsMaster <- true
 				}
 			}

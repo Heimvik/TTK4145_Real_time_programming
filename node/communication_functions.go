@@ -30,12 +30,15 @@ func F_TransmitMasterMessage(c_transmitMessage chan T_MasterMessage, port int) {
 	go bcast.Transmitter(port, c_transmitMessage)
 }
 
-func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int) {
+func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int, c_quit chan bool) {
 	c_receive := make(chan T_SlaveMessage)
 
-	go bcast.Receiver(port, c_receive)
+	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
+		case <- c_quit:
+			F_WriteLog("Closed f_ReceiveSlaveMessage")
+			return
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestSM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage
@@ -44,12 +47,15 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int) {
 	}
 }
 
-func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int) {
+func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int, c_quit chan bool) {
 	c_receive := make(chan T_MasterMessage)
 
-	go bcast.Receiver(port, c_receive)
+	go bcast.Receiver(port, c_quit, c_receive)
 	for {
 		select {
+		case <- c_quit:
+			F_WriteLog("Closed f_ReceiveMasterMessage")
+			return
 		case receivedMessage := <-c_receive:
 			if f_AcceptancetestMM() { //FUTURE ACCEPTANCETEST
 				c_verifiedMessage <- receivedMessage

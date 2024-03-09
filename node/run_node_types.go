@@ -6,17 +6,19 @@ import (
 
 //common include packages:
 
+type T_PBNodeRole uint8
 type T_Node struct {
 	NodeInfo       T_NodeInfo //role of node
+	PBRole         T_PBNodeRole
 	GlobalQueue    []T_GlobalQueueEntry
 	ConnectedNodes []T_NodeInfo
 	Elevator       elevator.T_Elevator //Its info needs to point at NodeInfo.ElevatorInfo
 }
-type T_NodeRole uint8
 
+type T_MSNodeRole uint8
 type T_NodeInfo struct {
 	PRIORITY            uint8
-	Role                T_NodeRole
+	MSRole              T_MSNodeRole
 	TimeUntilDisconnect int
 	ElevatorInfo        elevator.T_ElevatorInfo
 }
@@ -68,9 +70,14 @@ type T_Config struct {
 }
 
 const (
-	MASTER T_NodeRole = 0
-	SLAVE  T_NodeRole = 1
+	MASTER T_MSNodeRole = 0
+	SLAVE  T_MSNodeRole = 1
 )
+const (
+	BACKUP  T_PBNodeRole = 0
+	PRIMARY T_PBNodeRole = 1
+)
+
 const (
 	ASSIGN     T_AssignState = 0
 	WAITFORACK T_AssignState = 1
