@@ -249,8 +249,8 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
-	go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
+	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
 	globalQueue := f_GetGlobalQueue()
