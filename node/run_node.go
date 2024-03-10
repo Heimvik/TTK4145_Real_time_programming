@@ -294,7 +294,6 @@ func F_ProcessPairManager() {
 		}
 		F_WriteLog("Switched to primary")
 		f_RunPrimary()
-
 	}
 }
 
