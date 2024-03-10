@@ -249,7 +249,7 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	//go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
 	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
@@ -324,18 +324,18 @@ func f_RunBackup(c_isPrimary chan bool) {
 			thisNodeInfo := f_GetNodeInfo()
 			f_SetGlobalQueue(masterMessage.GlobalQueue)
 			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY {
-				/*
-					f_SetNodeInfo(T_NodeInfo{
-						PRIORITY:            masterMessage.Transmitter.PRIORITY,
-						MSRole:              masterMessage.Transmitter.MSRole,
-						TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
-						ElevatorInfo: elevator.T_ElevatorInfo{
-							Direction: elevator.NONE,
-							Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
-							State:     0,
-						},
-					}) */
-				f_SetNodeInfo(masterMessage.Transmitter)
+
+				f_SetNodeInfo(T_NodeInfo{
+					PRIORITY:            masterMessage.Transmitter.PRIORITY,
+					MSRole:              masterMessage.Transmitter.MSRole,
+					TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
+					ElevatorInfo: elevator.T_ElevatorInfo{
+						Direction: elevator.NONE,
+						Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
+						State:     0,
+					},
+				})
+				//f_SetNodeInfo(masterMessage.Transmitter)
 				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
 		case slaveMessage := <-c_receiveSlaveMessage:

@@ -52,6 +52,8 @@ Assigned request with ID: 3 assigned to node 1
 ```
 Aka we disallow backward information when a entry is reassigned. This fixes itself.
 
+Solution may be to let slave disconnect a period of time.
+
 ## DONE entries not removed when two masters present
 
 ### Context:  
