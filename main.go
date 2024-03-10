@@ -1,6 +1,8 @@
 package main
 
-import "the-elevator/node"
+import (
+	"the-elevator/node"
+)
 
 // "the-elevator/node"
 

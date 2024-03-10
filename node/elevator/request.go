@@ -24,3 +24,26 @@ const (
 	ACTIVE     T_RequestState = 2
 	DONE       T_RequestState = 3
 )
+
+func F_ReceiveRequest(req T_Request, elevator T_Elevator) T_Elevator {
+	elevator.P_serveRequest = &req
+	elevator.P_serveRequest.State = ACTIVE
+	elevator = F_SetElevatorDirection(elevator)
+	return elevator
+}
+
+func F_ClearRequest(elevator T_Elevator) T_Elevator {
+	elevator.P_serveRequest = nil
+	elevator.P_info.State = DOOROPEN
+	return elevator
+}
+
+// COMMENT: Legg ut i Run_elevator
+func F_SendRequest(button T_ButtonEvent, requestOut chan T_Request, elevator T_Elevator) {
+	if button.Button == BT_Cab {
+		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor)}
+	} else {
+		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor)}
+	}
+}
+
