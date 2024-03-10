@@ -324,7 +324,7 @@ func f_RunBackup(c_isPrimary chan bool) {
 			fmt.Println("Backup received mastermessage")
 			thisNodeInfo := f_GetNodeInfo()
 			f_SetGlobalQueue(masterMessage.GlobalQueue)
-			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == MASTER {
+			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY {
 				/*
 					f_SetNodeInfo(T_NodeInfo{
 						PRIORITY:            masterMessage.Transmitter.PRIORITY,
@@ -342,7 +342,7 @@ func f_RunBackup(c_isPrimary chan bool) {
 		case slaveMessage := <-c_receiveSlaveMessage:
 			fmt.Println("Backup received slavemessage")
 			thisNodeInfo := f_GetNodeInfo()
-			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY && thisNodeInfo.MSRole == SLAVE {
+			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY {
 				f_SetNodeInfo(slaveMessage.Transmitter)
 				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
