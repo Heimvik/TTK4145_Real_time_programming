@@ -664,13 +664,15 @@ func F_RunNode() {
 	c_quitSlaveVariableWatchDog := make(chan bool)
 	c_quitSlaveTimeManager := make(chan bool)
 
+	c_quit := make(chan bool)
+
 	go func() {
 		go f_NodeOperationManager(&ThisNode, nodeOperations, elevatorOperations) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
 		go f_ElevatorManager(nodeOperations, elevatorOperations, c_shouldCheckIfAssigned, c_entryFromElevator)
-		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT)
-		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
-		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
-		go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
+		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT, c_quit)
+		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT, c_quit)
+		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT, c_quit)
+		go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT, c_quit)
 		for {
 			select {
 			case <-c_nodeIsMaster:

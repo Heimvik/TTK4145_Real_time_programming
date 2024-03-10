@@ -7,6 +7,7 @@ import (
 	"the-elevator/network/network_libraries/bcast"
 	"the-elevator/node/elevator"
 	"time"
+	"math/rand"
 )
 
 // KILDE:
@@ -19,55 +20,113 @@ import (
 // - Object of T_Message
 // - Array of connected nodes (any unconnected nodes)
 
-type OrderedMap struct { //Used to keep track of the last 100 messages
+type OrderedMasterMap struct { //Used to keep track of the last 100 messages
 	keys   []uint32
-	values map[uint32]T_MasterMessage
+	values []T_MasterMessage
 }
 
-func (om *OrderedMap) Add(key uint32, value T_MasterMessage) { //Adds a message to the map, deletes the oldest message if the map is full
-	if _, exists := om.values[key]; !exists {
-		om.keys = append(om.keys, key)
-	}
-	om.values[key] = value
-
-	if len(om.keys) > 100 {
-		delete(om.values, om.keys[0])
-		om.keys = om.keys[1:]
-	}
+type OrderedSlaveMap struct { //Used to keep track of the last 100 messages
+	keys   []uint32
+	values []T_SlaveMessage
 }
 
-func (m *OrderedMap) Exists(key uint32) bool {
-    _, exists := m.values[key]
-    return exists
-}
-
-func (m *OrderedMap) Print() {
-    if len(m.keys) == 0 {
-        fmt.Println("The map is empty.", )
-        return
+func (m *OrderedMasterMap) Add(key uint32, value T_MasterMessage) {
+    for _, existingKey := range m.keys {
+        if existingKey == key {
+            return
+        }
     }
 
-    for _, key := range m.keys {
-        value := m.values[key]
-        fmt.Printf("Key: %v, Value: %+v\n", key, value)
+    if len(m.keys) == 100 {
+        m.keys = m.keys[1:]
+        m.values = m.values[1:]
+    }
+
+    m.keys = append(m.keys, key)
+    m.values = append(m.values, value)
+}
+
+func (m *OrderedMasterMap) Exists(key uint32) bool {
+    for _, existingKey := range m.keys {
+        if existingKey == key {
+            return true
+        }
+    }
+    return false
+}
+
+func (m *OrderedMasterMap) Print() {
+    for i, key := range m.keys {
+        fmt.Printf("Key: %v, Value: %v\n", key, m.values[i])
     }
 }
 
-var transmittedMasterMessages = OrderedMap{
-	keys:   make([]uint32, 0),
-	values: make(map[uint32]T_MasterMessage),
+func (m *OrderedSlaveMap) Add(key uint32, value T_SlaveMessage) {
+    for _, existingKey := range m.keys {
+        if existingKey == key {
+            return
+        }
+    }
+
+    if len(m.keys) == 100 {
+        m.keys = m.keys[1:]
+        m.values = m.values[1:]
+    }
+
+    m.keys = append(m.keys, key)
+    m.values = append(m.values, value)
 }
 
-var receivedMasterMessages = OrderedMap{
-	keys:   make([]uint32, 0),
-	values: make(map[uint32]T_MasterMessage),
+func (m *OrderedSlaveMap) Exists(key uint32) bool {
+    for _, existingKey := range m.keys {
+        if existingKey == key {
+            return true
+        }
+    }
+    return false
 }
 
-var verifiedMasterMessages = OrderedMap{
-	keys:   make([]uint32, 0),
-	values: make(map[uint32]T_MasterMessage),
+func (m *OrderedSlaveMap) Print() {
+    for i, key := range m.keys {
+        fmt.Printf("Key: %v, Value: %v\n", key, m.values[i])
+    }
 }
 
+var transmittedMasterMessages = OrderedMasterMap{
+	keys:   make([]uint32, 0),
+	values: []T_MasterMessage{},
+}
+
+var receivedMasterMessages = OrderedMasterMap{
+	keys:   make([]uint32, 0),
+	values: []T_MasterMessage{},
+}
+
+var verifiedMasterMessages = OrderedMasterMap{
+	keys:   make([]uint32, 0),
+	values: []T_MasterMessage{},
+}
+
+var transmittedSlaveMessages = OrderedSlaveMap{
+	keys:   make([]uint32, 0),
+	values: []T_SlaveMessage{},
+}
+
+var receivedSlaveMessages = OrderedSlaveMap{
+	keys:   make([]uint32, 0),
+	values: []T_SlaveMessage{},
+}
+
+var verifiedSlaveMessages = OrderedSlaveMap{
+	keys:   make([]uint32, 0),
+	values: []T_SlaveMessage{},
+}
+
+func (m T_MasterMessage) String() string {
+	// Example implementation. Adjust fields as needed.
+	return fmt.Sprintf("Transmitter: %+v, Checksum: %d, GlobalQueue Length: %d",
+		m.Transmitter, m.Checksum, len(m.GlobalQueue))
+}
 func f_calculateChecksum(data []byte) uint32 {
 	crc32Table := crc32.MakeTable(crc32.Castagnoli)
 	checksum := crc32.Checksum(data, crc32Table)
@@ -121,124 +180,7 @@ func f_MasterMessagesAreEqual(singleMessage T_MasterMessage, messageList []T_Mas
 	return true
 }
 
-func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int) {
-	c_slaveMessageWithCS := make(chan T_SlaveMessage)
-	go bcast.Transmitter(port, c_slaveMessageWithCS)
-
-	for {
-		select {
-		case transmitSlaveMessage := <-c_transmitSlaveMessage:
-			transmitSlaveMessage.Checksum = f_convertSlaveMessageToCS(transmitSlaveMessage)
-			for i := 0; i < 50; i++ {
-				c_slaveMessageWithCS <- transmitSlaveMessage
-				time.Sleep(time.Duration(1) * time.Millisecond)
-			}
-		}
-	}
-}
-
-
-func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int) {
-	c_receive := make(chan T_SlaveMessage)
-
-	go bcast.Receiver(port, c_receive)
-	var currentCSmap map[uint32][]T_SlaveMessage
-	for {
-		select {
-		case receivedMessage := <-c_receive:
-			if len(currentCSmap[receivedMessage.Checksum]) < 50 {
-				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
-			}
-		default:
-			var verifiedCS uint32
-			shouldResetMap := false
-
-			for currentCS, equalMMs := range currentCSmap {
-				if len(equalMMs) == 10 {
-					fmt.Printf("%d messages with equal checksum found: Verified\n", len(equalMMs))
-					c_verifiedMessage <- equalMMs[0]
-
-					for len(equalMMs) < 50 {
-						equalMMs = append(equalMMs, equalMMs[0])
-					}
-
-					currentCSmap[currentCS] = equalMMs
-					verifiedCS = currentCS
-					shouldResetMap = true
-					break
-				}
-			}
-
-			if shouldResetMap {
-				newCSmap := make(map[uint32][]T_SlaveMessage)
-				newCSmap[verifiedCS] = currentCSmap[verifiedCS]
-				currentCSmap = newCSmap
-			}
-		}
-	}
-}
-
-func (m T_MasterMessage) String() string {
-	// Example implementation. Adjust fields as needed.
-	return fmt.Sprintf("Transmitter: %+v, Checksum: %d, GlobalQueue Length: %d",
-		m.Transmitter, m.Checksum, len(m.GlobalQueue))
-}
-
-func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int) {
-	c_receive := make(chan T_MasterMessage)
-
-	go bcast.Receiver(port, c_receive)
-	currentCSmap := make(map[uint32][]T_MasterMessage)
-
-	for {
-		select {
-		case receivedMessage := <-c_receive:
-			if len(currentCSmap[receivedMessage.Checksum]) < 50 {
-				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
-				//logCurrentCSmap(currentCSmap)
-			}
-		default:
-			var verifiedCS uint32
-			shouldResetMap := false
-
-			for currentCS, equalMMs := range currentCSmap {
-				if len(equalMMs) >= 10 && len(equalMMs) < 50 && f_MasterMessagesAreEqual(equalMMs[0], equalMMs) {
-					fmt.Printf("%d messages with equal checksum found: Verified\n", len(equalMMs))
-					c_verifiedMessage <- equalMMs[0]
-
-					for len(equalMMs) < 50 {
-						equalMMs = append(equalMMs, equalMMs[0])
-					}
-
-					currentCSmap[currentCS] = equalMMs
-					verifiedCS = currentCS
-					shouldResetMap = true
-					break
-				}
-			}
-
-			if shouldResetMap {
-				logCurrentCSmap(currentCSmap)
-				newCSmap := make(map[uint32][]T_MasterMessage)
-				newCSmap[verifiedCS] = currentCSmap[verifiedCS]
-				currentCSmap = newCSmap
-			}
-		}
-	}
-}
-
-//Kommentarer til f_MasterMessagesAreEqual:
-//Sammenligner kun første indexen i arrayet med resten av arrayet
-//Dvs. hvis første index er feil, returnerer den alltid false
-//Burde heller lage en funksjon som finner de meldingene som er like, og returnerer true hvis det er flere enn 10 og evt. indexnummeret.
-//Sjekker kun GlobalQueue, ikke Transmitter
-
-//Kommentarer til F_ReceiveMasterMessage:
-//Hva skjedde med å calculate checksum og sammenligne med vedlagt checksum?
-
-
-func f_ArboAmountOfEqualMessages(messageList []T_MasterMessage) (int, int) { //Returns the amount of equal messages and the index of the message with the highest amount of equal messages
-
+func f_ArboAmountOfEqualMasterMessages(messageList []T_MasterMessage) (int, int) { //Returns the amount of equal messages and the index of the message with the highest amount of equal messages
 	var counter int
 	highestCounter := 0
 	highestCounterIndex := 0
@@ -257,102 +199,25 @@ func f_ArboAmountOfEqualMessages(messageList []T_MasterMessage) (int, int) { //R
 	}
 	return highestCounter, highestCounterIndex
 }
-func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port int) {
-	c_masterMessageWithCS := make(chan T_MasterMessage)
-	go bcast.Transmitter(port, c_masterMessageWithCS)
-	for {
-		select {
-		case transmitMasterMessage := <-c_transmitMasterMessage:
-			transmitMasterMessage.Checksum = f_convertMasterMessageToCS(transmitMasterMessage)
-			for i := 0; i < 10; i++ {
-				c_masterMessageWithCS <- transmitMasterMessage
-				transmittedMasterMessages.Add(transmitMasterMessage.Checksum, transmitMasterMessage)
-				time.Sleep(time.Duration(1) * time.Millisecond)
+
+func f_ArboAmountOfEqualSlaveMessages(messageList []T_SlaveMessage) (int, int) { //Returns the amount of equal messages and the index of the message with the highest amount of equal messages
+	var counter int
+	highestCounter := 0
+	highestCounterIndex := 0
+
+	for i := 0; i < len(messageList); i++ {
+		counter = 0
+		for j := 0; j < len(messageList); j++ {
+			if messageList[i].Transmitter == messageList[j].Transmitter && messageList[i].Entry == messageList[j].Entry {
+				counter++
 			}
 		}
-	}
-}
-
-func F_ArboReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int) {
-	c_receive := make(chan T_MasterMessage)
-	go bcast.Receiver(port, c_receive)
-	currentCSmap := make(map[uint32][]T_MasterMessage)
-
-	messageAlreadySentmap := OrderedMap{
-		keys:   make([]uint32, 0),
-		values: make(map[uint32]T_MasterMessage),
-	}
-
-	ticker := time.NewTicker(time.Millisecond * 100) // check for new messages every 500 milliseconds
-	defer ticker.Stop()
-
-	for {
-		select {
-		case receivedMessage := <-c_receive:
-			fmt.Printf("Received message: %v\n", receivedMessage.Checksum)
-			if !messageAlreadySentmap.Exists(receivedMessage.Checksum) {
-				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
-				receivedMasterMessages.Add(receivedMessage.Checksum, receivedMessage)
-			}
-		case <-ticker.C: // check for new messages every 500 milliseconds
-			for checksum, messages := range currentCSmap {
-				counter, index := f_ArboAmountOfEqualMessages(messages)
-				if counter >= 10 {
-					fmt.Printf("%d identical messages found: Verified\n", counter)
-					verifiedMasterMessages.Add(checksum, messages[index])
-
-					c_verifiedMessage <- messages[index]
-					messageAlreadySentmap.Add(checksum, messages[index])
-					delete(currentCSmap, checksum)
-	
-				}
-			}
+		if counter > highestCounter {
+			highestCounter = counter
+			highestCounterIndex = i
 		}
 	}
-}
-
-func F_ArboTestCommunication() {
-	c_receiveMasterMessage := make(chan T_MasterMessage)
-	c_transmitMasterMessage := make(chan T_MasterMessage)
-
-	go F_ArboReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
-	go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
-
-	quitTimer := time.NewTicker(time.Duration(15) * time.Second)
-
-	go func() {
-		for i := 1; i < 10; i++ {
-			var masterMessage T_MasterMessage
-			masterMessage.Transmitter = T_NodeInfo{}
-			masterMessage.GlobalQueue = make([]T_GlobalQueueEntry, 0)
-
-			entry := T_GlobalQueueEntry{
-				Request: elevator.T_Request{
-					Id:        uint16(i),
-					State:     elevator.UNASSIGNED,
-					Calltype:  5,
-					Floor:     4,
-					Direction: 2,
-				},
-				RequestedNode:     2,
-				AssignedNode:      0,
-				TimeUntilReassign: 15,
-			}
-			masterMessage.GlobalQueue = append(masterMessage.GlobalQueue, entry)
-			c_transmitMasterMessage <- masterMessage
-			time.Sleep(time.Duration(1) * time.Second)
-
-		}
-	}()
-
-	for {
-		select {
-		case <-quitTimer.C:
-			f_printOrderedMaps()
-			return
-		}
-	}
-
+	return highestCounter, highestCounterIndex
 }
 
 func logCurrentCSmap(currentCSmap map[uint32][]T_MasterMessage) {
@@ -364,69 +229,289 @@ func logCurrentCSmap(currentCSmap map[uint32][]T_MasterMessage) {
 	}
 }
 
-func printChecksumT_MasterMessageMap(checksumT_MasterMessageMap map[uint32]T_MasterMessage) {
-	for checksum, message := range checksumT_MasterMessageMap {
-		fmt.Printf("Checksum: %d, Message: %s\n", checksum, message.String())
-	}
-}
-
-func f_printOrderedMaps() {
-	fmt.Println("Transmitted Master Messages:")
+func f_printOrderedMasterMaps() {
+	fmt.Printf("\nTransmitted Master Messages: %v in total\n", len(transmittedMasterMessages.keys))
 	transmittedMasterMessages.Print()
 
-	fmt.Println("\nReceived Master Messages:")
+	fmt.Printf("\nReceived Master Messages: %v in total\n", len(receivedMasterMessages.keys))
 	receivedMasterMessages.Print()
 
-	fmt.Println("\nVerified Master Messages:")
+	fmt.Printf("\nVerified Master Messages: %v in total\n", len(verifiedMasterMessages.keys))
 	verifiedMasterMessages.Print()
 }
 
-func F_TestCommunication() {
-	c_receiveSlaveMessage := make(chan T_SlaveMessage)
-	c_receiveMasterMessage := make(chan T_MasterMessage)
-	c_transmitMasterMessage := make(chan T_MasterMessage)
-	c_transmitSlaveMessage := make(chan T_SlaveMessage)
+func f_printOrderedSlaveMaps() {
+	fmt.Printf("\nTransmitted Slave Messages: %v in total\n", len(transmittedSlaveMessages.keys))
+	transmittedSlaveMessages.Print()
 
-	go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT)
-	go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT)
-	go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
-	go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT)
+	fmt.Printf("\nReceived Slave Messages: %v in total\n", len(receivedSlaveMessages.keys))
+	receivedSlaveMessages.Print()
+
+	fmt.Printf("\nVerified Slave Messages: %v in total\n", len(verifiedSlaveMessages.keys))
+	verifiedSlaveMessages.Print()
+}	
+
+func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int, c_quit chan bool) {
+	c_slaveMessageWithCS := make(chan T_SlaveMessage)
+	go bcast.Transmitter(port, c_slaveMessageWithCS)
+
+	for {
+		select {
+		case transmitSlaveMessage := <-c_transmitSlaveMessage:
+			transmitSlaveMessage.Checksum = f_convertSlaveMessageToCS(transmitSlaveMessage)
+			for i := 0; i < 20; i++ {
+				//fmt.Printf("Transmitting slaveMessage: %d\n", transmitSlaveMessage)
+				c_slaveMessageWithCS <- transmitSlaveMessage
+				transmittedSlaveMessages.Add(transmitSlaveMessage.Checksum, transmitSlaveMessage)
+				time.Sleep(100 * time.Millisecond)
+			}
+		
+		case <-c_quit:
+			fmt.Println("SLAVE TRANSMITTER:\t Quitting")
+			time.Sleep(500 * time.Millisecond)
+			return
+		}
+	}
+}
+
+func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port int, c_quit chan bool) {
+	c_masterMessageWithCS := make(chan T_MasterMessage)
+	go bcast.Transmitter(port, c_masterMessageWithCS)
+
+	for {
+		select {
+		case transmitMasterMessage := <-c_transmitMasterMessage:
+			transmitMasterMessage.Checksum = f_convertMasterMessageToCS(transmitMasterMessage)
+			for i := 0; i < 20; i++ {
+				//fmt.Printf("Transmitting masterMessage: %d\n", transmitMasterMessage)
+				c_masterMessageWithCS <- transmitMasterMessage
+				transmittedMasterMessages.Add(transmitMasterMessage.Checksum, transmitMasterMessage)
+				time.Sleep(1 * time.Millisecond)
+			}
+		case <-c_quit:
+			fmt.Println("MASTER TRANSMITTER:\t Quitting")
+			time.Sleep(500 * time.Millisecond)
+			return
+		}
+	}
+}
+
+
+func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int, c_quit chan bool) {
+	c_receive := make(chan T_SlaveMessage)
+	go bcast.Receiver(port, c_receive)
+	currentCSmap := make(map[uint32][]T_SlaveMessage)
+
+	messageAlreadySentmap := OrderedSlaveMap{
+		keys:   make([]uint32, 0),
+		values: []T_SlaveMessage{},
+	}
+
+	ticker := time.NewTicker(time.Millisecond * 10) // check for new messages every 500 milliseconds
+	defer ticker.Stop()
+
+	for {
+		select {
+		case receivedMessage := <-c_receive:
+			if !messageAlreadySentmap.Exists(receivedMessage.Checksum) {
+				fmt.Printf("Received SlaveMessage: %d\n", receivedMessage)
+				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
+				receivedSlaveMessages.Add(receivedMessage.Checksum, receivedMessage)
+			}
+
+		case <-ticker.C: // check for new messages every 500 milliseconds
+			for checksum, messages := range currentCSmap {
+				counter, index := f_ArboAmountOfEqualSlaveMessages(messages)
+				if counter >= 3 {
+					fmt.Printf("%d identical SlaveMessages found: Verified\n", counter)
+					verifiedSlaveMessages.Add(checksum, messages[index])
+
+					c_verifiedMessage <- messages[index]
+					messageAlreadySentmap.Add(checksum, messages[index])
+					delete(currentCSmap, checksum)
+				}
+			}
+
+		case <-c_quit:
+			fmt.Println("SLAVE RECEIVER:\t Quitting")
+			time.Sleep(500 * time.Millisecond)
+			return
+		}
+	}
+}
+
+func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int, c_quit chan bool) {
+	c_receive := make(chan T_MasterMessage)
+	go bcast.Receiver(port, c_receive)
+	currentCSmap := make(map[uint32][]T_MasterMessage)
+
+	messageAlreadySentmap := OrderedMasterMap{
+		keys:   make([]uint32, 0),
+		values: []T_MasterMessage{},
+	}
+
+	ticker := time.NewTicker(time.Millisecond * 10) // check for new messages every 500 milliseconds
+	defer ticker.Stop()
+
+	for {
+		select {
+		case receivedMessage := <-c_receive:
+			if !messageAlreadySentmap.Exists(receivedMessage.Checksum) {
+				fmt.Printf("Received MasterMessage: %d\n", receivedMessage)
+				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
+				receivedMasterMessages.Add(receivedMessage.Checksum, receivedMessage)
+			}
+
+		case <-ticker.C: // check for new messages every 500 milliseconds
+			for checksum, messages := range currentCSmap {
+				counter, index := f_ArboAmountOfEqualMasterMessages(messages)
+				if counter >= 3 {
+					fmt.Printf("%d identical MasterMessages found: Verified\n", counter)
+					verifiedMasterMessages.Add(checksum, messages[index])
+
+					c_verifiedMessage <- messages[index]
+					messageAlreadySentmap.Add(checksum, messages[index])
+					delete(currentCSmap, checksum)
+	
+				}
+			}
+		case <-c_quit:
+			fmt.Println("MASTER RECEIVER:\t Quitting")
+			time.Sleep(10 * time.Second)
+			return
+		}
+	}
+}
+
+func F_ArboTestCommunication() {
+	c_verifiedMasterMessage := make(chan T_MasterMessage)
+	c_transmitMasterMessage := make(chan T_MasterMessage)
+	c_verifiedSlaveMessage := make(chan T_SlaveMessage)
+	c_transmitSlaveMessage := make(chan T_SlaveMessage)
+	c_quit := make(chan bool)
+	
+	go F_ReceiveMasterMessage(c_verifiedMasterMessage, MASTERPORT, c_quit)
+	go F_TransmitMasterMessage(c_transmitMasterMessage, MASTERPORT, c_quit)
+	go F_ReceiveSlaveMessage(c_verifiedSlaveMessage, SLAVEPORT, c_quit)
+	go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT, c_quit)
+
+	quitTimer := time.NewTicker(7 * time.Second)
+
+	globalQ1 := []T_GlobalQueueEntry{}
+	//globalQ2 := []T_GlobalQueueEntry{}
+
+	sentToMasterTransmit := []T_MasterMessage{}
+	sentToSlaveTransmit := []T_SlaveMessage{}
+
+	rand.Seed(time.Now().UnixNano())
 
 	go func() {
-		for i := 1; i < 10; i++ {
-			var masterMessage T_MasterMessage
-			masterMessage.Transmitter = T_NodeInfo{}
-			masterMessage.GlobalQueue = make([]T_GlobalQueueEntry, 0)
+
+		for i := 1; i < 5; i++ {
+			var masterMessage1 T_MasterMessage
+			var slaveMessage1 T_SlaveMessage
+
+			masterMessage1.Transmitter = T_NodeInfo{PRIORITY: uint8(rand.Intn(10)), 
+													Role: T_NodeRole(uint8(rand.Intn(10))), 
+													TimeUntilDisconnect: rand.Intn(10), 
+													ElevatorInfo: elevator.T_ElevatorInfo{
+														Floor: int8(rand.Intn(5)), 
+														Direction: elevator.T_ElevatorDirection(rand.Intn(2)), 
+														State: elevator.T_ElevatorState(uint8(rand.Intn(3))),
+													}}
+			slaveMessage1.Transmitter = T_NodeInfo{	PRIORITY: uint8(rand.Intn(10)), 
+													Role: T_NodeRole(uint8(rand.Intn(10))), 
+													TimeUntilDisconnect: rand.Intn(10), 
+													ElevatorInfo: elevator.T_ElevatorInfo{
+														Floor: int8(rand.Intn(5)), 
+														Direction: elevator.T_ElevatorDirection(rand.Intn(2)), 
+														State: elevator.T_ElevatorState(uint8(rand.Intn(3))),
+													}}
 
 			entry := T_GlobalQueueEntry{
 				Request: elevator.T_Request{
 					Id:        uint16(i),
 					State:     elevator.UNASSIGNED,
-					Calltype:  5,
-					Floor:     4,
-					Direction: 2,
+					Calltype:  elevator.T_Call(rand.Intn(10)),
+					Floor:     int8(rand.Intn(4)),
+					Direction: elevator.T_ElevatorDirection(rand.Intn(2)),
 				},
-				RequestedNode:     2,
-				AssignedNode:      0,
-				TimeUntilReassign: 15,
+				RequestedNode:     uint8(rand.Intn(3)),
+				AssignedNode:      uint8(rand.Intn(3)),
+				TimeUntilReassign: uint8(rand.Intn(10)),
 			}
-			masterMessage.GlobalQueue = append(masterMessage.GlobalQueue, entry)
 
-			c_transmitMasterMessage <- masterMessage
-			fmt.Println("Message sent: %v", masterMessage)
+			globalQ1 = append(globalQ1, entry)
+			masterMessage1.GlobalQueue = globalQ1
+			slaveMessage1.Entry = entry
 
-			time.Sleep(time.Duration(5) * time.Second)
+			c_transmitMasterMessage <- masterMessage1
+			sentToMasterTransmit = append(sentToMasterTransmit, masterMessage1)
+
+			c_transmitSlaveMessage <- slaveMessage1
+			sentToSlaveTransmit = append(sentToSlaveTransmit, slaveMessage1)
+			
+			time.Sleep(100 * time.Millisecond)
 
 		}
 	}()
 
-	for {
-		select {
-		case masterMessage := <-c_receiveMasterMessage:
-			fmt.Println("Message received: %v", masterMessage)
+	// go func() {
 
+	// 	for i := 1; i < 5; i++ {
+	// 		var masterMessage2 T_MasterMessage
+	// 		var slaveMessage2 T_SlaveMessage
+	// 		masterMessage2.Transmitter = T_NodeInfo{}
+	// 		slaveMessage2.Transmitter = T_NodeInfo{}
+
+	// 		entry := T_GlobalQueueEntry{
+	// 			Request: elevator.T_Request{
+	// 				Id:        uint16(i),
+	// 				State:     elevator.UNASSIGNED,
+	// 				Calltype:  6,
+	// 				Floor:     5,
+	// 				Direction: 4,
+	// 			},
+	// 			RequestedNode:     3,
+	// 			AssignedNode:      2,
+	// 			TimeUntilReassign: 1,
+	// 		}
+
+	// 		globalQ2 = append(globalQ2, entry)
+	// 		masterMessage2.GlobalQueue = globalQ2
+	// 		slaveMessage2.Entry = entry
+	// 		c_transmitMasterMessage <- masterMessage2
+	// 		c_transmitSlaveMessage <- slaveMessage2
+	// 		time.Sleep(100 * time.Millisecond)
+
+	// 	}
+	// }()
+	
+	go func () {
+		for {
+			select{
+			case verified := <- c_verifiedMasterMessage:
+				fmt.Printf("\nMASTER VERIFIED Message In: %d | Message Out: %d\n\n", sentToMasterTransmit[0], verified)
+				copy(sentToMasterTransmit, sentToMasterTransmit[1:])
+				sentToMasterTransmit = sentToMasterTransmit[:len(sentToMasterTransmit)-1]
+			
+			case verified := <- c_verifiedSlaveMessage:
+				fmt.Printf("\nSLAVE VERIFIED Message In %d | Message Out %d\n\n", sentToSlaveTransmit[0], verified)
+				copy(sentToSlaveTransmit, sentToSlaveTransmit[1:])
+				sentToSlaveTransmit = sentToSlaveTransmit[:len(sentToSlaveTransmit)-1]
+
+			case <-quitTimer.C:
+				fmt.Printf("TEST:\t\t Quitting\n")
+				f_printOrderedMasterMaps()
+				f_printOrderedSlaveMaps()
+				c_quit <- true
+				time.Sleep(1 * time.Second)
+				return	
+			}
 		}
-	}
+	}()
+
+	<-c_quit
+	time.Sleep(5 * time.Second)
+	
 }
-
-
