@@ -1,13 +1,18 @@
 
-- [Known issues:](#known-issues)
-  - [Disallow backward information in reassign](#disallow-backward-information-in-reassign)
-  - [DONE entries not removed when two masters present](#done-entries-not-removed-when-two-masters-present)
-    - [Context:](#context)
-    - [Problem:](#problem)
-    - [Solution](#solution)
+- [1. Known issues:](#1-known-issues)
+  - [1.1. Disallow backward information in reassign](#11-disallow-backward-information-in-reassign)
+    - [1.1.1. Context](#111-context)
+    - [1.1.2. Problem](#112-problem)
+    - [1.1.3. Solution](#113-solution)
+  - [1.2. DONE entries not removed when two masters present](#12-done-entries-not-removed-when-two-masters-present)
+    - [1.2.1. Context:](#121-context)
+    - [1.2.2. Problem:](#122-problem)
+    - [1.2.3. Solution](#123-solution)
 
-# Known issues:
-## Disallow backward information in reassign
+# 1. Known issues:
+## 1.1. Disallow backward information in reassign
+### 1.1.1. Context
+### 1.1.2. Problem
 Upon having both nodes connected, disconnecting master, connecting master, we get the log:  
 ```
 Node: | 1 | MASTER | has GQ:  
@@ -50,16 +55,15 @@ Node: | 2 | SLAVE | received SM from | 2 | Request ID: | 0 | State: | UNASSIGNED
 Node: | 1 | request resent DONE  
 Assigned request with ID: 3 assigned to node 1
 ```
+### 1.1.3. Solution
 Aka we disallow backward information when a entry is reassigned. This fixes itself.
 
-Solution may be to let slave disconnect a period of time.
+## 1.2. DONE entries not removed when two masters present
 
-## DONE entries not removed when two masters present
-
-### Context:  
+### 1.2.1. Context:  
 Node 1 is run, role is set to master. Node 2 is run, role is set to slave. Entries get added to GQ, Node 1 is terminated, Node 2 is set to master.
 After disconnect time runs out Node 1 is revived. While both Node 1 and Node 2 are master, Node 1 assigns and finishes entry 5, and sends a MM to the slaves to remove entry 5 from GQ.  
-### Problem:
+### 1.2.2. Problem:
 As Node 2 is still master when entry 5 should be removed, Node 2 will keep entry 5 as DONE. The following log describes the current problem:   
 ```
 Started all master routines
@@ -102,7 +106,7 @@ Node: | 1 | MASTER | has GQ:
 Entry: | 1 | State: | ACTIVE | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 5.00 | Requested node: | 1 | Assigned node: | 1 |   
 Entry: | 4 | State: | ACTIVE | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 2 |  
 ```
-### Solution
+### 1.2.3. Solution
 As the problem will likely be solved either whent Node 1 is once again terminated, and Node 2 is set to master, or when Node 2 is terminated, this problem is not critical.  
 The proposed solution however is changing the functions,
 
