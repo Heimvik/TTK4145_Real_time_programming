@@ -81,16 +81,14 @@ func F_SimulateRequest(elevatorOperations T_ElevatorOperations, c_requestFromEle
 //***END TEST FUNCTIONS***
 
 /*
-05.03.2024
+10.03.2024
 TODO:
 - Fikse alt av lampegreier (ÆSJ!!!)
-- Finn ut av hva som skal skje med ID
 - Fjerne unødvendige variabler og funksjoner (ongoing)
 - Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode. (going pretty good)
-- Legge til elevatormusic.
 */
 
-var DOOROPENTIME int = 3 //kan kanskje flyttes men foreløpig kan den bli
+//kan kanskje flyttes men foreløpig kan den bli
 
 func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface,c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
 
@@ -99,13 +97,16 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	F_SetMotorDirection(DOWN)
 
 	var chans T_ElevatorChannels = F_InitChannes(c_requestIn, c_requestOut)
-
+	//interface for getting and setting elevator
+	go F_GetAndSetElevator(elevatorOperations, c_getSetElevatorInterface)
+	//polling sensors
 	go F_PollButtons(chans.C_buttons)
 	go F_PollFloorSensor(chans.C_floors)
 	go F_PollObstructionSwitch(chans.C_obstr)
 	go F_PollStopButton(chans.C_obstr)
-	go F_GetAndSetElevator(elevatorOperations, c_getSetElevatorInterface)
-
+	//doortimer
+	go F_DoorTimer(chans)
+	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans)
 }
 			// Kommentarer kodekvalitet:

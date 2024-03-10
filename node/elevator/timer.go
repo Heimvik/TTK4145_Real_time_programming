@@ -4,15 +4,22 @@ import (
 	"time"
 )
 
-func F_DoorTimer(timerStop chan bool, timerTimeout chan bool){
-	timer := time.NewTicker(time.Duration(DOOROPENTIME) * time.Second)
+const DOOROPENTIME = 3000 //ms
+
+func F_DoorTimer(chans T_ElevatorChannels){
 	for {
-		select {
-		case <-timer.C:
-			timerTimeout <- true
-		case <-timerStop:
-			timer.Stop()
-			return
+		<-chans.C_timerStart
+		timer := time.NewTicker(time.Duration(DOOROPENTIME/2) * time.Millisecond) //time to open
+		TIMERLOOP:
+		for {
+			select {
+			case <-timer.C:
+				chans.C_timerTimeout <- true
+			case <-chans.C_timerStop:
+				
+				timer.Stop()
+				break TIMERLOOP
+			}
 		}
 	}
 }
