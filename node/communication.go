@@ -19,6 +19,8 @@ import (
 // - Object of T_Message
 // - Array of connected nodes (any unconnected nodes)
 
+var messagesToSend int = 20
+
 func f_calculateChecksum(data []byte) uint32 {
 	crc32Table := crc32.MakeTable(crc32.Castagnoli)
 	checksum := crc32.Checksum(data, crc32Table)
@@ -75,14 +77,13 @@ func f_MasterMessagesAreEqual(singleMessage T_MasterMessage, messageList []T_Mas
 func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int) {
 	c_slaveMessageWithCS := make(chan T_SlaveMessage)
 	go bcast.Transmitter(port, c_slaveMessageWithCS)
-
 	for {
 		select {
 		case transmitSlaveMessage := <-c_transmitSlaveMessage:
 			transmitSlaveMessage.Checksum = f_convertSlaveMessageToCS(transmitSlaveMessage)
-			for i := 0; i < 10; i++ {
+			for i := 0; i < messagesToSend; i++ {
 				c_slaveMessageWithCS <- transmitSlaveMessage
-				time.Sleep(time.Duration(100) * time.Millisecond)
+				time.Sleep(time.Duration(1) * time.Millisecond)
 			}
 		}
 	}
@@ -94,7 +95,7 @@ func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port 
 		select {
 		case transmitMasterMessage := <-c_transmitMasterMessage:
 			transmitMasterMessage.Checksum = f_convertMasterMessageToCS(transmitMasterMessage)
-			for i := 0; i < 50; i++ {
+			for i := 0; i < messagesToSend; i++ {
 				c_masterMessageWithCS <- transmitMasterMessage
 				time.Sleep(time.Duration(1) * time.Millisecond)
 			}
@@ -104,39 +105,18 @@ func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port 
 
 func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int) {
 	c_receive := make(chan T_SlaveMessage)
-
 	go bcast.Receiver(port, c_receive)
 	var currentCSmap map[uint32][]T_SlaveMessage
 	for {
 		select {
 		case receivedMessage := <-c_receive:
-			if len(currentCSmap[receivedMessage.Checksum]) < 50 {
-				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
-			}
-		default:
-			var verifiedCS uint32
-			shouldResetMap := false
-
-			for currentCS, equalMMs := range currentCSmap {
-				if len(equalMMs) == 10 {
-					fmt.Printf("10 messages with equal checksum found: Verified\n", len(equalMMs))
+			currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
+			for _, equalMMs := range currentCSmap {
+				if len(equalMMs) > (messagesToSend / 2) {
 					c_verifiedMessage <- equalMMs[0]
-
-					for len(equalMMs) < 50 {
-						equalMMs = append(equalMMs, equalMMs[0])
-					}
-
-					currentCSmap[currentCS] = equalMMs
-					verifiedCS = currentCS
-					shouldResetMap = true
+					currentCSmap = make(map[uint32][]T_SlaveMessage)
 					break
 				}
-			}
-
-			if shouldResetMap {
-				newCSmap := make(map[uint32][]T_SlaveMessage)
-				newCSmap[verifiedCS] = currentCSmap[verifiedCS]
-				currentCSmap = newCSmap
 			}
 		}
 	}
@@ -163,35 +143,13 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int) {
 	for {
 		select {
 		case receivedMessage := <-c_receive:
-			if len(currentCSmap[receivedMessage.Checksum]) < 50 {
-				currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
-				logCurrentCSmap(currentCSmap)
-			}
-		default:
-			var verifiedCS uint32
-			shouldResetMap := false
-
-			for currentCS, equalMMs := range currentCSmap {
-				if len(equalMMs) == 10 && f_MasterMessagesAreEqual(equalMMs[0], equalMMs) {
-					fmt.Printf("10 messages with equal checksum found: Verified\n", len(equalMMs))
+			currentCSmap[receivedMessage.Checksum] = append(currentCSmap[receivedMessage.Checksum], receivedMessage)
+			for _, equalMMs := range currentCSmap {
+				if len(equalMMs) > (messagesToSend/2) && f_MasterMessagesAreEqual(equalMMs[0], equalMMs) {
 					c_verifiedMessage <- equalMMs[0]
-
-					for len(equalMMs) < 50 {
-						equalMMs = append(equalMMs, equalMMs[0])
-					}
-					logCurrentCSmap(currentCSmap)
-
-					currentCSmap[currentCS] = equalMMs
-					verifiedCS = currentCS
-					shouldResetMap = true
+					currentCSmap = make(map[uint32][]T_MasterMessage)
 					break
 				}
-			}
-
-			if shouldResetMap {
-				newCSmap := make(map[uint32][]T_MasterMessage)
-				newCSmap[verifiedCS] = currentCSmap[verifiedCS]
-				currentCSmap = newCSmap
 			}
 		}
 	}
