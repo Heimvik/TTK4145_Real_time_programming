@@ -5,7 +5,7 @@ import (
 )
 
 func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
-	for{
+	for {
 		select {
 		case button := <-chans.C_buttons:
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
@@ -23,7 +23,7 @@ func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_Ele
 	}
 }
 
-func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	oldElevator.CurrentID++
@@ -31,7 +31,7 @@ func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_
 	F_SendRequest(button, chans.C_requestOut, oldElevator)
 }
 
-func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_FloorArrival(newFloor, oldElevator)
@@ -44,16 +44,18 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	}
 }
 
-func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_DoorTimeout(oldElevator)
+	chans.getSetElevatorInterface.C_set <- newElevator
 	if newElevator.P_info.State == IDLE {
 		chans.C_timerStop <- true
-		time.Sleep(time.Duration(DOOROPENTIME/2) *time.Millisecond) //closing door
+		time.Sleep(time.Duration(DOOROPENTIME/2) * time.Millisecond) //closing door
+	} else {
+		chans.C_timerStart <- true
 	}
-	chans.getSetElevatorInterface.C_set <- newElevator
-	
+
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	// if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil {
 	// 	chans.C_requestOut <- newReq
@@ -62,7 +64,7 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	// }
 }
 
-func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_ReceiveRequest(newRequest, oldElevator)
@@ -79,7 +81,7 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	}
 }
 
-func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 
@@ -88,7 +90,7 @@ func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_G
 	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
-func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels){
+func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 
@@ -97,7 +99,6 @@ func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevato
 	newElevator := F_SetElevatorDirection(oldElevator)
 	chans.getSetElevatorInterface.C_set <- newElevator
 }
-
 
 func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
@@ -119,13 +120,13 @@ func F_DoorTimeout(elevator T_Elevator) T_Elevator {
 	}
 	return elevator
 }
+
 //gammel innmat i DoorTimeout, fjernet at den resender fordi elevator bør ikke få inn request når DOOROPEN
-	// if elevator.P_info.State == DOOROPEN && !elevator.Obstructed { //hvis heisen ikke er obstructed skal den gå til IDLE
-	// 	elevator.P_info.State = IDLE
-	// 	return elevator, T_Request{}
-	// } else if (elevator.P_info.State == DOOROPEN) && (elevator.Obstructed) && (elevator.P_serveRequest != nil) {
-	// 	resendReq := *elevator.P_serveRequest
-	// 	resendReq.State = UNASSIGNED
-	// 	return elevator, resendReq
-	// }
-	
+// if elevator.P_info.State == DOOROPEN && !elevator.Obstructed { //hvis heisen ikke er obstructed skal den gå til IDLE
+// 	elevator.P_info.State = IDLE
+// 	return elevator, T_Request{}
+// } else if (elevator.P_info.State == DOOROPEN) && (elevator.Obstructed) && (elevator.P_serveRequest != nil) {
+// 	resendReq := *elevator.P_serveRequest
+// 	resendReq.State = UNASSIGNED
+// 	return elevator, resendReq
+// }
