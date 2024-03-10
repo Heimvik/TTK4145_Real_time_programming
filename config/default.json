@@ -2,7 +2,7 @@
   "ip": "ip",
   "slaveport": 20013,
   "masterport": 20014,
-  "elevatorport": 15657,
+  "elevatorport": 15658,
   "priority": 2,
   "nodes": 3,
   "floors": 4,

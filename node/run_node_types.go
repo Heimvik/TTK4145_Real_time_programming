@@ -40,13 +40,13 @@ type T_MasterMessage struct {
 	Transmitter T_NodeInfo
 	//Receiver    T_NodeInfo //For checking
 	GlobalQueue []T_GlobalQueueEntry
-	//Checksum int
+	Checksum    uint32
 }
 type T_SlaveMessage struct {
 	Transmitter T_NodeInfo
 	//Receiver    T_NodeInfo         //For checking
-	Entry T_GlobalQueueEntry //find a better name?
-	//Checksum int
+	Entry    T_GlobalQueueEntry //find a better name?
+	Checksum uint32
 }
 
 type T_AssignState int

@@ -37,7 +37,7 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	newElevator := F_FloorArrival(newFloor, oldElevator)
 	chans.getSetElevatorInterface.C_set <- newElevator
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
-	if newElevator.P_info.State == DOOROPEN {
+	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
 		chans.C_timerStart <- true
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest

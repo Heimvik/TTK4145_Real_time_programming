@@ -81,10 +81,15 @@ func f_DirectionToString(direction elevator.T_ElevatorDirection) string {
 	}
 }
 func f_WriteLogSlaveMessage(slaveMessage T_SlaveMessage) {
-	request := slaveMessage.Entry.Request
+	entryStr := fmt.Sprintf("Entry: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %.2f | ",
+		slaveMessage.Entry.Request.Id, f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(slaveMessage.Entry.Request.Calltype), slaveMessage.Entry.Request.Floor, f_DirectionToString(slaveMessage.Entry.Request.Direction), float64(slaveMessage.Entry.TimeUntilReassign))
+	entryStr += fmt.Sprintf("Requested node: | %d | ",
+		slaveMessage.Entry.RequestedNode)
+	entryStr += fmt.Sprintf("Assigned node: | %d | ",
+		slaveMessage.Entry.AssignedNode)
 	thisNode := f_GetNodeInfo()
-	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Request ID: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s |",
-		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.MSRole), int(slaveMessage.Transmitter.PRIORITY), int(request.Id), f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(request.Calltype), int(request.Floor), f_DirectionToString(request.Direction))
+	logStr := fmt.Sprintf("Node: | %d | %s | received SM from | %d | Entry: %s",
+		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.MSRole), int(slaveMessage.Transmitter.PRIORITY), entryStr)
 	F_WriteLog(logStr)
 }
 func f_WriteLogMasterMessage(masterMessage T_MasterMessage) {

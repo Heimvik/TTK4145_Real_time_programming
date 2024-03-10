@@ -155,3 +155,15 @@ func f_UpdateGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueIn
 	}
 }
 ```
+
+## Wont find ack if order in the same etasje -> fails to assign any further
+Assigned request with ID: 1 assigned to node 1
+2024/03/10 18:17:00 log_functions.go:15: Getting ack from last assinged...
+2024/03/10 18:17:00 log_functions.go:15: Found assigned request with ID: 1 assigned to node 1
+2024/03/10 18:17:00 log_functions.go:15: Found assigned entry!
+2024/03/10 18:17:00 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/10 18:17:00 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/10 18:17:00 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+
+### Solution
+Adding a channel for sending ack upon receiving messages as well (in addition to just polling data from CN)

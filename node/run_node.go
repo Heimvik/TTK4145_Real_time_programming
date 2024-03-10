@@ -57,7 +57,7 @@ func init() {
 	LEASTRESPONSIVEPERIOD = config.LeastResponsivePeriod
 }
 
-func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_quit chan bool) {
+func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_receivedActiveEntry chan T_GlobalQueueEntry, c_quit chan bool) {
 	for {
 	PollLastAssigned:
 		select {
@@ -74,25 +74,36 @@ func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_quit
 				case <-c_quit:
 					F_WriteLog("Closed: f_CheckAssignedNodeState")
 					return
+				case receivedActiveEntry := <-c_receivedActiveEntry:
+					globalQueue := f_GetGlobalQueue()
+					assignedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
+					fmt.Println(assignedEntry.Request.Id, assignedEntry.RequestedNode, receivedActiveEntry.Request.Id, receivedActiveEntry.RequestedNode)
+					if f_EntriesAreEqual(assignedEntry, receivedActiveEntry) {
+						ackAssignmentSucessFull.C_Acknowledgement <- true
+						F_WriteLog("Found ack (received ACTIVE)")
+						assignBreakoutTimer.Stop()
+						break PollLastAssigned
+					}
 				default:
 					connectedNodes := f_GetConnectedNodes()
 					globalQueue := f_GetGlobalQueue()
-					updatedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
+					assigneddEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
 					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
-					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && updatedEntry.Request.State == elevator.ACTIVE {
+					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && assigneddEntry.Request.State == elevator.ACTIVE {
 						ackAssignmentSucessFull.C_Acknowledgement <- true
-						F_WriteLog("Found ack")
+						F_WriteLog("Found ack (changes in connected nodes)")
 						assignBreakoutTimer.Stop()
 						break PollLastAssigned
 					}
 				}
-				time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 			}
+		case <-c_receivedActiveEntry:
+			F_WriteLog("ACTIVE entry already handeled")
 		case <-c_quit:
 			F_WriteLog("Closed: f_CheckAssignedNodeState")
 			return
 		}
-		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
+		time.Sleep(time.Duration(MOSTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
 
@@ -204,6 +215,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	for {
 		select {
 		case assignState = <-c_assignState:
+			F_WriteLog("Assignstate: " + strconv.Itoa(int(assignState)))
 		case <-c_quit:
 			F_WriteLog("Closed: f_CheckIfShouldAssign")
 			return
@@ -223,17 +235,22 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 					c_ackAssignmentSucessFull <- ackAssignmentSucessFull
 					F_WriteLog("Assigned request with ID: " + strconv.Itoa(int(assignedEntry.Request.Id)) + " assigned to node " + strconv.Itoa(int(assignedEntry.AssignedNode)))
 					assignState = WAITFORACK
+					F_WriteLog("Assignstate: WAITFORACK")
+					F_WriteLogGlobalQueueEntry(globalQueue[assignedEntryIndex])
 				}
-
 				getSetGlobalQueueInterface.c_set <- globalQueue
-
+				if (assignedEntry != T_GlobalQueueEntry{}) {
+					F_WriteLogGlobalQueueEntry(f_GetGlobalQueue()[assignedEntryIndex])
+				}
 			case WAITFORACK:
 				select {
 				case assigmentWasSucessFull := <-ackAssignmentSucessFull.C_Acknowledgement:
 					if assigmentWasSucessFull {
+						F_WriteLog("Assignstate: ASSIGN")
 						assignState = ASSIGN
 					} else {
 						assignState = ASSIGN //Start reassigning after 10 secs anyways
+						F_WriteLog("Assignstate: ASSIGN")
 					}
 				default:
 				}
@@ -249,7 +266,7 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	c_requestToElevator := make(chan elevator.T_Request)
 	shouldCheckIfAssigned := true
 
-	//go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
+	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT)
 	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
@@ -324,18 +341,18 @@ func f_RunBackup(c_isPrimary chan bool) {
 			thisNodeInfo := f_GetNodeInfo()
 			f_SetGlobalQueue(masterMessage.GlobalQueue)
 			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY {
-
-				f_SetNodeInfo(T_NodeInfo{
-					PRIORITY:            masterMessage.Transmitter.PRIORITY,
-					MSRole:              masterMessage.Transmitter.MSRole,
-					TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
-					ElevatorInfo: elevator.T_ElevatorInfo{
-						Direction: elevator.NONE,
-						Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
-						State:     0,
-					},
-				})
-				//f_SetNodeInfo(masterMessage.Transmitter)
+				/*
+					f_SetNodeInfo(T_NodeInfo{
+						PRIORITY:            masterMessage.Transmitter.PRIORITY,
+						MSRole:              masterMessage.Transmitter.MSRole,
+						TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
+						ElevatorInfo: elevator.T_ElevatorInfo{
+							Direction: elevator.NONE,
+							Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
+							State:     0,
+						},
+					})*/
+				f_SetNodeInfo(masterMessage.Transmitter)
 				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
 		case slaveMessage := <-c_receiveSlaveMessage:
@@ -385,6 +402,7 @@ func f_RunPrimary() {
 
 	c_assignState := make(chan T_AssignState)
 	c_ackAssignmentSucessFull := make(chan T_AckObject)
+	c_receivedActiveEntry := make(chan T_GlobalQueueEntry)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
 	go func() {
@@ -408,7 +426,7 @@ func f_RunPrimary() {
 				go f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_quitMasterRoutines)
 				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
 				go f_CheckIfShouldAssign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackAssignmentSucessFull, c_assignState, c_quitMasterRoutines)
-				go f_CheckAssignedNodeState(c_ackAssignmentSucessFull, c_quitMasterRoutines)
+				go f_CheckAssignedNodeState(c_ackAssignmentSucessFull, c_receivedActiveEntry, c_quitMasterRoutines)
 				c_assignState <- ASSIGN
 				F_WriteLog("Started all master routines")
 
@@ -423,7 +441,7 @@ func f_RunPrimary() {
 	}()
 
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
-	printGQTimer := time.NewTicker(time.Duration(2000) * time.Millisecond)
+	logTimer := time.NewTicker(time.Duration(2000) * time.Millisecond)
 
 	c_nodeIsMaster <- true
 
@@ -435,7 +453,6 @@ func f_RunPrimary() {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_WriteLogMasterMessage(masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				f_WriteLogConnectedNodes(f_GetConnectedNodes())
 				thisNode := f_GetNodeInfo()
 				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
 					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
@@ -445,15 +462,19 @@ func f_RunPrimary() {
 
 				f_WriteLogSlaveMessage(slaveMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
-				f_WriteLogConnectedNodes(f_GetConnectedNodes())
 				if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
 					f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
+				}
+				if slaveMessage.Entry.Request.State == elevator.ACTIVE {
+					c_receivedActiveEntry <- slaveMessage.Entry
 				}
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
 				if entryFromElevator.Request.State == elevator.DONE {
 					c_shouldCheckIfAssigned <- true
+				} else if entryFromElevator.Request.State == elevator.ACTIVE {
+					c_receivedActiveEntry <- entryFromElevator
 				}
 
 				thisNode := f_GetNodeInfo()
@@ -468,6 +489,7 @@ func f_RunPrimary() {
 					GlobalQueue: globalQueue,
 				}
 				c_transmitMasterMessage <- masterMessage
+				F_WriteLog("Delete entry mastermessage sent")
 				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
 			case <-sendTimer.C:
@@ -479,14 +501,16 @@ func f_RunPrimary() {
 				c_transmitMasterMessage <- masterMessage
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 
-			case <-printGQTimer.C:
+			case <-logTimer.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
+				connectedNodes := f_GetConnectedNodes()
+				f_WriteLogConnectedNodes(connectedNodes)
 				F_WriteLog("Node: | " + strconv.Itoa(int(nodeInfo.PRIORITY)) + " | MASTER | has GQ:\n")
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
 				}
-				printGQTimer.Reset(time.Duration(2000) * time.Millisecond)
+				logTimer.Reset(time.Duration(2000) * time.Millisecond)
 
 			default:
 				connectedNodes := f_GetConnectedNodes()
@@ -502,6 +526,7 @@ func f_RunPrimary() {
 				if newNodeInfo.MSRole == SLAVE {
 					c_nodeIsSlave <- true
 				}
+
 			}
 
 		case SLAVE:
@@ -513,7 +538,6 @@ func f_RunPrimary() {
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				f_WriteLogSlaveMessage(slaveMessage)
-				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -538,14 +562,16 @@ func f_RunPrimary() {
 				}
 				c_transmitSlaveMessage <- aliveMessage
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
-			case <-printGQTimer.C:
+			case <-logTimer.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
+				connectedNodes := f_GetConnectedNodes()
+				f_WriteLogConnectedNodes(connectedNodes)
 				F_WriteLog("Node: | " + strconv.Itoa(int(nodeInfo.PRIORITY)) + " | SLAVE | has GQ:\n")
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
 				}
-				printGQTimer.Reset(time.Duration(2000) * time.Millisecond)
+				logTimer.Reset(time.Duration(2000) * time.Millisecond)
 			default:
 				connectedNodes := f_GetConnectedNodes()
 

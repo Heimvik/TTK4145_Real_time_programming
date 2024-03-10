@@ -26,77 +26,48 @@ func f_NodeOperationManager(node *T_Node) {
 	for {
 		select {
 		case responseChan := <-nodeOperations.c_getNodeInfo:
-			//fmt.Println("11")
 			responseChan <- node.NodeInfo
-			//fmt.Println("12")
 		case newNodeInfo := <-nodeOperations.c_setNodeInfo:
-			//fmt.Println("21")
 			node.NodeInfo = newNodeInfo
 			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
-			//fmt.Println("22")
 		case responseChan := <-nodeOperations.c_getSetNodeInfo:
-			//fmt.Println("31")
 			responseChan <- node.NodeInfo
 			node.NodeInfo = <-responseChan
 			node.Elevator.P_info = &node.NodeInfo.ElevatorInfo
-			//fmt.Println("32")
 
 		case responseChan := <-nodeOperations.c_getGlobalQueue:
-			//fmt.Println("41")
 			responseChan <- node.GlobalQueue
-			//fmt.Println("42")
 		case newGlobalQueue := <-nodeOperations.c_setGlobalQueue:
-			//fmt.Println("51")
 			node.GlobalQueue = newGlobalQueue
-			//fmt.Println("52")
 		case responseChan := <-nodeOperations.c_getSetGlobalQueue:
-			//fmt.Println("61")
 			responseChan <- node.GlobalQueue
 			node.GlobalQueue = <-responseChan
-			//fmt.Println("62")
 
 		case responseChan := <-nodeOperations.c_getConnectedNodes:
-			//fmt.Println("71")
 			responseChan <- node.ConnectedNodes
-			//fmt.Println("72")
 		case newConnectedNodes := <-nodeOperations.c_setConnectedNodes:
-			//fmt.Println("81")
 			node.ConnectedNodes = newConnectedNodes
-			//fmt.Println("82")
-
 		case responseChan := <-nodeOperations.c_getSetConnectedNodes:
-			//fmt.Println("91")
 			responseChan <- node.ConnectedNodes
 			node.ConnectedNodes = <-responseChan
-			//fmt.Println("92")
 
 		case responseChan := <-elevatorOperations.C_getElevator:
-			//fmt.Println("101")
 			responseChan <- node.Elevator
-			//fmt.Println("102")
 		case newElevator := <-elevatorOperations.C_setElevator:
-			//fmt.Println("111")
 			node.Elevator = newElevator
-			//fmt.Println("112")
 		case responseChan := <-elevatorOperations.C_getSetElevator:
-			//fmt.Println("121")
 			responseChan <- node.Elevator
 			node.Elevator = <-responseChan
-			//fmt.Println("122")
 
 		default:
-			//fmt.Println("Runs")
 		}
 	}
 }
 
 func f_GetNodeInfo() T_NodeInfo {
 	c_responseChan := make(chan T_NodeInfo)
-	//fmt.Println("G1")
-	nodeOperations.c_getNodeInfo <- c_responseChan // Send the response channel to the NodeOperationManager
-	//fmt.Println("G2")
-	nodeInfo := <-c_responseChan // Receive the node info from the response channel
-	//fmt.Println("G3")
+	nodeOperations.c_getNodeInfo <- c_responseChan 
+	nodeInfo := <-c_responseChan 
 	return nodeInfo
 }
 func f_SetNodeInfo(nodeInfo T_NodeInfo) {

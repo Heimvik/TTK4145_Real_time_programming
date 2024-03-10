@@ -13,6 +13,10 @@ func f_AbsInt(x int8) int8 {
 	return x
 }
 
+func f_EntriesAreEqual(e1 T_GlobalQueueEntry, e2 T_GlobalQueueEntry) bool {
+	return ((e1.Request.Id == e2.Request.Id) && (e1.RequestedNode == e2.RequestedNode))
+}
+
 func f_ClosestElevatorNode(floor int8, nodes []T_NodeInfo) uint8 {
 	var closestNode T_NodeInfo
 	closestFloor := FLOORS
@@ -184,16 +188,16 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	entryIsUnique := true
 	entryIndex := 0
 	for i, entry := range globalQueue {
-		if entryToAdd.Request.Id == entry.Request.Id && entryToAdd.RequestedNode == entry.RequestedNode {
+		if f_EntriesAreEqual(entryToAdd, entry) {
 			entryIsUnique = false
 			entryIndex = i
 			break
 		}
 	}
-	if entryIsUnique {
+	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
-	} else {
-		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign <= globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
+	} else if !entryIsUnique {
+		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
 		} else {
 			F_WriteLog("Disallowed backward information")

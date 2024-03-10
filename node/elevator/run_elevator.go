@@ -90,7 +90,7 @@ TODO:
 
 //kan kanskje flyttes men foreløpig kan den bli
 
-func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface,c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
+func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int) {
 
 	F_InitDriver(fmt.Sprintf("localhost:%d", elevatorport))
 
@@ -109,12 +109,12 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans)
 }
-			// Kommentarer kodekvalitet:
-			// - La alle ganger du skriver til c_out og c_in være lesbare her, og ikke pakk det inn i funksjon (ta ut receiveRequest og sendRequest)
-			// - Lag en sentral FSM, ikke fordelt på mange funksjoner, som switcher på elevator.state, hvor alt som skal
-			// 	skje i IDLE, skjer i IDLE casen, alt som skal skje i MOVING skjer i moving casen osv. SÅ heller sende den
-			// 	til og fra forskjellige states her ute
-			// - Prøv å generaliser (krymp) if-statements, evt lag en funksjon med conditions hvis det er nødt til å være veldig mye
-			// - f_StorbokstavStorbokstav i funksjoner
-			// - andre navn en "a" i caser
 
+// Kommentarer kodekvalitet:
+// - La alle ganger du skriver til c_out og c_in være lesbare her, og ikke pakk det inn i funksjon (ta ut receiveRequest og sendRequest)
+// - Lag en sentral FSM, ikke fordelt på mange funksjoner, som switcher på elevator.state, hvor alt som skal
+// 	skje i IDLE, skjer i IDLE casen, alt som skal skje i MOVING skjer i moving casen osv. SÅ heller sende den
+// 	til og fra forskjellige states her ute
+// - Prøv å generaliser (krymp) if-statements, evt lag en funksjon med conditions hvis det er nødt til å være veldig mye
+// - f_StorbokstavStorbokstav i funksjoner
+// - andre navn en "a" i caser
