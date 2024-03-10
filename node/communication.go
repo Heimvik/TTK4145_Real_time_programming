@@ -10,6 +10,16 @@ import (
 	"math/rand"
 )
 
+const(
+	messagesToTransmit = 20					//Amount of identical messages to transmit 
+	messagesNeededForVerification = 3 		//Amount of identical messages needed for verification
+	millisecondsBetweenTransmissions = 1	//Milliseconds between each transmission
+	millisecondsBetweenReceivesCheck = 10 	//Milliseconds between each check for identical messages
+	millisecondsBetweenEntries = 1000 		//Milliseconds between new entry is added to global queue in test
+	testFunctionRuntimeInSeconds = 7		//Runtime of the test function
+	amountOfTestEntries = 5					//Amount of entries to add to global queue in test		
+)
+
 // KILDE:
 
 //This should:
@@ -259,11 +269,11 @@ func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int
 		select {
 		case transmitSlaveMessage := <-c_transmitSlaveMessage:
 			transmitSlaveMessage.Checksum = f_convertSlaveMessageToCS(transmitSlaveMessage)
-			for i := 0; i < 20; i++ {
+			for i := 0; i < messagesToTransmit; i++ {
 				//fmt.Printf("Transmitting slaveMessage: %d\n", transmitSlaveMessage)
 				c_slaveMessageWithCS <- transmitSlaveMessage
 				transmittedSlaveMessages.Add(transmitSlaveMessage.Checksum, transmitSlaveMessage)
-				time.Sleep(100 * time.Millisecond)
+				time.Sleep(millisecondsBetweenTransmissions * time.Millisecond)
 			}
 		
 		case <-c_quit:
@@ -282,11 +292,11 @@ func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port 
 		select {
 		case transmitMasterMessage := <-c_transmitMasterMessage:
 			transmitMasterMessage.Checksum = f_convertMasterMessageToCS(transmitMasterMessage)
-			for i := 0; i < 20; i++ {
+			for i := 0; i < messagesToTransmit; i++ {
 				//fmt.Printf("Transmitting masterMessage: %d\n", transmitMasterMessage)
 				c_masterMessageWithCS <- transmitMasterMessage
 				transmittedMasterMessages.Add(transmitMasterMessage.Checksum, transmitMasterMessage)
-				time.Sleep(1 * time.Millisecond)
+				time.Sleep(millisecondsBetweenTransmissions * time.Millisecond)
 			}
 		case <-c_quit:
 			fmt.Println("MASTER TRANSMITTER:\t Quitting")
@@ -307,7 +317,7 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int, c_qu
 		values: []T_SlaveMessage{},
 	}
 
-	ticker := time.NewTicker(time.Millisecond * 10) // check for new messages every 500 milliseconds
+	ticker := time.NewTicker(time.Millisecond * millisecondsBetweenReceivesCheck) 
 	defer ticker.Stop()
 
 	for {
@@ -319,10 +329,10 @@ func F_ReceiveSlaveMessage(c_verifiedMessage chan T_SlaveMessage, port int, c_qu
 				receivedSlaveMessages.Add(receivedMessage.Checksum, receivedMessage)
 			}
 
-		case <-ticker.C: // check for new messages every 500 milliseconds
+		case <-ticker.C: 
 			for checksum, messages := range currentCSmap {
 				counter, index := f_ArboAmountOfEqualSlaveMessages(messages)
-				if counter >= 3 {
+				if counter >= messagesNeededForVerification {
 					fmt.Printf("%d identical SlaveMessages found: Verified\n", counter)
 					verifiedSlaveMessages.Add(checksum, messages[index])
 
@@ -350,7 +360,7 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int, c_
 		values: []T_MasterMessage{},
 	}
 
-	ticker := time.NewTicker(time.Millisecond * 10) // check for new messages every 500 milliseconds
+	ticker := time.NewTicker(time.Millisecond * millisecondsBetweenReceivesCheck) 
 	defer ticker.Stop()
 
 	for {
@@ -362,10 +372,10 @@ func F_ReceiveMasterMessage(c_verifiedMessage chan T_MasterMessage, port int, c_
 				receivedMasterMessages.Add(receivedMessage.Checksum, receivedMessage)
 			}
 
-		case <-ticker.C: // check for new messages every 500 milliseconds
+		case <-ticker.C: 
 			for checksum, messages := range currentCSmap {
 				counter, index := f_ArboAmountOfEqualMasterMessages(messages)
-				if counter >= 3 {
+				if counter >= messagesNeededForVerification {
 					fmt.Printf("%d identical MasterMessages found: Verified\n", counter)
 					verifiedMasterMessages.Add(checksum, messages[index])
 
@@ -395,7 +405,7 @@ func F_ArboTestCommunication() {
 	go F_ReceiveSlaveMessage(c_verifiedSlaveMessage, SLAVEPORT, c_quit)
 	go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT, c_quit)
 
-	quitTimer := time.NewTicker(7 * time.Second)
+	quitTimer := time.NewTicker(testFunctionRuntimeInSeconds * time.Second)
 
 	globalQ1 := []T_GlobalQueueEntry{}
 	//globalQ2 := []T_GlobalQueueEntry{}
@@ -407,7 +417,7 @@ func F_ArboTestCommunication() {
 
 	go func() {
 
-		for i := 1; i < 5; i++ {
+		for i := 1; i < amountOfTestEntries+1; i++ {
 			var masterMessage1 T_MasterMessage
 			var slaveMessage1 T_SlaveMessage
 
