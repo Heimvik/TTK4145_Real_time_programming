@@ -41,9 +41,11 @@ func F_ClearRequest(elevator T_Elevator) T_Elevator {
 // COMMENT: Legg ut i Run_elevator
 func F_SendRequest(button T_ButtonEvent, requestOut chan T_Request, elevator T_Elevator) {
 	if button.Button == BT_Cab {
-		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor)}
+		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: CAB, Floor: int8(button.Floor), Direction: NONE}
+	} else if button.Button == BT_HallUp {
+		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor), Direction: UP}
 	} else {
-		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor)}
+		requestOut <- T_Request{Id: uint16(elevator.CurrentID), State: 0, Calltype: HALL, Floor: int8(button.Floor), Direction: DOWN}
 	}
 }
 
