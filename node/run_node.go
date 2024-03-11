@@ -242,37 +242,29 @@ be determined by the signaling of unassigned/done entries further out in the pro
 
 */
 
-func f_TurnOnLight(entry T_GlobalQueueEntry, entryIsUnique bool) {
-	thisNodeInfo := f_GetNodeInfo()
-
+func f_TurnOnLight(entry T_GlobalQueueEntry) { //priority uint8
 	//Turn on light for new entry in global queue
-	if entry.Request.State != elevator.DONE && entryIsUnique {
-		if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN{
-			elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), true)
+	if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN {
+		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), true)
 
-		}else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP{
-			elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
+	} else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP {
+		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
 
-		}else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == thisNodeInfo.PRIORITY{
-			elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
-		}
+	} else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY {
+		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
 	}
 }
 
 func f_TurnOffLight(entry T_GlobalQueueEntry) {
-	thisNodeInfo := f_GetNodeInfo()
-
 	//Turn off light for done entry in global queue
-	if entry.Request.State == elevator.DONE {
-		if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN{
-			elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), false)
+	if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN {
+		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), false)
 
-		}else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP{
-			elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), false)
+	} else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP {
+		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), false)
 
-		}else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == thisNodeInfo.PRIORITY{
-			elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), false)
-		}
+	} else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY {
+		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), false)
 	}
 }
 
@@ -447,12 +439,12 @@ func f_RunPrimary() {
 					f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				}
-				f_WriteLogMasterMessage(masterMessage)
+				// f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
 				f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage, c_receivedActiveEntry)
-				f_WriteLogSlaveMessage(slaveMessage)
+				// f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -511,13 +503,13 @@ func f_RunPrimary() {
 			case masterMessage := <-c_receiveMasterMessage:
 				f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				f_WriteLogMasterMessage(masterMessage)
+				// f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
 				}
-				f_WriteLogSlaveMessage(slaveMessage)
+				// f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)

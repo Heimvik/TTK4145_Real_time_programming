@@ -126,6 +126,7 @@ func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, remoteEntry)
 		if remoteEntry.Request.State == elevator.DONE {
 			entriesToRemove = append(entriesToRemove, remoteEntry)
+			f_TurnOffLight(remoteEntry)
 		}
 	}
 	if len(entriesToRemove) > 0 {
@@ -151,7 +152,7 @@ func f_RemoveEntryGlobalQueue(globalQueue []T_GlobalQueueEntry, entriesToRemove 
 		for _, entryToRemove := range entriesToRemove {
 			if entry.Request.Id == entryToRemove.Request.Id && entry.RequestedNode == entryToRemove.RequestedNode {
 				newGlobalQueue = append(globalQueue[:i], globalQueue[i+1:]...)
-				f_TurnOffLight(entry)
+				
 			}
 		}
 	}
@@ -169,6 +170,7 @@ func f_RemoveFinishedEntry(c_ackSentEntryToSlave chan T_AckObject, globalQueue [
 	F_WriteLog("MASTER found done entry waiting for sending to slave before removing")
 	select {
 	case <-c_sentDoneEntryToSlave:
+		f_TurnOffLight(finishedEntry)
 		F_WriteLog("Removed entry: | " + strconv.Itoa(int(finishedEntry.Request.Id)) + " | " + strconv.Itoa(int(finishedEntry.RequestedNode)) + " | from global queue")
 		globalQueue = append(globalQueue[:finishedEntryIndex], globalQueue[finishedEntryIndex+1:]...)
 		return globalQueue
@@ -205,8 +207,7 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
-		f_TurnOnLight(entryToAdd, entryIsUnique)
-
+		
 	} else if !entryIsUnique {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
@@ -215,4 +216,8 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		}
 	}
 	getSetGlobalQueueInterface.c_set <- globalQueue
+
+	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
+		f_TurnOnLight(entryToAdd)
+	}
 }
