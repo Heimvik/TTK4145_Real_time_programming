@@ -1,30 +1,27 @@
 package elevator
 
 import (
-	"fmt"
 	"time"
 )
 
-func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
+func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels, c_elevatorWithoutErrors chan bool) {
 	for {
 		select {
 		case button := <-chans.C_buttons:
-			fmt.Printf("Handling button event\n")
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
 		case newFloor := <-chans.C_floors:
-			fmt.Printf("Arrived at floor %v",newFloor)
 			f_HandleFloorArrivalEvent(int8(newFloor), c_getSetElevatorInterface, chans)
 		case <-chans.C_timerTimeout:
 			f_HandleDoorTimeoutEvent(c_getSetElevatorInterface, chans)
 		case newRequest := <-chans.C_requestIn:
-			fmt.Print("Received request from node\n")
 			f_HandleRequestToElevatorEvent(newRequest, c_getSetElevatorInterface, chans)
 		case obstructed := <-chans.C_obstr:
-			fmt.Print("Handling OBSTRUCTED event\n")
 			f_HandleObstructedEvent(obstructed, c_getSetElevatorInterface, chans)
 		case stop := <-chans.C_stop:
-			fmt.Print("Handling STOP event\n")
 			f_HandleStopEvent(stop, c_getSetElevatorInterface, chans)
+		default:
+			c_elevatorWithoutErrors <- true
+			time.Sleep(time.Duration(1)*time.Millisecond)
 		}
 	}
 }
@@ -34,9 +31,7 @@ func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	oldElevator.CurrentID++
 	chans.getSetElevatorInterface.C_set <- oldElevator
-	fmt.Print("Sending request to node\n")
 	F_SendRequest(button, chans.C_requestOut, oldElevator)
-	fmt.Print("Request sent to node\n")
 }
 
 func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
@@ -46,7 +41,6 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	chans.getSetElevatorInterface.C_set <- newElevator
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
-		fmt.Print("FADO: Sending DONE request to node\n")
 		chans.C_timerStart <- true
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
@@ -80,15 +74,12 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	chans.getSetElevatorInterface.C_set <- newElevator
 
 	if newElevator.P_info.State == DOOROPEN {
-		fmt.Print("DO: Sending ACTIVE request to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
-		fmt.Print("DO: SENDING DONE request to node\n")
 		newRequest.State = DONE
 		chans.C_requestOut <- newRequest
 		chans.C_timerStart <- true
 	} else {
-		fmt.Print("MOVING: Sending ACTIVE request to node\n")
 		chans.C_requestOut <- *newElevator.P_serveRequest
 	}
 }

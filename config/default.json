@@ -13,5 +13,8 @@
   "assignbreakoutperiod":10,
   "mostresponsiveperiod":500,
   "mediumresponsiveperiod":1500,
-  "leastresponsiveperiod":5000
+  "leastresponsiveperiod":5000,
+  "terminationperiod":15,
+  "maxallowedelevatorerrors": 2,
+  "maxallowednodeerrors":2
 }

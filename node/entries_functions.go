@@ -17,6 +17,19 @@ func f_EntriesAreEqual(e1 T_GlobalQueueEntry, e2 T_GlobalQueueEntry) bool {
 	return ((e1.Request.Id == e2.Request.Id) && (e1.RequestedNode == e2.RequestedNode))
 }
 
+func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) bool {
+	if len(q1) != len(q2) {
+		return false
+	}
+
+	for i := 0; i < len(q1); i++ {
+		if q1[i] != q2[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func f_ClosestElevatorNode(floor int8, nodes []T_NodeInfo) uint8 {
 	var closestNode T_NodeInfo
 	closestDifference := int8(FLOORS)
@@ -74,17 +87,7 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 			case elevator.HALL:
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
 			case elevator.CAB:
-				elevatorAvalibale := false
-				for _, nodeInfo := range connectedNodes {
-					if nodeInfo.PRIORITY == entry.RequestedNode && nodeInfo.ElevatorInfo.State == elevator.IDLE {
-						elevatorAvalibale = true
-					}
-				}
-				if elevatorAvalibale {
-					chosenNode = entry.RequestedNode
-				} else {
-					chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
-				}
+				chosenNode = entry.RequestedNode
 			}
 
 			entry.Request.State = elevator.ASSIGNED

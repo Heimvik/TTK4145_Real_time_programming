@@ -52,21 +52,24 @@ type T_SlaveMessage struct {
 type T_AssignState int
 
 type T_Config struct {
-	Ip                     string `json:"ip"`
-	SlavePort              int    `json:"slaveport"`
-	MasterPort             int    `json:"masterport"`
-	ElevatorPort           int    `json:"elevatorport"`
-	Priority               uint8  `json:"priority"`
-	Nodes                  uint8  `json:"nodes"`
-	Floors                 int8   `json:"floors"`
-	ReassignTime           uint8  `json:"reassigntime"`
-	ConnectionTime         int    `json:"connectiontime"`
-	SendPeriod             int    `json:"sendperiod"`
-	GetSetPeriod           int    `json:"getsetperiod"`
-	AssignBreakoutPeriod   int    `json:"assignbreakoutperiod"`
-	MostResponsivePeriod   int    `json:"mostresponsiveperiod"`
-	MiddleResponsivePeriod int    `json:"middleresponsiveperiod"`
-	LeastResponsivePeriod  int    `json:"leastresponsiveperiod"`
+	Ip                       string `json:"ip"`
+	SlavePort                int    `json:"slaveport"`
+	MasterPort               int    `json:"masterport"`
+	ElevatorPort             int    `json:"elevatorport"`
+	Priority                 uint8  `json:"priority"`
+	Nodes                    uint8  `json:"nodes"`
+	Floors                   int8   `json:"floors"`
+	ReassignTime             uint8  `json:"reassigntime"`
+	ConnectionTime           int    `json:"connectiontime"`
+	SendPeriod               int    `json:"sendperiod"`
+	GetSetPeriod             int    `json:"getsetperiod"`
+	AssignBreakoutPeriod     int    `json:"assignbreakoutperiod"`
+	MostResponsivePeriod     int    `json:"mostresponsiveperiod"`
+	MiddleResponsivePeriod   int    `json:"middleresponsiveperiod"`
+	LeastResponsivePeriod    int    `json:"leastresponsiveperiod"`
+	TerminationPeriod        int    `json:"terminationperiod"`
+	MaxAllowedElevatorErrors int    `json:"maxallowedelevatorerrors"`
+	MaxAllowedNodeErrors     int    `json:"maxallowednodeerrors"`
 }
 
 const (
@@ -128,3 +131,6 @@ var ASSIGNBREAKOUTPERIOD int
 var MOSTRESPONSIVEPERIOD int
 var MEDIUMRESPONSIVEPERIOD int
 var LEASTRESPONSIVEPERIOD int
+var TERMINATIONPERIOD int
+var MAX_ALLOWED_ELEVATOR_ERRORS int
+var MAX_ALLOWED_NODE_ERRORS int
