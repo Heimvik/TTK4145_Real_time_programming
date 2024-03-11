@@ -39,6 +39,7 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
 		chans.C_timerStart <- true
+		F_SetDoorOpenLamp(true)
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
 	}
@@ -52,6 +53,7 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	if newElevator.P_info.State == IDLE {
 		chans.C_timerStop <- true
 		time.Sleep(time.Duration(DOOROPENTIME/2) * time.Millisecond) //closing door
+		F_SetDoorOpenLamp(false)
 	} else {
 		chans.C_timerStart <- true
 	}
@@ -95,7 +97,7 @@ func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevato
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 
 	oldElevator.StopButton = stop
-
+	F_SetStopLamp(stop)
 	newElevator := F_SetElevatorDirection(oldElevator)
 	chans.getSetElevatorInterface.C_set <- newElevator
 }
@@ -104,7 +106,7 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case MOVING:
-		if F_shouldStop(elevator) {
+		if F_shouldStop(elevator) {	
 			elevator = F_SetElevatorDirection(elevator)
 		}
 	// case IDLE: //should only happen when initializing, when the elevator first reaches a floor
