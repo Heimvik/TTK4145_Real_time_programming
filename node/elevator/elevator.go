@@ -42,32 +42,31 @@ type T_GetSetElevatorInterface struct {
 	C_set chan T_Elevator
 }
 
-
 type T_ElevatorChannels struct {
 	getSetElevatorInterface T_GetSetElevatorInterface
-	C_timerStart   chan bool
-	C_timerStop    chan bool
-	C_timerTimeout chan bool
-	C_buttons      chan T_ButtonEvent
-	C_floors       chan int
-	C_obstr        chan bool
-	C_stop         chan bool
-	C_requestIn    chan T_Request
-	C_requestOut   chan T_Request
+	C_timerStart            chan bool
+	C_timerStop             chan bool
+	C_timerTimeout          chan bool
+	C_buttons               chan T_ButtonEvent
+	C_floors                chan int
+	C_obstr                 chan bool
+	C_stop                  chan bool
+	C_requestIn             chan T_Request
+	C_requestOut            chan T_Request
 }
 
 func F_InitChannes(c_requestIn chan T_Request, c_requestOut chan T_Request) T_ElevatorChannels {
 	return T_ElevatorChannels{
 		getSetElevatorInterface: T_GetSetElevatorInterface{C_get: make(chan T_Elevator), C_set: make(chan T_Elevator)},
-		C_timerStart:   make(chan bool),
-		C_timerStop:    make(chan bool),
-		C_timerTimeout: make(chan bool),
-		C_buttons:      make(chan T_ButtonEvent),
-		C_floors:       make(chan int),
-		C_obstr:        make(chan bool),
-		C_stop:         make(chan bool),
-		C_requestIn:    c_requestIn,
-		C_requestOut:   c_requestOut,
+		C_timerStart:            make(chan bool),
+		C_timerStop:             make(chan bool),
+		C_timerTimeout:          make(chan bool),
+		C_buttons:               make(chan T_ButtonEvent),
+		C_floors:                make(chan int),
+		C_obstr:                 make(chan bool),
+		C_stop:                  make(chan bool),
+		C_requestIn:             c_requestIn,
+		C_requestOut:            c_requestOut,
 	}
 }
 
@@ -117,13 +116,8 @@ func F_shouldStop(elevator T_Elevator) bool {
 // her sender jeg ut (fiks deadlock)
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 
-
 func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
-	if elevator.P_serveRequest == nil || elevator.StopButton{
-		//hva skjer med DO her?
-		elevator.P_info.Direction = NONE
-		F_SetMotorDirection(NONE)
-	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = DOWN
 		F_SetMotorDirection(DOWN)
@@ -134,7 +128,13 @@ func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten
 	} else {
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
-		elevator = F_ClearRequest(elevator)
+		// elevator = F_ClearRequest(elevator)
 	}
+	return elevator
+}
+
+func F_StopElevator(elevator T_Elevator) T_Elevator {
+	elevator.P_info.Direction = NONE
+	F_SetMotorDirection(NONE)
 	return elevator
 }

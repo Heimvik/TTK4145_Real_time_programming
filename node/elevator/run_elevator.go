@@ -107,7 +107,7 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	//doortimer
 	go F_DoorTimer(chans)
 	//FSM
-	go F_FSM(c_getSetElevatorInterface, chans)
+	go F_FSM(c_getSetElevatorInterface, chans, elevatorOperations)
 }
 			// Kommentarer kodekvalitet:
 			// - La alle ganger du skriver til c_out og c_in være lesbare her, og ikke pakk det inn i funksjon (ta ut receiveRequest og sendRequest)

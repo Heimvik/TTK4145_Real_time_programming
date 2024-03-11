@@ -31,6 +31,9 @@ func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_
 	F_SendRequest(button, chans.C_requestOut, oldElevator)
 }
 
+//riktig floor -> stopelevator -> clear request ->  send done -> open door
+//feil floor -> setDir
+//IDLE||DOOROPEN -> stopelevator
 func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
@@ -38,9 +41,9 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	chans.getSetElevatorInterface.C_set <- newElevator
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN {
-		chans.C_timerStart <- true
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
+		chans.C_timerStart <- true
 	}
 }
 
@@ -55,19 +58,19 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	} else {
 		chans.C_timerStart <- true
 	}
-
-	//JONASCOMMENT: sjekk om logikken her kan forenkles
-	// if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil {
-	// 	chans.C_requestOut <- newReq
-	// } else if newElevator.P_info.State == IDLE {
-	// 	chans.C_timerStop <- true
-	// }
 }
 
+//samme floor -> clearReq -> send ACTIVE -> send DONE -> open door
+//forskjellig floor -> setDir -> send active
 func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_ReceiveRequest(newRequest, oldElevator)
+	if F_shouldStop(newElevator){
+		newElevator = F_ClearRequest(newElevator)
+	} else {
+		newElevator = F_SetElevatorDirection(newElevator)
+	}
 	chans.getSetElevatorInterface.C_set <- newElevator
 
 	if newElevator.P_info.State == DOOROPEN {
@@ -84,9 +87,7 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
-
 	oldElevator.Obstructed = obstructed
-
 	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
@@ -95,9 +96,12 @@ func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevato
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 
 	oldElevator.StopButton = stop
-
-	newElevator := F_SetElevatorDirection(oldElevator)
-	chans.getSetElevatorInterface.C_set <- newElevator
+	if stop {
+		oldElevator = F_StopElevator(oldElevator)
+	} else {
+		oldElevator = F_SetElevatorDirection(oldElevator)
+	}
+	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
 func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
@@ -105,11 +109,12 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	switch elevator.P_info.State {
 	case MOVING:
 		if F_shouldStop(elevator) {
-			elevator = F_SetElevatorDirection(elevator)
+			elevator = F_StopElevator(elevator)
+			elevator = F_ClearRequest(elevator)
 		}
 	// case IDLE: //should only happen when initializing, when the elevator first reaches a floor
 	default: //changed to default, in case of elevator being moved during dooropen
-		F_SetMotorDirection(NONE)
+		elevator = F_StopElevator(elevator)
 	}
 	return elevator
 }
