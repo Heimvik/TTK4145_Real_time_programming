@@ -70,17 +70,17 @@ type T_Config struct {
 }
 
 const (
-	MASTER T_MSNodeRole = 0
-	SLAVE  T_MSNodeRole = 1
+	MSROLE_MASTER T_MSNodeRole = 0
+	MSROLE_SLAVE  T_MSNodeRole = 1
 )
 const (
-	BACKUP  T_PBNodeRole = 0
-	PRIMARY T_PBNodeRole = 1
+	PBROLE_BACKUP  T_PBNodeRole = 0
+	PBROLE_PRIMARY T_PBNodeRole = 1
 )
 
 const (
-	ASSIGN     T_AssignState = 0
-	WAITFORACK T_AssignState = 1
+	ASSIGNSTATE_ASSIGN     T_AssignState = 0
+	ASSIGNSTATE_WAITFORACK T_AssignState = 1
 )
 
 // NodeOperation represents an operation to be performed on T_Node

@@ -17,7 +17,7 @@ func F_WriteLog(text string) bool {
 }
 func f_NodeRoleToString(role T_MSNodeRole) string {
 	switch role {
-	case MASTER:
+	case MSROLE_MASTER:
 		return "MASTER"
 	default:
 		return "SLAVE"

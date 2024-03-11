@@ -173,7 +173,7 @@ func f_DecrementTimeUntilDisconnect(c_getSetConnectedNodesInterface chan T_GetSe
 }
 
 func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackAssignmentSucessFull chan T_AckObject, c_assignState chan T_AssignState, c_quit chan bool) {
-	assignState := ASSIGN
+	assignState := ASSIGNSTATE_ASSIGN
 	c_assignmentSuccessfull := make(chan bool)
 	ackAssignmentSucessFull := T_AckObject{
 		C_Acknowledgement: c_assignmentSuccessfull,
@@ -187,7 +187,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 			return
 		default:
 			switch assignState {
-			case ASSIGN:
+			case ASSIGNSTATE_ASSIGN:
 				connectedNodes := f_GetConnectedNodes()
 				avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
 				c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
@@ -199,7 +199,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 					ackAssignmentSucessFull.ObjectToAcknowledge = assignedEntry
 					c_ackAssignmentSucessFull <- ackAssignmentSucessFull
 					F_WriteLog("Assigned request with ID: " + strconv.Itoa(int(assignedEntry.Request.Id)) + " assigned to node " + strconv.Itoa(int(assignedEntry.AssignedNode)))
-					assignState = WAITFORACK
+					assignState = ASSIGNSTATE_WAITFORACK
 					F_WriteLog("Assignstate: 1")
 					F_WriteLogGlobalQueueEntry(globalQueue[assignedEntryIndex])
 				}
@@ -207,14 +207,14 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 				if (assignedEntry != T_GlobalQueueEntry{}) {
 					F_WriteLogGlobalQueueEntry(f_GetGlobalQueue()[assignedEntryIndex])
 				}
-			case WAITFORACK:
+			case ASSIGNSTATE_WAITFORACK:
 				select {
 				case assigmentWasSucessFull := <-ackAssignmentSucessFull.C_Acknowledgement:
 					if assigmentWasSucessFull {
 						F_WriteLog("Assignstate: 0")
-						assignState = ASSIGN
+						assignState = ASSIGNSTATE_ASSIGN
 					} else {
-						assignState = ASSIGN
+						assignState = ASSIGNSTATE_ASSIGN
 						F_WriteLog("Assignstate: 0")
 					}
 				default:
@@ -224,6 +224,53 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		}
 		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 	}
+}
+
+/*
+Psudocode for Lightsmanager. All elevetors should show the same lights under normal circumstances, except
+cab light, which is not shared.
+
+We will first try the folowin approach:
+Deciding if lights should be on shuld be determined by any !DONE entries in f_getGlobalQueue.
+This locic is implemented in the for loop below.
+
+Potential problems:
+This is dependent of polling the GQ, and not message based, such that it might not register sudden changes in
+lights, but might not be a problem. An alternative solution would be to syncronize with a c_entryDone channel
+everywhere we are reamoving from GQ (after removal). In this case deciding if lights should be on/off should
+be determined by the signaling of unassigned/done entries further out in the program.
+
+*/
+
+func f_LightsManager() {
+	/*
+		for{
+			globalQueue := f_getGlobalQueue()
+			thisNodeInfo := f_GetNodeInfo()
+
+			//handle door open light?
+
+			//handles lights ON
+			for entry in globalqueue{
+				if entry.Request.State != REQUESTSTATE_DONE{
+					if hallRequest{
+						elevator.f_TurnOnLight(doneEntry.Request)
+					} else if cabRequest {
+						if doneEntry.Assignednode == f_getThisNodeInfo.PRIORITY{
+							elevator.f_TurnOnLight(doneEntry.Request)
+						}
+					}
+				}else{
+					elevator.f_TurnOffLight(entry.Request)
+				}
+			}
+
+			//handles ligts OFF
+			finn ALLE mulige requests (floor 0-3, C/H, Direction?) aka. alle mulige lys som fins
+			finn alle av disse som ikke er i GQ
+			kjør f_TurnOffLight() på alle disse
+		}
+	*/
 }
 
 func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry, c_getSetElevatorInterface chan elevator.T_GetSetElevatorInterface) {
@@ -355,6 +402,7 @@ func f_RunPrimary() {
 		go f_GetSetConnectedNodes(c_getSetConnectedNodesInterface)
 
 		go f_ElevatorManager(c_shouldCheckIfAssigned, c_entryFromElevator, c_getSetElevatorInterface)
+		go f_LightsManager()
 		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT, c_quitReceive)
 		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT, c_quitReceive)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
@@ -369,7 +417,7 @@ func f_RunPrimary() {
 				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_quitMasterRoutines)
 				go f_CheckIfShouldAssign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackAssignmentSucessFull, c_assignState, c_quitMasterRoutines)
 				go f_CheckAssignedNodeState(c_ackAssignmentSucessFull, c_receivedActiveEntry, c_quitMasterRoutines)
-				c_assignState <- ASSIGN
+				c_assignState <- ASSIGNSTATE_ASSIGN
 				F_WriteLog("Started all master routines")
 
 			case <-c_nodeIsSlave:
@@ -390,23 +438,18 @@ func f_RunPrimary() {
 	for {
 		nodeRole := f_GetNodeInfo().MSRole
 		switch nodeRole {
-		case MASTER:
+		case MSROLE_MASTER:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				if masterMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
-					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+					f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				}
 				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
-				if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
-					f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
-				}
-				if slaveMessage.Entry.Request.State == elevator.ACTIVE {
-					c_receivedActiveEntry <- slaveMessage.Entry
-				}
+				f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage, c_receivedActiveEntry)
 				f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
@@ -456,15 +499,15 @@ func f_RunPrimary() {
 				getSetNodeInfoInterface.c_set <- newNodeInfo
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
-				if newNodeInfo.MSRole == SLAVE {
+				if newNodeInfo.MSRole == MSROLE_SLAVE {
 					c_nodeIsSlave <- true
 				}
 			}
 
-		case SLAVE:
+		case MSROLE_SLAVE:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
-				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+				f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				f_WriteLogMasterMessage(masterMessage)
 
@@ -515,7 +558,7 @@ func f_RunPrimary() {
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 
-				if newNodeInfo.MSRole == MASTER {
+				if newNodeInfo.MSRole == MSROLE_MASTER {
 					c_nodeIsMaster <- true
 				}
 			}
