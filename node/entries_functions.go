@@ -151,6 +151,7 @@ func f_RemoveEntryGlobalQueue(globalQueue []T_GlobalQueueEntry, entriesToRemove 
 		for _, entryToRemove := range entriesToRemove {
 			if entry.Request.Id == entryToRemove.Request.Id && entry.RequestedNode == entryToRemove.RequestedNode {
 				newGlobalQueue = append(globalQueue[:i], globalQueue[i+1:]...)
+				f_TurnOffLight(entry)
 			}
 		}
 	}
@@ -204,6 +205,8 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
+		f_TurnOnLight(entryToAdd, entryIsUnique)
+
 	} else if !entryIsUnique {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd

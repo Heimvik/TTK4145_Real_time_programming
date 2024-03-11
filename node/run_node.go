@@ -242,35 +242,38 @@ be determined by the signaling of unassigned/done entries further out in the pro
 
 */
 
-func f_LightsManager() {
-	/*
-		for{
-			globalQueue := f_getGlobalQueue()
-			thisNodeInfo := f_GetNodeInfo()
+func f_TurnOnLight(entry T_GlobalQueueEntry, entryIsUnique bool) {
+	thisNodeInfo := f_GetNodeInfo()
 
-			//handle door open light?
+	//Turn on light for new entry in global queue
+	if entry.Request.State != elevator.DONE && entryIsUnique {
+		if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN{
+			elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), true)
 
-			//handles lights ON
-			for entry in globalqueue{
-				if entry.Request.State != REQUESTSTATE_DONE{
-					if hallRequest{
-						elevator.f_TurnOnLight(doneEntry.Request)
-					} else if cabRequest {
-						if doneEntry.Assignednode == f_getThisNodeInfo.PRIORITY{
-							elevator.f_TurnOnLight(doneEntry.Request)
-						}
-					}
-				}else{
-					elevator.f_TurnOffLight(entry.Request)
-				}
-			}
+		}else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP{
+			elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
 
-			//handles ligts OFF
-			finn ALLE mulige requests (floor 0-3, C/H, Direction?) aka. alle mulige lys som fins
-			finn alle av disse som ikke er i GQ
-			kjør f_TurnOffLight() på alle disse
+		}else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == thisNodeInfo.PRIORITY{
+			elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
 		}
-	*/
+	}
+}
+
+func f_TurnOffLight(entry T_GlobalQueueEntry) {
+	thisNodeInfo := f_GetNodeInfo()
+
+	//Turn off light for done entry in global queue
+	if entry.Request.State == elevator.DONE {
+		if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN{
+			elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), false)
+
+		}else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP{
+			elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), false)
+
+		}else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == thisNodeInfo.PRIORITY{
+			elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), false)
+		}
+	}
 }
 
 func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry, c_getSetElevatorInterface chan elevator.T_GetSetElevatorInterface) {
@@ -402,7 +405,6 @@ func f_RunPrimary() {
 		go f_GetSetConnectedNodes(c_getSetConnectedNodesInterface)
 
 		go f_ElevatorManager(c_shouldCheckIfAssigned, c_entryFromElevator, c_getSetElevatorInterface)
-		go f_LightsManager()
 		go F_ReceiveSlaveMessage(c_receiveSlaveMessage, SLAVEPORT, c_quitReceive)
 		go F_ReceiveMasterMessage(c_receiveMasterMessage, MASTERPORT, c_quitReceive)
 		go F_TransmitSlaveMessage(c_transmitSlaveMessage, SLAVEPORT)
