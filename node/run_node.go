@@ -75,9 +75,7 @@ func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_rece
 					F_WriteLog("Closed: f_CheckAssignedNodeState")
 					return
 				case receivedActiveEntry := <-c_receivedActiveEntry:
-					globalQueue := f_GetGlobalQueue()
-					assignedEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
-					fmt.Println(assignedEntry.Request.Id, assignedEntry.RequestedNode, receivedActiveEntry.Request.Id, receivedActiveEntry.RequestedNode)
+					assignedEntry := f_FindEntry(lastAssignedEntry, f_GetGlobalQueue())
 					if f_EntriesAreEqual(assignedEntry, receivedActiveEntry) {
 						ackAssignmentSucessFull.C_Acknowledgement <- true
 						F_WriteLog("Found ack (received ACTIVE)")
@@ -85,11 +83,9 @@ func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_rece
 						break PollLastAssigned
 					}
 				default:
-					connectedNodes := f_GetConnectedNodes()
-					globalQueue := f_GetGlobalQueue()
-					assigneddEntry := f_FindEntry(lastAssignedEntry.Request.Id, lastAssignedEntry.RequestedNode, globalQueue)
-					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, connectedNodes)
-					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && assigneddEntry.Request.State == elevator.ACTIVE {
+					assignedEntry := f_FindEntry(lastAssignedEntry, f_GetGlobalQueue())
+					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, f_GetConnectedNodes())
+					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && assignedEntry.Request.State == elevator.ACTIVE {
 						ackAssignmentSucessFull.C_Acknowledgement <- true
 						F_WriteLog("Found ack (changes in connected nodes)")
 						assignBreakoutTimer.Stop()
@@ -122,7 +118,6 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 			for i, entry := range globalQueue {
 				if entry.TimeUntilReassign == 0 {
 					doneEntry = globalQueue[i]
-					//fmt.Println(strconv.Itoa(int(doneEntry.RequestedNode)))
 					doneEntryIndex = i
 				}
 			}
@@ -143,27 +138,24 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 
 func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface) { //begge
 	for {
-		select {
-		default:
-			c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
-			connectedNodes := <-getSetConnectedNodesInterface.c_get
+		c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
+		connectedNodes := <-getSetConnectedNodesInterface.c_get
 
-			nodeToDisconnect, nodeToDisconnectIndex := T_NodeInfo{}, 0
-			for i, nodeInfo := range connectedNodes {
-				if nodeInfo.TimeUntilDisconnect == 0 {
-					nodeToDisconnect = nodeInfo
-					nodeToDisconnectIndex = i
-					break
-				}
+		nodeToDisconnect, nodeToDisconnectIndex := T_NodeInfo{}, 0
+		for i, nodeInfo := range connectedNodes {
+			if nodeInfo.TimeUntilDisconnect == 0 {
+				nodeToDisconnect = nodeInfo
+				nodeToDisconnectIndex = i
+				break
 			}
-			if (nodeToDisconnect != T_NodeInfo{}) {
-				connectedNodes = append(connectedNodes[:nodeToDisconnectIndex], connectedNodes[nodeToDisconnectIndex+1:]...)
-				F_WriteLog("Node " + strconv.Itoa(int(nodeToDisconnect.PRIORITY)) + " disconnected")
-			}
-			getSetConnectedNodesInterface.c_set <- connectedNodes
-
-			time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 		}
+		if (nodeToDisconnect != T_NodeInfo{}) {
+			connectedNodes = append(connectedNodes[:nodeToDisconnectIndex], connectedNodes[nodeToDisconnectIndex+1:]...)
+			F_WriteLog("Node " + strconv.Itoa(int(nodeToDisconnect.PRIORITY)) + " disconnected")
+		}
+		getSetConnectedNodesInterface.c_set <- connectedNodes
+
+		time.Sleep(time.Duration(LEASTRESPONSIVEPERIOD) * time.Microsecond)
 	}
 }
 
@@ -182,7 +174,6 @@ func f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface chan T_GetSetGlob
 				}
 			}
 			getSetGlobalQueueInterface.c_set <- globalQueue
-
 			time.Sleep(1 * time.Second)
 		}
 	}
@@ -190,19 +181,15 @@ func f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface chan T_GetSetGlob
 
 func f_DecrementTimeUntilDisconnect(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface) { //Begge
 	for {
-		select {
-		default:
-			c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
-			connectedNodes := <-getSetConnectedNodesInterface.c_get
-			for i, connectedNode := range connectedNodes {
-				if connectedNode.TimeUntilDisconnect > 0 {
-					connectedNodes[i].TimeUntilDisconnect -= 1
-				}
+		c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
+		connectedNodes := <-getSetConnectedNodesInterface.c_get
+		for i, connectedNode := range connectedNodes {
+			if connectedNode.TimeUntilDisconnect > 0 {
+				connectedNodes[i].TimeUntilDisconnect -= 1
 			}
-			getSetConnectedNodesInterface.c_set <- connectedNodes
-
-			time.Sleep(1 * time.Second)
 		}
+		getSetConnectedNodesInterface.c_set <- connectedNodes
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -222,7 +209,6 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		default:
 			switch assignState {
 			case ASSIGN:
-				//Enters upon change fom
 				connectedNodes := f_GetConnectedNodes()
 				avalibaleNodes := f_GetAvalibaleNodes(connectedNodes)
 				c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
@@ -235,7 +221,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 					c_ackAssignmentSucessFull <- ackAssignmentSucessFull
 					F_WriteLog("Assigned request with ID: " + strconv.Itoa(int(assignedEntry.Request.Id)) + " assigned to node " + strconv.Itoa(int(assignedEntry.AssignedNode)))
 					assignState = WAITFORACK
-					F_WriteLog("Assignstate: WAITFORACK")
+					F_WriteLog("Assignstate: 1")
 					F_WriteLogGlobalQueueEntry(globalQueue[assignedEntryIndex])
 				}
 				getSetGlobalQueueInterface.c_set <- globalQueue
@@ -246,11 +232,11 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 				select {
 				case assigmentWasSucessFull := <-ackAssignmentSucessFull.C_Acknowledgement:
 					if assigmentWasSucessFull {
-						F_WriteLog("Assignstate: ASSIGN")
+						F_WriteLog("Assignstate: 0")
 						assignState = ASSIGN
 					} else {
 						assignState = ASSIGN //Start reassigning after 10 secs anyways
-						F_WriteLog("Assignstate: ASSIGN")
+						F_WriteLog("Assignstate: 0")
 					}
 				default:
 				}
@@ -299,6 +285,7 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 //-global variables should ALWAYS be handled by server to operate onn good data
 
 func F_ProcessPairManager() {
+	fmt.Println("Checking for primaries...")
 	go f_NodeOperationManager(&ThisNode)
 
 	c_isPrimary := make(chan bool)
@@ -314,13 +301,8 @@ func F_ProcessPairManager() {
 	}
 }
 
-//IMPORTANT:
-//-global variables should ALWAYS be handled by server to operate onn good data
-//-all receive from channles should be organized in for-select!!! -> walk trough code and do
-
 func f_RunBackup(c_isPrimary chan bool) {
 	//constantly check if we receive messages
-	F_WriteLog("Started as BACKUP")
 	c_quitBackupRoutines := make(chan bool)
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
@@ -332,33 +314,22 @@ func f_RunBackup(c_isPrimary chan bool) {
 	for {
 		select {
 		case <-PBTicker.C:
-			fmt.Println("Timer ran out - initiates primary role")
+			fmt.Println("No primary found, initiates primary role")
 			close(c_quitBackupRoutines)
 			c_isPrimary <- true
 			return
 		case masterMessage := <-c_receiveMasterMessage:
-			fmt.Println("Backup received mastermessage")
 			thisNodeInfo := f_GetNodeInfo()
 			f_SetGlobalQueue(masterMessage.GlobalQueue)
 			if thisNodeInfo.PRIORITY == masterMessage.Transmitter.PRIORITY {
-				/*
-					f_SetNodeInfo(T_NodeInfo{
-						PRIORITY:            masterMessage.Transmitter.PRIORITY,
-						MSRole:              masterMessage.Transmitter.MSRole,
-						TimeUntilDisconnect: masterMessage.Transmitter.TimeUntilDisconnect,
-						ElevatorInfo: elevator.T_ElevatorInfo{
-							Direction: elevator.NONE,
-							Floor:     masterMessage.Transmitter.ElevatorInfo.Floor,
-							State:     0,
-						},
-					})*/
+				fmt.Println("Master primary found")
 				f_SetNodeInfo(masterMessage.Transmitter)
 				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
 		case slaveMessage := <-c_receiveSlaveMessage:
-			fmt.Println("Backup received slavemessage")
 			thisNodeInfo := f_GetNodeInfo()
 			if thisNodeInfo.PRIORITY == slaveMessage.Transmitter.PRIORITY {
+				fmt.Println("Slave primary found")
 				f_SetNodeInfo(slaveMessage.Transmitter)
 				PBTicker.Reset(time.Duration(CONNECTIONTIME) * time.Second)
 			}
@@ -386,7 +357,6 @@ func f_RunPrimary() {
 	c_getSetConnectedNodesInterface := make(chan T_GetSetConnectedNodesInterface)
 	c_getSetElevatorInterface := make(chan elevator.T_GetSetElevatorInterface)
 
-	//to run the main FSM
 	c_nodeIsMaster := make(chan bool)
 	c_quitMasterRoutines := make(chan bool)
 	c_quitReceive := make(chan bool)
@@ -406,8 +376,6 @@ func f_RunPrimary() {
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
 
 	go func() {
-		go f_NodeOperationManager(&ThisNode) //SHOULD BE THE ONLY REFERENCE TO ThisNode!
-
 		go f_GetSetNodeInfo(c_getSetNodeInfoInterface)
 		go f_GetSetGlobalQueue(c_getSetGlobalQueueInterface)
 		go f_GetSetConnectedNodes(c_getSetConnectedNodesInterface)
@@ -451,16 +419,13 @@ func f_RunPrimary() {
 		case MASTER:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
-				f_WriteLogMasterMessage(masterMessage)
-				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				thisNode := f_GetNodeInfo()
-				if masterMessage.Transmitter.PRIORITY != thisNode.PRIORITY {
+				if masterMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
 					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				}
+				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
-
-				f_WriteLogSlaveMessage(slaveMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
 				if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
 					f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
@@ -468,6 +433,7 @@ func f_RunPrimary() {
 				if slaveMessage.Entry.Request.State == elevator.ACTIVE {
 					c_receivedActiveEntry <- slaveMessage.Entry
 				}
+				f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -476,9 +442,7 @@ func f_RunPrimary() {
 				} else if entryFromElevator.Request.State == elevator.ACTIVE {
 					c_receivedActiveEntry <- entryFromElevator
 				}
-
-				thisNode := f_GetNodeInfo()
-				F_WriteLog("Node: | " + strconv.Itoa(int(thisNode.PRIORITY)) + " | MASTER | updated GQ entry:\n")
+				F_WriteLog("Node: | " + strconv.Itoa(int(f_GetNodeInfo().PRIORITY)) + " | MASTER | updated GQ entry:\n")
 				F_WriteLogGlobalQueueEntry(entryFromElevator)
 
 			case ackSentGlobalQueueToSlave := <-c_ackSentGlobalQueueToSlave:
@@ -489,13 +453,11 @@ func f_RunPrimary() {
 					GlobalQueue: globalQueue,
 				}
 				c_transmitMasterMessage <- masterMessage
-				F_WriteLog("Delete entry mastermessage sent")
 				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
 			case <-sendTimer.C:
-				transmitterNodeInfo := f_GetNodeInfo()
 				masterMessage := T_MasterMessage{
-					Transmitter: transmitterNodeInfo,
+					Transmitter: f_GetNodeInfo(),
 					GlobalQueue: f_GetGlobalQueue(),
 				}
 				c_transmitMasterMessage <- masterMessage
@@ -514,29 +476,28 @@ func f_RunPrimary() {
 
 			default:
 				connectedNodes := f_GetConnectedNodes()
-
 				c_getSetNodeInfoInterface <- getSetNodeInfoInterface
 				oldNodeInfo := <-getSetNodeInfoInterface.c_get
 				newNodeInfo := f_AssignNewRole(oldNodeInfo, connectedNodes)
 				getSetNodeInfoInterface.c_set <- newNodeInfo
-
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
-
 				if newNodeInfo.MSRole == SLAVE {
 					c_nodeIsSlave <- true
 				}
-
 			}
 
 		case SLAVE:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
-				f_WriteLogMasterMessage(masterMessage)
 				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
+				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
+				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
+					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
+				}
 				f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
@@ -547,13 +508,12 @@ func f_RunPrimary() {
 				thisNode := f_GetNodeInfo()
 				F_WriteLog("Node: | " + strconv.Itoa(int(thisNode.PRIORITY)) + " | SLAVE | updated GQ entry:\n")
 				F_WriteLogGlobalQueueEntry(entryFromElevator)
-
-				transmitter := f_GetNodeInfo()
 				infoMessage := T_SlaveMessage{
-					Transmitter: transmitter,
+					Transmitter: f_GetNodeInfo(),
 					Entry:       entryFromElevator,
 				}
 				c_transmitSlaveMessage <- infoMessage
+
 			case <-sendTimer.C:
 				transmitter := f_GetNodeInfo()
 				aliveMessage := T_SlaveMessage{
@@ -574,12 +534,10 @@ func f_RunPrimary() {
 				logTimer.Reset(time.Duration(2000) * time.Millisecond)
 			default:
 				connectedNodes := f_GetConnectedNodes()
-
 				c_getSetNodeInfoInterface <- getSetNodeInfoInterface
 				oldNodeInfo := <-getSetNodeInfoInterface.c_get
 				newNodeInfo := f_AssignNewRole(oldNodeInfo, connectedNodes)
 				getSetNodeInfoInterface.c_set <- newNodeInfo
-
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 

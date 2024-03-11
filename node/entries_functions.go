@@ -1,7 +1,6 @@
 package node
 
 import (
-	"fmt"
 	"strconv"
 	"the-elevator/node/elevator"
 	"time"
@@ -22,7 +21,6 @@ func f_ClosestElevatorNode(floor int8, nodes []T_NodeInfo) uint8 {
 	var closestNode T_NodeInfo
 	closestDifference := int8(FLOORS)
 	for _, nodeInfo := range nodes {
-		fmt.Print(int(nodeInfo.PRIORITY))
 		currentDifference := f_AbsInt(int8(nodeInfo.ElevatorInfo.Floor) - floor)
 		if currentDifference < closestDifference {
 			closestDifference = currentDifference
@@ -113,9 +111,9 @@ func F_FindAssignedEntry(globalQueue []T_GlobalQueueEntry, thisNodeInfo T_NodeIn
 	return T_GlobalQueueEntry{}, -1
 }
 
-func f_FindEntry(id uint16, requestedNode uint8, globalQueue []T_GlobalQueueEntry) T_GlobalQueueEntry {
+func f_FindEntry(entryToFind T_GlobalQueueEntry, globalQueue []T_GlobalQueueEntry) T_GlobalQueueEntry {
 	for _, entry := range globalQueue {
-		if id == entry.Request.Id && entry.RequestedNode == requestedNode {
+		if f_EntriesAreEqual(entryToFind, entry) {
 			return entry
 		}
 	}
