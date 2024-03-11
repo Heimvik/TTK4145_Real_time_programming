@@ -260,6 +260,17 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	}
 }
 
+func F_ShouldTerminate() bool{
+	/*
+	Should return true to catch all error states. We know the system is faulty if:
+	- No advancement in globalQueue for T seconds
+	- Not communicating for T seconds
+	- Not having elevator that responds
+	- 
+	*/
+	return true
+}
+
 func F_ProcessPairManager() {
 	fmt.Println("Checking for primaries...")
 	go f_NodeOperationManager(&ThisNode) //Should be only reference to ThisNode
