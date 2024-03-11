@@ -20,28 +20,7 @@ func init() {
 	var config T_Config
 	json.NewDecoder(configFile).Decode(&config)
 
-	// Init thisNode
 	ThisNode = f_InitNode(config)
-
-	nodeOperations = T_NodeOperations{
-		c_getNodeInfo:    make(chan chan T_NodeInfo),
-		c_setNodeInfo:    make(chan T_NodeInfo),
-		c_getSetNodeInfo: make(chan chan T_NodeInfo),
-
-		c_getGlobalQueue:    make(chan chan []T_GlobalQueueEntry),
-		c_setGlobalQueue:    make(chan []T_GlobalQueueEntry),
-		c_getSetGlobalQueue: make(chan chan []T_GlobalQueueEntry),
-
-		c_getConnectedNodes:    make(chan chan []T_NodeInfo),
-		c_setConnectedNodes:    make(chan []T_NodeInfo),
-		c_getSetConnectedNodes: make(chan chan []T_NodeInfo),
-	}
-	elevatorOperations = elevator.T_ElevatorOperations{
-		C_getElevator:    make(chan chan elevator.T_Elevator),
-		C_setElevator:    make(chan elevator.T_Elevator),
-		C_getSetElevator: make(chan chan elevator.T_Elevator),
-	}
-
 	IP = config.Ip
 	FLOORS = config.Floors
 	REASSIGNTIME = config.ReassignTime
@@ -235,7 +214,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 						F_WriteLog("Assignstate: 0")
 						assignState = ASSIGN
 					} else {
-						assignState = ASSIGN //Start reassigning after 10 secs anyways
+						assignState = ASSIGN
 						F_WriteLog("Assignstate: 0")
 					}
 				default:
@@ -272,7 +251,7 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 				assignedEntry, _ = F_FindAssignedEntry(globalQueue, thisNodeInfo)
 				if (assignedEntry != T_GlobalQueueEntry{}) {
 					F_WriteLog("Found assigned entry!")
-					c_requestToElevator <- assignedEntry.Request //NB! Depending on that elevator is polling in IDLE, Breakout here?
+					c_requestToElevator <- assignedEntry.Request
 					shouldCheckIfAssigned = false
 				}
 			}
@@ -281,12 +260,9 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	}
 }
 
-//IMPORTANT:
-//-global variables should ALWAYS be handled by server to operate onn good data
-
 func F_ProcessPairManager() {
 	fmt.Println("Checking for primaries...")
-	go f_NodeOperationManager(&ThisNode)
+	go f_NodeOperationManager(&ThisNode) //Should be only reference to ThisNode
 
 	c_isPrimary := make(chan bool)
 	go f_RunBackup(c_isPrimary)
@@ -302,7 +278,6 @@ func F_ProcessPairManager() {
 }
 
 func f_RunBackup(c_isPrimary chan bool) {
-	//constantly check if we receive messages
 	c_quitBackupRoutines := make(chan bool)
 	c_receiveSlaveMessage := make(chan T_SlaveMessage)
 	c_receiveMasterMessage := make(chan T_MasterMessage)
@@ -338,7 +313,6 @@ func f_RunBackup(c_isPrimary chan bool) {
 }
 
 func f_RunPrimary() {
-
 	getSetNodeInfoInterface := T_GetSetNodeInfoInterface{
 		c_get: make(chan T_NodeInfo),
 		c_set: make(chan T_NodeInfo),
