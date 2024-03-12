@@ -29,7 +29,6 @@ type T_Elevator struct {
 	StopButton     bool
 	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
 	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
-	PrevServeReq   T_Request
 }
 
 type T_ElevatorInfo struct {
@@ -110,7 +109,7 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 	}
 }
 
-func F_shouldStop(elevator T_Elevator) bool {
+func F_ShouldStop(elevator T_Elevator) bool {
 	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
@@ -119,10 +118,7 @@ func F_shouldStop(elevator T_Elevator) bool {
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 
 func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
-	if elevator.P_serveRequest == nil || elevator.StopButton {
-		elevator.P_info.Direction = NONE
-		F_SetMotorDirection(NONE)
-	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = DOWN
 		F_SetMotorDirection(DOWN)
@@ -133,7 +129,13 @@ func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten
 	} else {
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
-		elevator = F_ClearRequest(elevator)
+		// elevator = F_ClearRequest(elevator)
 	}
+	return elevator
+}
+
+func F_StopElevator(elevator T_Elevator) T_Elevator {
+	elevator.P_info.Direction = NONE
+	F_SetMotorDirection(NONE)
 	return elevator
 }

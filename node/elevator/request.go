@@ -28,13 +28,10 @@ const (
 func F_ReceiveRequest(req T_Request, elevator T_Elevator) T_Elevator {
 	elevator.P_serveRequest = &req
 	elevator.P_serveRequest.State = ACTIVE
-	elevator = F_SetElevatorDirection(elevator)
 	return elevator
 }
 
 func F_ClearRequest(elevator T_Elevator) T_Elevator {
-	elevator.PrevServeReq = *elevator.P_serveRequest
-	elevator.PrevServeReq.State = DONE
 	elevator.P_serveRequest = nil
 	elevator.P_info.State = DOOROPEN
 	return elevator
