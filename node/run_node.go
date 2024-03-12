@@ -185,7 +185,7 @@ func f_DecrementTimeUntilDisconnect(c_getSetConnectedNodesInterface chan T_GetSe
 	}
 }
 
-func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackAssignmentSucessFull chan T_AckObject, c_assignState chan T_AssignState, c_quit chan bool) {
+func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackAssignmentSucessFull chan T_AckObject, c_assignState chan T_AssignState, c_elevatorWithoutError chan bool, c_quit chan bool) {
 	assignState := ASSIGNSTATE_ASSIGN
 	c_assignmentSuccessfull := make(chan bool)
 	ackAssignmentSucessFull := T_AckObject{
@@ -228,6 +228,7 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 						assignState = ASSIGNSTATE_ASSIGN
 					} else {
 						assignState = ASSIGNSTATE_ASSIGN
+						c_elevatorWithoutError <- false
 						F_WriteLog("Assignstate: 0")
 					}
 				default:
@@ -280,8 +281,6 @@ func f_TurnOffLight(entry T_GlobalQueueEntry) {
 		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), false)
 	}
 }
-
-
 
 func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry, c_getSetElevatorInterface chan elevator.T_GetSetElevatorInterface, c_elevatorWithoutErrors chan bool) {
 	c_requestFromElevator := make(chan elevator.T_Request)
