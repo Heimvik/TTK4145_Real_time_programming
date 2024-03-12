@@ -171,20 +171,29 @@ func f_FindEntry(entryToFind T_GlobalQueueEntry, globalQueue []T_GlobalQueueEntr
 	return T_GlobalQueueEntry{}
 }
 
-func f_UpdateGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
+func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, remoteEntry)
 		if remoteEntry.Request.State == elevator.DONE {
 			entriesToRemove = append(entriesToRemove, remoteEntry)
+			//f_TurnOffLight(remoteEntry)
 		}
 	}
-
 	if len(entriesToRemove) > 0 {
 		c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
 		globalQueue := <-getSetGlobalQueueInterface.c_get
 		globalQueue = f_RemoveEntryGlobalQueue(globalQueue, entriesToRemove)
 		getSetGlobalQueueInterface.c_set <- globalQueue
+	}
+}
+
+func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry){
+	if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
+		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
+	}
+	if slaveMessage.Entry.Request.State == elevator.ACTIVE {
+		c_receivedActiveEntry <- slaveMessage.Entry
 	}
 }
 
@@ -194,6 +203,7 @@ func f_RemoveEntryGlobalQueue(globalQueue []T_GlobalQueueEntry, entriesToRemove 
 		for _, entryToRemove := range entriesToRemove {
 			if entry.Request.Id == entryToRemove.Request.Id && entry.RequestedNode == entryToRemove.RequestedNode {
 				newGlobalQueue = append(globalQueue[:i], globalQueue[i+1:]...)
+				
 			}
 		}
 	}
@@ -211,6 +221,7 @@ func f_RemoveFinishedEntry(c_ackSentEntryToSlave chan T_AckObject, globalQueue [
 	F_WriteLog("MASTER found done entry waiting for sending to slave before removing")
 	select {
 	case <-c_sentDoneEntryToSlave:
+		//f_TurnOffLight(finishedEntry)
 		F_WriteLog("Removed entry: | " + strconv.Itoa(int(finishedEntry.Request.Id)) + " | " + strconv.Itoa(int(finishedEntry.RequestedNode)) + " | from global queue")
 		globalQueue = append(globalQueue[:finishedEntryIndex], globalQueue[finishedEntryIndex+1:]...)
 		return globalQueue
@@ -247,6 +258,7 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
+		
 	} else if !entryIsUnique {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
@@ -255,4 +267,8 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		}
 	}
 	getSetGlobalQueueInterface.c_set <- globalQueue
+
+	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
+		// f_TurnOnLight(entryToAdd)
+	}
 }

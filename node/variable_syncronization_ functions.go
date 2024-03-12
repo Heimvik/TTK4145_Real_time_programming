@@ -71,7 +71,7 @@ func f_GetNodeInfo() T_NodeInfo {
 	return nodeInfo
 }
 func f_SetNodeInfo(nodeInfo T_NodeInfo) {
-	nodeOperations.c_setNodeInfo <- nodeInfo // Send the nodeInfo directly to be written
+	nodeOperations.c_setNodeInfo <- nodeInfo 
 }
 
 func f_GetSetNodeInfo(c_getSetNodeInfoInterface chan T_GetSetNodeInfoInterface) {

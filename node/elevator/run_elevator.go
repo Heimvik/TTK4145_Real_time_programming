@@ -118,7 +118,7 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	go F_PollButtons(chans.C_buttons)
 	go F_PollFloorSensor(chans.C_floors)
 	go F_PollObstructionSwitch(chans.C_obstr)
-	go F_PollStopButton(chans.C_obstr)
+	go F_PollStopButton(chans.C_stop)
 	//doortimer
 	go F_DoorTimer(chans)
 	//FSM
