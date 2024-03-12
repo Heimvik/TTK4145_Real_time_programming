@@ -110,7 +110,7 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
-	oldElevator.Obstructed = obstructed
+	oldElevator.P_info.Obstructed = obstructed
 	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
@@ -144,7 +144,7 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 }
 
 func F_DoorTimeout(elevator T_Elevator) T_Elevator {
-	if elevator.P_info.State == DOOROPEN && !elevator.Obstructed {
+	if elevator.P_info.State == DOOROPEN && !elevator.P_info.Obstructed {
 		elevator.P_info.State = IDLE
 	}
 	return elevator

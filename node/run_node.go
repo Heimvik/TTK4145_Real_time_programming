@@ -94,11 +94,12 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 			F_WriteLog("Closed: f_CheckGlobalQueueEntryStatus")
 			return
 		case <-checkChangesToGlobalQueue.C:
-			if f_GlobalQueueAreEqual(previousGlobalQueue, f_GetGlobalQueue()) && len(previousGlobalQueue) != 0 {
+			currentGlobalQueue := f_GetGlobalQueue()
+			if f_GlobalQueueAreEqual(previousGlobalQueue, currentGlobalQueue) && len(currentGlobalQueue) != 0 && !f_GlobalQueueFullyObstructed(currentGlobalQueue) {
 				F_WriteLog(fmt.Sprintf("No changes in globalQueue for %d seconds", TERMINATIONPERIOD))
 				c_nodeWithoutError <- false
 			} else {
-				previousGlobalQueue = f_GetGlobalQueue()
+				previousGlobalQueue = currentGlobalQueue
 				checkChangesToGlobalQueue.Reset(time.Duration(TERMINATIONPERIOD) * time.Second)
 			}
 		default:
@@ -567,13 +568,11 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 			case masterMessage := <-c_receiveMasterMessage:
 				f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
 				}
-				//f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
