@@ -90,6 +90,21 @@ TODO:
 
 //kan kanskje flyttes men foreløpig kan den bli
 
+func F_AcknowledgeRequests(elevatorOperations T_ElevatorOperations, chans T_ElevatorChannels) {
+	previousElevator := T_Elevator{}
+	for {
+		currentElevator := F_GetElevator(elevatorOperations)
+		if currentElevator.P_serveRequest != nil {
+			if currentElevator.P_serveRequest.State == ACTIVE && previousElevator.P_serveRequest == nil {
+				chans.C_requestOut <- *currentElevator.P_serveRequest
+			} else if currentElevator.P_serveRequest.State == DONE && previousElevator.P_serveRequest.State == ACTIVE {
+				chans.C_requestOut <- *currentElevator.P_serveRequest
+			}
+		}
+		previousElevator = currentElevator
+	}
+}
+
 func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int, c_elevatorWithoutErrors chan bool) {
 
 	F_InitDriver(fmt.Sprintf("localhost:%d", elevatorport))
@@ -108,6 +123,8 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	go F_DoorTimer(chans)
 	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans, c_elevatorWithoutErrors)
+
+	go F_AcknowledgeRequests(elevatorOperations, chans)
 }
 
 // Kommentarer kodekvalitet:

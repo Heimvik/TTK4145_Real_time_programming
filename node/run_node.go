@@ -278,8 +278,8 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 				globalQueue = f_GetGlobalQueue()
 				assignedEntry, _ = F_FindAssignedEntry(globalQueue, thisNodeInfo)
 				if (assignedEntry != T_GlobalQueueEntry{}) {
-					F_WriteLog("Found assigned entry!")
 					c_requestToElevator <- assignedEntry.Request
+					F_WriteLog("Found assigned entry!")
 					shouldCheckIfAssigned = false
 				}
 			}
@@ -453,9 +453,9 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 		}
 	}()
 
-	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
-	lightsTimer := time.NewTicker(time.Duration(500) * time.Millisecond)
-	logTimer := time.NewTicker(time.Duration(2000) * time.Millisecond)
+	sendTicker := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
+	lightsTicker := time.NewTicker(time.Duration(500) * time.Millisecond)
+	logTicker := time.NewTicker(time.Duration(2000) * time.Millisecond)
 
 	c_nodeIsMaster <- true
 
@@ -501,19 +501,19 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				c_transmitMasterMessage <- masterMessage
 				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
-			case <-sendTimer.C:
+			case <-sendTicker.C:
 				masterMessage := T_MasterMessage{
 					Transmitter: f_GetNodeInfo(),
 					GlobalQueue: f_GetGlobalQueue(),
 				}
 				c_transmitMasterMessage <- masterMessage
-				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
+				sendTicker.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 
-			case <-lightsTimer.C:
+			case <-lightsTicker.C:
 				f_UpdateLights()
-				lightsTimer.Reset(time.Duration(500) * time.Millisecond)
+				lightsTicker.Reset(time.Duration(500) * time.Millisecond)
 
-			case <-logTimer.C:
+			case <-logTicker.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
 				connectedNodes := f_GetConnectedNodes()
@@ -522,7 +522,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
 				}
-				logTimer.Reset(time.Duration(2000) * time.Millisecond)
+				logTicker.Reset(time.Duration(2000) * time.Millisecond)
 
 			default:
 				connectedNodes := f_GetConnectedNodes()
@@ -564,20 +564,20 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				}
 				c_transmitSlaveMessage <- infoMessage
 
-			case <-sendTimer.C:
+			case <-sendTicker.C:
 				transmitter := f_GetNodeInfo()
 				aliveMessage := T_SlaveMessage{
 					Transmitter: transmitter,
 					Entry:       T_GlobalQueueEntry{},
 				}
 				c_transmitSlaveMessage <- aliveMessage
-				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
+				sendTicker.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 
-			case <-lightsTimer.C:
+			case <-lightsTicker.C:
 				f_UpdateLights()
-				lightsTimer.Reset(time.Duration(500) * time.Millisecond)
+				lightsTicker.Reset(time.Duration(500) * time.Millisecond)
 
-			case <-logTimer.C:
+			case <-logTicker.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
 				connectedNodes := f_GetConnectedNodes()
@@ -586,7 +586,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				for _, entry := range globalQueue {
 					F_WriteLogGlobalQueueEntry(entry)
 				}
-				logTimer.Reset(time.Duration(2000) * time.Millisecond)
+				logTicker.Reset(time.Duration(2000) * time.Millisecond)
 			default:
 				connectedNodes := f_GetConnectedNodes()
 				c_getSetNodeInfoInterface <- getSetNodeInfoInterface
