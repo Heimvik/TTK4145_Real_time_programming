@@ -247,7 +247,7 @@ func f_TurnOnLight(entry T_GlobalQueueEntry) {
 	} else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP {
 		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
 
-	} else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY {
+	} else if entry.Request.Calltype == elevator.CAB && entry.RequestedNode == f_GetNodeInfo().PRIORITY {
 		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
 	}
 }
