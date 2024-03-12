@@ -1,8 +1,8 @@
 package elevator
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
@@ -70,6 +70,7 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	// }
 }
 
+//tar inn req -> velger dir -> evt clearReq -> evt åpne dør -> sender req til node
 func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	fmt.Println("Handling request to elevator")
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
@@ -87,6 +88,10 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 		fmt.Println("Sending request to node")
 		chans.C_requestOut <- *newElevator.P_serveRequest
 	}
+}
+
+func f_ShouldWait3Seconds(elevator T_Elevator) bool {
+	return elevator.P_serveRequest.State == DONE || (elevator.PrevServeReq.Calltype == HALL && elevator.PrevServeReq.Direction != elevator.P_info.Direction)	
 }
 
 func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
@@ -113,7 +118,7 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case MOVING:
-		if F_shouldStop(elevator) {	
+		if F_shouldStop(elevator) {
 			elevator = F_SetElevatorDirection(elevator)
 		}
 	// case IDLE: //should only happen when initializing, when the elevator first reaches a floor

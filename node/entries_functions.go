@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+func removeNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
+	for i, node := range nodes {
+		if node.PRIORITY == nodeToRemove.PRIORITY {
+			nodes = append(nodes[:i], nodes[i+1:]...)
+			break
+		}
+	}
+	return nodes
+}
+
 func f_AbsInt(x int8) int8 {
 	if x < 0 {
 		return -x
@@ -64,6 +74,8 @@ func F_AssembleEntryFromRequest(receivedRequest elevator.T_Request, thisNodeInfo
 	return returnEntry
 }
 
+//JONAS: Hva med å gjøre det mulig å assigne under DOOR OPEN, og heller reassigne hvis den står i DOOR OPEN for lenge?
+
 func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeInfo, avalibaleNodes []T_NodeInfo) (T_GlobalQueueEntry, int) {
 	assignedEntry := T_GlobalQueueEntry{}
 	assignedEntryIndex := -1
@@ -83,7 +95,11 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 				if elevatorAvalibale {
 					chosenNode = entry.RequestedNode
 				} else {
-					chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
+					avalibaleNodes = removeNode(avalibaleNodes, T_NodeInfo{PRIORITY: entry.RequestedNode})
+					//Add Hall request to one of the available nodes to entry.Request.Floor
+					//Add cab request with new node as requested node
+					
+
 				}
 			}
 

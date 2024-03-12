@@ -29,12 +29,13 @@ type T_Elevator struct {
 	StopButton     bool
 	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
 	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
+	PrevServeReq   T_Request
 }
 
 type T_ElevatorInfo struct {
 	Direction T_ElevatorDirection
 	Floor     int8 //ranges from 1-4
-	State     T_ElevatorState
+	State T_ElevatorState
 }
 
 type T_GetSetElevatorInterface struct {
@@ -112,6 +113,7 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 func F_shouldStop(elevator T_Elevator) bool {
 	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
+
 
 // her sender jeg ut (fiks deadlock)
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
