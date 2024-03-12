@@ -1,6 +1,7 @@
 # TODO list
-## Decrease sendperiod and number of messages sent each time
-## Constants with FIRSTWORD_SECONDWORD
+- [ ] Decrease sendperiod and number of messages sent each time
+- [ ] Constants with FIRSTWORD_SECONDWORD
+- [ ] Simulate packet loss as described on [this site](https://medium.com/@adilrk/network-tools-19a12519737b).
 
 # Triple Elevator System Test Cases
 
@@ -62,5 +63,5 @@
 - [ ] Verify behavior of hall buttons when the elevator is disconnected from the network.
 
 ### Stop Button
-- [ ] Test behavior of the stop button.
+- [ ] Test behavior of the stop button (NOT!!).
 
