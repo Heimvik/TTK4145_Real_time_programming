@@ -74,8 +74,6 @@ func F_AssembleEntryFromRequest(receivedRequest elevator.T_Request, thisNodeInfo
 	return returnEntry
 }
 
-//JONAS: Hva med å gjøre det mulig å assigne under DOOR OPEN, og heller reassigne hvis den står i DOOR OPEN for lenge?
-
 func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeInfo, avalibaleNodes []T_NodeInfo) (T_GlobalQueueEntry, int) {
 	assignedEntry := T_GlobalQueueEntry{}
 	assignedEntryIndex := -1
@@ -86,21 +84,7 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 			case elevator.HALL:
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
 			case elevator.CAB:
-				elevatorAvalibale := false
-				for _, nodeInfo := range connectedNodes {
-					if nodeInfo.PRIORITY == entry.RequestedNode && nodeInfo.ElevatorInfo.State == elevator.IDLE {
-						elevatorAvalibale = true
-					}
-				}
-				if elevatorAvalibale {
-					chosenNode = entry.RequestedNode
-				} else {
-					avalibaleNodes = removeNode(avalibaleNodes, T_NodeInfo{PRIORITY: entry.RequestedNode})
-					//Add Hall request to one of the available nodes to entry.Request.Floor
-					//Add cab request with new node as requested node
-					
-
-				}
+				chosenNode = entry.RequestedNode
 			}
 
 			entry.Request.State = elevator.ASSIGNED
@@ -153,7 +137,7 @@ func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 }
 
-func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry){
+func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry) {
 	if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
 	}
@@ -168,7 +152,7 @@ func f_RemoveEntryGlobalQueue(globalQueue []T_GlobalQueueEntry, entriesToRemove 
 		for _, entryToRemove := range entriesToRemove {
 			if entry.Request.Id == entryToRemove.Request.Id && entry.RequestedNode == entryToRemove.RequestedNode {
 				newGlobalQueue = append(globalQueue[:i], globalQueue[i+1:]...)
-				
+
 			}
 		}
 	}
@@ -223,7 +207,7 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
-		
+
 	} else if !entryIsUnique {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
 			globalQueue[entryIndex] = entryToAdd
@@ -232,8 +216,4 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		}
 	}
 	getSetGlobalQueueInterface.c_set <- globalQueue
-
-	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
-		f_TurnOnLight(entryToAdd)
-	}
 }
