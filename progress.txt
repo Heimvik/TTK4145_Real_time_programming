@@ -12,7 +12,7 @@ No calls are lost                                                               
         Losing power to the elevator motor 
         Losing power to the machine that controls the elevator
 
-        Network packet loss is not a failure, and can occur at any time
+        Network packet loss is not a failure, and can occur at any time                                                                         | CHECK
         An elevator entering the network is not a failure
 
     No calls should be lost in the presence of failures
