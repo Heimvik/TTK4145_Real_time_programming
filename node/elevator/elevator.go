@@ -34,7 +34,7 @@ type T_Elevator struct {
 type T_ElevatorInfo struct {
 	Direction T_ElevatorDirection
 	Floor     int8 //ranges from 1-4
-	State     T_ElevatorState
+	State T_ElevatorState
 }
 
 type T_GetSetElevatorInterface struct {
@@ -109,18 +109,16 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 	}
 }
 
-func F_shouldStop(elevator T_Elevator) bool {
+func F_ShouldStop(elevator T_Elevator) bool {
 	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
+
 
 // her sender jeg ut (fiks deadlock)
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 
 func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
-	if elevator.P_serveRequest == nil || elevator.StopButton {
-		elevator.P_info.Direction = NONE
-		F_SetMotorDirection(NONE)
-	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
 		elevator.P_info.State = MOVING
 		elevator.P_info.Direction = DOWN
 		F_SetMotorDirection(DOWN)
@@ -131,7 +129,13 @@ func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten
 	} else {
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
-		elevator = F_ClearRequest(elevator)
+		// elevator = F_ClearRequest(elevator)
 	}
+	return elevator
+}
+
+func F_StopElevator(elevator T_Elevator) T_Elevator {
+	elevator.P_info.Direction = NONE
+	F_SetMotorDirection(NONE)
 	return elevator
 }

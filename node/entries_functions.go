@@ -6,6 +6,16 @@ import (
 	"time"
 )
 
+func removeNode(nodes []T_NodeInfo, nodeToRemove T_NodeInfo) []T_NodeInfo {
+	for i, node := range nodes {
+		if node.PRIORITY == nodeToRemove.PRIORITY {
+			nodes = append(nodes[:i], nodes[i+1:]...)
+			break
+		}
+	}
+	return nodes
+}
+
 func f_AbsInt(x int8) int8 {
 	if x < 0 {
 		return -x
@@ -129,15 +139,20 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 	assignedEntry := T_GlobalQueueEntry{}
 	assignedEntryIndex := -1
 	for i, entry := range globalQueue {
-		if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
-			chosenNode := uint8(0)
-			switch entry.Request.Calltype {
-			case elevator.HALL:
+		chosenNode := uint8(0)
+		switch entry.Request.Calltype{
+		case elevator.HALL:
+			if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
-			case elevator.CAB:
-				chosenNode = entry.RequestedNode
 			}
-
+		case elevator.CAB:
+			for _, avalibaleNode := range avalibaleNodes {
+				if (entry.Request.State == elevator.UNASSIGNED) && (avalibaleNode.PRIORITY == entry.RequestedNode) {
+					chosenNode = entry.RequestedNode
+				}
+			}
+		}
+		if chosenNode != 0{
 			entry.Request.State = elevator.ASSIGNED
 			assignedEntry = T_GlobalQueueEntry{
 				Request:           entry.Request,
@@ -188,7 +203,7 @@ func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 }
 
-func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry){
+func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry) {
 	if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
 	}
@@ -203,7 +218,7 @@ func f_RemoveEntryGlobalQueue(globalQueue []T_GlobalQueueEntry, entriesToRemove 
 		for _, entryToRemove := range entriesToRemove {
 			if entry.Request.Id == entryToRemove.Request.Id && entry.RequestedNode == entryToRemove.RequestedNode {
 				newGlobalQueue = append(globalQueue[:i], globalQueue[i+1:]...)
-				
+
 			}
 		}
 	}
@@ -258,7 +273,7 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
 		globalQueue = append(globalQueue, entryToAdd)
-		
+
 	} else if !entryIsUnique {
 		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign {
 			globalQueue[entryIndex] = entryToAdd

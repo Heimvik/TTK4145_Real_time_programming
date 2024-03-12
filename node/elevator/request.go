@@ -52,7 +52,6 @@ func F_ConvertButtonTypeToRequest(buttonEvent T_ButtonEvent) T_Request {
 func F_ReceiveRequest(req T_Request, elevator T_Elevator) T_Elevator {
 	elevator.P_serveRequest = &req
 	elevator.P_serveRequest.State = ACTIVE
-	elevator = F_SetElevatorDirection(elevator)
 	return elevator
 }
 

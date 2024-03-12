@@ -1,7 +1,6 @@
 package elevator
 
 import (
-	"time"
 	"fmt"
 )
 
@@ -9,18 +8,24 @@ func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_Ele
 	for {
 		select {
 		case button := <-chans.C_buttons:
-			fmt.Print("Button event")
+			fmt.Print("Beginning button event\n")
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
+			fmt.Print("Finished button event\n")
 		case newFloor := <-chans.C_floors:
+			fmt.Print("Beginning floor event\n")
 			f_HandleFloorArrivalEvent(int8(newFloor), c_getSetElevatorInterface, chans)
+			fmt.Print("Finished floor event\n")
 		case <-chans.C_timerTimeout:
+			fmt.Print("Beginning door timeout event\n")
 			f_HandleDoorTimeoutEvent(c_getSetElevatorInterface, chans)
+			fmt.Print("Finished door timeout event\n")
 		case newRequest := <-chans.C_requestIn:
+			fmt.Print("Beginning request to elevator event\n")
 			f_HandleRequestToElevatorEvent(newRequest, c_getSetElevatorInterface, chans)
+			fmt.Print("Finished request to elevator event\n")
 		case obstructed := <-chans.C_obstr:
 			f_HandleObstructedEvent(obstructed, c_getSetElevatorInterface, chans)
 		case stop := <-chans.C_stop:
-			fmt.Println("STOP")
 			f_HandleStopEvent(stop, c_getSetElevatorInterface, chans)
 		default:
 			c_elevatorWithoutErrors <- true
@@ -37,6 +42,9 @@ func f_HandleButtonEvent(button T_ButtonEvent, c_getSetElevatorInterface chan T_
 	F_SendRequest(button, chans.C_requestOut, oldElevator)
 }
 
+//riktig floor -> stopelevator -> clear request ->  send done -> open door
+//feil floor -> setDir
+//IDLE||DOOROPEN -> stopelevator
 func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	F_SetFloorIndicator(int(newFloor))
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
@@ -45,10 +53,11 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	chans.getSetElevatorInterface.C_set <- newElevator
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
-		chans.C_timerStart <- true
 		F_SetDoorOpenLamp(true)
+		fmt.Print("Sending done to node\n")
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
+		chans.C_timerStart <- true
 	}
 }
 
@@ -59,47 +68,48 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	chans.getSetElevatorInterface.C_set <- newElevator
 	if newElevator.P_info.State == IDLE {
 		chans.C_timerStop <- true
-		time.Sleep(time.Duration(DOOROPENTIME/2) * time.Millisecond) //closing door
 		F_SetDoorOpenLamp(false)
 	} else {
 		chans.C_timerStart <- true
 	}
-
-	//JONASCOMMENT: sjekk om logikken her kan forenkles
-	// if newReq.State == UNASSIGNED && newElevator.P_serveRequest != nil {
-	// 	chans.C_requestOut <- newReq
-	// } else if newElevator.P_info.State == IDLE {
-	// 	chans.C_timerStop <- true
-	// }
 }
 
+//samme floor -> clearReq -> send ACTIVE -> send DONE -> open door
+//forskjellig floor -> setDir -> send active
 func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
-	fmt.Println("Handling request to elevator")
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_ReceiveRequest(newRequest, oldElevator)
-
+	cleared := false
+	if F_ShouldStop(newElevator){
+		newElevator = F_ClearRequest(newElevator)
+		cleared = true
+	} else {
+		newElevator = F_SetElevatorDirection(newElevator)
+	}
 	chans.getSetElevatorInterface.C_set <- newElevator
-	
 
-	if newElevator.P_info.State == DOOROPEN {
+	if cleared {
+		fmt.Print("Sending active to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
+		fmt.Print("Sending done to node\n")
 		newRequest.State = DONE
 		chans.C_requestOut <- newRequest
+		F_SetDoorOpenLamp(true)
 		chans.C_timerStart <- true
 	} else {
-		fmt.Println("Sending request to node")
-		chans.C_requestOut <- *newElevator.P_serveRequest
+		fmt.Print("Sending active to node\n")
+		newRequest.State = ACTIVE
+		chans.C_requestOut <- newRequest
 	}
 }
+
 
 func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
-
 	oldElevator.Obstructed = obstructed
-
 	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
@@ -109,21 +119,25 @@ func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevato
 
 	oldElevator.StopButton = stop
 	F_SetStopLamp(stop)
-	newElevator := F_SetElevatorDirection(oldElevator)
-	chans.getSetElevatorInterface.C_set <- newElevator
-	fmt.Println("DONE STOPPING")
+	if stop {
+		oldElevator = F_StopElevator(oldElevator)
+	} else {
+		oldElevator = F_SetElevatorDirection(oldElevator)
+	}
+	chans.getSetElevatorInterface.C_set <- oldElevator
 }
 
 func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case MOVING:
-		if F_shouldStop(elevator) {	
-			elevator = F_SetElevatorDirection(elevator)
+		if F_ShouldStop(elevator) {
+			elevator = F_StopElevator(elevator)
+			elevator = F_ClearRequest(elevator)
 		}
 	// case IDLE: //should only happen when initializing, when the elevator first reaches a floor
 	default: //changed to default, in case of elevator being moved during dooropen
-		F_SetMotorDirection(NONE)
+		elevator = F_StopElevator(elevator)
 	}
 	return elevator
 }
@@ -134,13 +148,3 @@ func F_DoorTimeout(elevator T_Elevator) T_Elevator {
 	}
 	return elevator
 }
-
-//gammel innmat i DoorTimeout, fjernet at den resender fordi elevator bør ikke få inn request når DOOROPEN
-// if elevator.P_info.State == DOOROPEN && !elevator.Obstructed { //hvis heisen ikke er obstructed skal den gå til IDLE
-// 	elevator.P_info.State = IDLE
-// 	return elevator, T_Request{}
-// } else if (elevator.P_info.State == DOOROPEN) && (elevator.Obstructed) && (elevator.P_serveRequest != nil) {
-// 	resendReq := *elevator.P_serveRequest
-// 	resendReq.State = UNASSIGNED
-// 	return elevator, resendReq
-// }
