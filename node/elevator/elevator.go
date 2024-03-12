@@ -117,9 +117,7 @@ func F_shouldStop(elevator T_Elevator) bool {
 // COMMENT: Enig her, funksjonen heter det den skal gjøre
 
 func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
-	fmt.Println("Got here")
 	if elevator.P_serveRequest == nil || elevator.StopButton {
-		fmt.Println("Got here 1")
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
 	} else if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
@@ -131,7 +129,6 @@ func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten
 		elevator.P_info.Direction = UP
 		F_SetMotorDirection(UP)
 	} else {
-		fmt.Println("Got here 2")
 		elevator.P_info.Direction = NONE
 		F_SetMotorDirection(NONE)
 		elevator = F_ClearRequest(elevator)

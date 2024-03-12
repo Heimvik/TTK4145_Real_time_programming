@@ -30,6 +30,54 @@ func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) boo
 	return true
 }
 
+func f_FindPossibleRequests() []elevator.T_Request {
+	possibleCalls := []elevator.T_Call{elevator.CAB, elevator.HALL}
+	possibleFloors := []int8{}
+	for i := 0; i < int(FLOORS); i++ {
+		possibleFloors = append(possibleFloors, int8(i))
+	}
+	possibleDirections := []elevator.T_ElevatorDirection{-1, 1}
+	possibleRequests := make([]elevator.T_Request, 0)
+	for _, floor := range possibleFloors {
+		for _, call := range possibleCalls {
+			if call == elevator.HALL {
+				for _, direction := range possibleDirections {
+					if !(floor == FLOORS-1 && direction == elevator.UP) || !(floor == 0 && direction == elevator.DOWN) {
+						possibleRequests = append(possibleRequests, elevator.T_Request{0, 0, call, floor, direction})
+					}
+				}
+			} else if call == elevator.CAB {
+				possibleRequests = append(possibleRequests, elevator.T_Request{0, 0, call, floor, elevator.NONE})
+			}
+		}
+	}
+	return possibleRequests
+}
+
+func f_FindNotPresentRequests(globalQueue []T_GlobalQueueEntry, possibleRequests []elevator.T_Request) []elevator.T_Request {
+	notPresentRequests := make([]elevator.T_Request, 0)
+	if len(globalQueue) == 0 {
+		return possibleRequests
+	}
+	for _, request := range possibleRequests {
+		found := false
+		for _, entry := range globalQueue {
+			if request.Floor == entry.Request.Floor {
+				if request.Calltype == elevator.HALL && entry.Request.Calltype == elevator.HALL && request.Direction == entry.Request.Direction {
+					found = true
+					break
+				} else if request.Calltype == elevator.CAB && entry.Request.Calltype == elevator.CAB {
+					found = true
+					break
+				}
+			}
+		}
+		if !found {
+			notPresentRequests = append(notPresentRequests, request)
+		}
+	}
+	return notPresentRequests
+}
 func f_ClosestElevatorNode(floor int8, nodes []T_NodeInfo) uint8 {
 	var closestNode T_NodeInfo
 	closestDifference := int8(FLOORS)

@@ -240,6 +240,20 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 }
 
+func f_UpdateLights() {
+	globalQueue := f_GetGlobalQueue()
+	possibleRequests := f_FindPossibleRequests()
+	notpresentRequests := f_FindNotPresentRequests(globalQueue, possibleRequests)
+
+	for _, requestNotBeingServed := range notpresentRequests {
+		elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestNotBeingServed), int(requestNotBeingServed.Floor), false)
+	}
+	for _, entryBeingServed := range globalQueue {
+		requestBeingServed := entryBeingServed.Request
+		elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestBeingServed), int(requestBeingServed.Floor), true)
+	}
+}
+
 func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator chan T_GlobalQueueEntry, c_getSetElevatorInterface chan elevator.T_GetSetElevatorInterface, c_elevatorWithoutErrors chan bool) {
 	c_requestFromElevator := make(chan elevator.T_Request)
 	c_requestToElevator := make(chan elevator.T_Request)
@@ -440,6 +454,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 	}()
 
 	sendTimer := time.NewTicker(time.Duration(SENDPERIOD) * time.Millisecond)
+	lightsTimer := time.NewTicker(time.Duration(500) * time.Millisecond)
 	logTimer := time.NewTicker(time.Duration(2000) * time.Millisecond)
 
 	c_nodeIsMaster <- true
@@ -493,6 +508,10 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				}
 				c_transmitMasterMessage <- masterMessage
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
+
+			case <-lightsTimer.C:
+				f_UpdateLights()
+				lightsTimer.Reset(time.Duration(500) * time.Millisecond)
 
 			case <-logTimer.C:
 				globalQueue := f_GetGlobalQueue()
@@ -553,6 +572,11 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				}
 				c_transmitSlaveMessage <- aliveMessage
 				sendTimer.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
+
+			case <-lightsTimer.C:
+				f_UpdateLights()
+				lightsTimer.Reset(time.Duration(500) * time.Millisecond)
+
 			case <-logTimer.C:
 				globalQueue := f_GetGlobalQueue()
 				nodeInfo := f_GetNodeInfo()
@@ -571,7 +595,6 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				getSetNodeInfoInterface.c_set <- newNodeInfo
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
-
 				if newNodeInfo.MSRole == MASTER {
 					c_nodeIsMaster <- true
 				}
