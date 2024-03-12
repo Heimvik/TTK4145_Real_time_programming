@@ -78,15 +78,20 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 	assignedEntry := T_GlobalQueueEntry{}
 	assignedEntryIndex := -1
 	for i, entry := range globalQueue {
-		if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
-			chosenNode := uint8(0)
-			switch entry.Request.Calltype {
-			case elevator.HALL:
+		chosenNode := uint8(0)
+		switch entry.Request.Calltype{
+		case elevator.HALL:
+			if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
-			case elevator.CAB:
-				chosenNode = entry.RequestedNode
 			}
-
+		case elevator.CAB:
+			for _, avalibaleNode := range avalibaleNodes {
+				if (entry.Request.State == elevator.UNASSIGNED) && (avalibaleNode.PRIORITY == entry.RequestedNode) {
+					chosenNode = entry.RequestedNode
+				}
+			}
+		}
+		if chosenNode != 0{
 			entry.Request.State = elevator.ASSIGNED
 			assignedEntry = T_GlobalQueueEntry{
 				Request:           entry.Request,
