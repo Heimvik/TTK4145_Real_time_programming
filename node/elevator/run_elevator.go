@@ -124,7 +124,7 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans, c_elevatorWithoutErrors)
 
-	go F_AcknowledgeRequests(elevatorOperations, chans)
+	//go F_AcknowledgeRequests(elevatorOperations, chans)
 }
 
 // Kommentarer kodekvalitet:

@@ -260,15 +260,11 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		globalQueue = append(globalQueue, entryToAdd)
 		
 	} else if !entryIsUnique {
-		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign { //only allow forward entry states //>=?
+		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign {
 			globalQueue[entryIndex] = entryToAdd
 		} else {
 			F_WriteLog("Disallowed backward information")
 		}
 	}
 	getSetGlobalQueueInterface.c_set <- globalQueue
-
-	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
-		// f_TurnOnLight(entryToAdd)
-	}
 }

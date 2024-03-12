@@ -1,173 +1,643 @@
-2024/03/12 03:21:10 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
-2024/03/12 03:21:10 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:12 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 3) | 
-2024/03/12 03:21:12 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:14 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:14 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:16 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:16 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:18 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:18 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:19 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:19 log_functions.go:15: Entry: | 1 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:19 log_functions.go:15: Assigned request with ID: 1 assigned to node 1
-2024/03/12 03:21:19 log_functions.go:15: Assignstate: 1
-2024/03/12 03:21:19 log_functions.go:15: Getting ack from last assinged...
-2024/03/12 03:21:19 log_functions.go:15: Entry: | 1 | State: | ASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:19 log_functions.go:15: Entry: | 1 | State: | ASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:19 log_functions.go:15: Found assigned request with ID: 1 assigned to node 1
-2024/03/12 03:21:19 log_functions.go:15: Found assigned entry!
-2024/03/12 03:21:19 log_functions.go:15: Node: | 1 | request resent ACTIVE
-2024/03/12 03:21:19 log_functions.go:15: Assignstate: 0
-2024/03/12 03:21:19 log_functions.go:15: Found ack (changes in connected nodes)
-2024/03/12 03:21:19 log_functions.go:15: ACTIVE entry already handeled
-2024/03/12 03:21:19 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:19 log_functions.go:15: Entry: | 1 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:20 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:20 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:20 log_functions.go:15: Entry: | 1 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:22 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:22 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:22 log_functions.go:15: Entry: | 1 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 12.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:24 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:24 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:24 log_functions.go:15: Entry: | 1 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 10.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:26 log_functions.go:15: Node: | 1 | request resent DONE
-2024/03/12 03:21:26 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:26 log_functions.go:15: Entry: | 1 | State: | DONE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:26 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
-2024/03/12 03:21:26 log_functions.go:15: Removed entry: | 1 | 1 | from global queue
-2024/03/12 03:21:26 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:3 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:26 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:28 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:3 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:28 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:30 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:30 log_functions.go:15: Entry: | 2 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:30 log_functions.go:15: Assigned request with ID: 2 assigned to node 1
-2024/03/12 03:21:30 log_functions.go:15: Assignstate: 1
-2024/03/12 03:21:30 log_functions.go:15: Entry: | 2 | State: | ASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:30 log_functions.go:15: Getting ack from last assinged...
-2024/03/12 03:21:30 log_functions.go:15: Entry: | 2 | State: | ASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:30 log_functions.go:15: Found assigned request with ID: 2 assigned to node 1
-2024/03/12 03:21:30 log_functions.go:15: Found assigned entry!
-2024/03/12 03:21:30 log_functions.go:15: Node: | 1 | request resent ACTIVE
-2024/03/12 03:21:30 log_functions.go:15: Assignstate: 0
-2024/03/12 03:21:30 log_functions.go:15: Found ack (changes in connected nodes)
-2024/03/12 03:21:30 log_functions.go:15: ACTIVE entry already handeled
-2024/03/12 03:21:30 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:30 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:30 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:3 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:30 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:30 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:32 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:3 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:32 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:32 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 12.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:33 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:34 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:34 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:34 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 10.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:34 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:35 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:35 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:36 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:36 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:36 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 8.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:36 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:36 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:36 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:36 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:38 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:0 State:1}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:38 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:38 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 6.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:38 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:38 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:38 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:39 log_functions.go:15: Node: | 1 | request resent DONE
-2024/03/12 03:21:39 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:39 log_functions.go:15: Entry: | 2 | State: | DONE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:39 log_functions.go:15: Assigned request with ID: 3 assigned to node 1
-2024/03/12 03:21:39 log_functions.go:15: Assignstate: 1
-2024/03/12 03:21:39 log_functions.go:15: Entry: | 3 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:39 log_functions.go:15: Getting ack from last assinged...
-2024/03/12 03:21:39 log_functions.go:15: Entry: | 3 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:39 log_functions.go:15: Found assigned request with ID: 3 assigned to node 1
-2024/03/12 03:21:39 log_functions.go:15: Found assigned entry!
-2024/03/12 03:21:39 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
-2024/03/12 03:21:39 log_functions.go:15: Removed entry: | 2 | 1 | from global queue
-2024/03/12 03:21:40 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:0 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:40 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:40 log_functions.go:15: Entry: | 3 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:40 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:40 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:40 log_functions.go:15: Node: | 1 | request resent ACTIVE
-2024/03/12 03:21:40 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:40 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:40 log_functions.go:15: Assignstate: 0
-2024/03/12 03:21:40 log_functions.go:15: Found ack (received ACTIVE)
-2024/03/12 03:21:42 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:0 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:42 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:42 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:42 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:42 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:44 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:44 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:44 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:44 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:44 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:46 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:1}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:46 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:46 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 9.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:46 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:46 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:47 log_functions.go:15: Node: | 1 | request resent DONE
-2024/03/12 03:21:47 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
-2024/03/12 03:21:47 log_functions.go:15: Entry: | 3 | State: | DONE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:47 log_functions.go:15: Assigned request with ID: 4 assigned to node 1
-2024/03/12 03:21:47 log_functions.go:15: Assignstate: 1
-2024/03/12 03:21:47 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:47 log_functions.go:15: Getting ack from last assinged...
-2024/03/12 03:21:47 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:47 log_functions.go:15: Found assigned request with ID: 4 assigned to node 1
-2024/03/12 03:21:47 log_functions.go:15: Found assigned entry!
-2024/03/12 03:21:47 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
-2024/03/12 03:21:47 log_functions.go:15: Removed entry: | 3 | 1 | from global queue
-2024/03/12 03:21:48 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:48 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:48 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:48 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:50 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:50 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:50 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:50 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:52 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:52 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:52 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 9.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:52 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:54 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:54 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:54 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 7.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:54 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:56 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:56 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:56 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 5.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:56 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:21:57 log_functions.go:15: Assignstate: 0
-2024/03/12 03:21:57 log_functions.go:15: Assigned request with ID: 5 assigned to node 1
-2024/03/12 03:21:57 log_functions.go:15: Assignstate: 1
-2024/03/12 03:21:57 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:57 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:57 log_functions.go:15: Getting ack from last assinged...
-2024/03/12 03:21:58 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:21:58 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:21:58 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 3.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:21:58 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:22:00 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:22:00 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:22:00 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 1.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:22:00 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 1 | 
-2024/03/12 03:22:01 log_functions.go:15: Reassigned entry: | 4 | 1 | in global queue
-2024/03/12 03:22:02 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
-2024/03/12 03:22:02 log_functions.go:15: Node: | 1 | MASTER | has GQ:
-2024/03/12 03:22:02 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
-2024/03/12 03:22:02 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 9.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:26 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:26 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:28 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:28 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:30 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:30 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:32 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:32 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 1 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:33 log_functions.go:15: Assigned request with ID: 1 assigned to node 1
+2024/03/12 15:18:33 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 1 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 1 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:33 log_functions.go:15: Found assigned request with ID: 1 assigned to node 1
+2024/03/12 15:18:33 log_functions.go:15: Found assigned entry!
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 1 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:33 log_functions.go:15: Assignstate: 0
+2024/03/12 15:18:33 log_functions.go:15: Found ack (received ACTIVE)
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 1 | State: | DONE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:33 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:18:33 log_functions.go:15: Removed entry: | 1 | 1 | from global queue
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 2 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:33 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:33 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:34 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:34 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:34 log_functions.go:15: Entry: | 2 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:34 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:35 log_functions.go:15: Assigned request with ID: 2 assigned to node 1
+2024/03/12 15:18:35 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:18:35 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:35 log_functions.go:15: Entry: | 2 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:35 log_functions.go:15: Entry: | 2 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:35 log_functions.go:15: Found assigned request with ID: 2 assigned to node 1
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:36 log_functions.go:15: Entry: | 2 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:36 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:36 log_functions.go:15: Found assigned entry!
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:36 log_functions.go:15: Assignstate: 0
+2024/03/12 15:18:36 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:18:36 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:36 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:36 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:36 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:36 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:37 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:37 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:37 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:37 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:38 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 2 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:38 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:38 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:39 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:18:39 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:39 log_functions.go:15: Entry: | 2 | State: | DONE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:39 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:18:39 log_functions.go:15: Removed entry: | 2 | 1 | from global queue
+2024/03/12 15:18:39 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:39 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:40 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 3 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:40 log_functions.go:15: Assigned request with ID: 3 assigned to node 1
+2024/03/12 15:18:40 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:40 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 3 | State: | ASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:40 log_functions.go:15: Entry: | 3 | State: | ASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:40 log_functions.go:15: Found assigned request with ID: 3 assigned to node 1
+2024/03/12 15:18:42 log_functions.go:15: Found assigned entry!
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:42 log_functions.go:15: Assignstate: 0
+2024/03/12 15:18:42 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:18:42 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:42 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:42 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:42 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:44 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 3 | State: | ACTIVE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 4 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:44 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:18:44 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:44 log_functions.go:15: Entry: | 3 | State: | DONE | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:44 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:18:44 log_functions.go:15: Removed entry: | 3 | 1 | from global queue
+2024/03/12 15:18:45 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:45 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Assigned request with ID: 4 assigned to node 1
+2024/03/12 15:18:46 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:46 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:46 log_functions.go:15: Found assigned request with ID: 4 assigned to node 1
+2024/03/12 15:18:46 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:0 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:46 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 4 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:46 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:47 log_functions.go:15: Found assigned entry!
+2024/03/12 15:18:47 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:47 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:47 log_functions.go:15: Assignstate: 0
+2024/03/12 15:18:47 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:18:47 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:47 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:47 log_functions.go:15: Entry: | 4 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:47 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:47 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:47 log_functions.go:15: Entry: | 4 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:48 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:0 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:48 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 4 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:48 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:50 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 4 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 12.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:50 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:52 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 4 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 10.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 5 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:52 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:18:52 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:52 log_functions.go:15: Entry: | 4 | State: | DONE | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:52 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:18:52 log_functions.go:15: Removed entry: | 4 | 1 | from global queue
+2024/03/12 15:18:54 log_functions.go:15: Assigned request with ID: 5 assigned to node 1
+2024/03/12 15:18:54 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:54 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:54 log_functions.go:15: Found assigned request with ID: 5 assigned to node 1
+2024/03/12 15:18:54 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:54 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 5 | State: | ASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:54 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:55 log_functions.go:15: Found assigned entry!
+2024/03/12 15:18:55 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:55 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:18:55 log_functions.go:15: Assignstate: 0
+2024/03/12 15:18:55 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:18:55 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:55 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:55 log_functions.go:15: Entry: | 5 | State: | ACTIVE | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:55 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:18:55 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:55 log_functions.go:15: Entry: | 5 | State: | ACTIVE | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:56 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:56 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 5 | State: | ACTIVE | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:56 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:18:58 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 5 | State: | DONE | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:58 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:18:58 log_functions.go:15: Removed entry: | 5 | 1 | from global queue
+2024/03/12 15:18:58 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:18:58 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 6 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:58 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:18:59 log_functions.go:15: Assigned request with ID: 6 assigned to node 1
+2024/03/12 15:18:59 log_functions.go:15: Assignstate: 1
+2024/03/12 15:18:59 log_functions.go:15: Entry: | 6 | State: | ASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:59 log_functions.go:15: Entry: | 6 | State: | ASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:18:59 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:18:59 log_functions.go:15: Found assigned request with ID: 6 assigned to node 1
+2024/03/12 15:19:00 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:00 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 6 | State: | ASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:00 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:01 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:01 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:01 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:01 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:01 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:19:01 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:01 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:01 log_functions.go:15: Entry: | 6 | State: | ACTIVE | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:01 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:01 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:01 log_functions.go:15: Entry: | 6 | State: | ACTIVE | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:02 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:02 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 6 | State: | ACTIVE | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:02 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:03 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:03 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:03 log_functions.go:15: Entry: | 6 | State: | DONE | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:03 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:03 log_functions.go:15: Removed entry: | 6 | 1 | from global queue
+2024/03/12 15:19:04 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:0 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:04 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 7 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:04 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:05 log_functions.go:15: Assigned request with ID: 7 assigned to node 1
+2024/03/12 15:19:05 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:05 log_functions.go:15: Entry: | 7 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:05 log_functions.go:15: Entry: | 7 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:05 log_functions.go:15: Found assigned request with ID: 7 assigned to node 1
+2024/03/12 15:19:05 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:0 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 7 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:06 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:06 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:06 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:19:06 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 7 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:06 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:06 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:06 log_functions.go:15: Entry: | 7 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:08 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:0 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:08 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 7 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:08 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:09 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:09 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:09 log_functions.go:15: Entry: | 7 | State: | DONE | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:09 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:09 log_functions.go:15: Removed entry: | 7 | 1 | from global queue
+2024/03/12 15:19:10 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:10 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 8 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:10 log_functions.go:15: Assigned request with ID: 8 assigned to node 1
+2024/03/12 15:19:10 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 8 | State: | ASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:10 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:10 log_functions.go:15: Entry: | 8 | State: | ASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:10 log_functions.go:15: Found assigned request with ID: 8 assigned to node 1
+2024/03/12 15:19:12 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 8 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:12 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:12 log_functions.go:15: Found ack (received ACTIVE)
+2024/03/12 15:19:12 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 8 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:12 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 8 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:12 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:14 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:14 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 8 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 9 | State: | UNASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:14 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:14 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:14 log_functions.go:15: Entry: | 8 | State: | DONE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:14 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:14 log_functions.go:15: Removed entry: | 8 | 1 | from global queue
+2024/03/12 15:19:16 log_functions.go:15: Assigned request with ID: 9 assigned to node 1
+2024/03/12 15:19:16 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 9 | State: | ASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:16 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 9 | State: | ASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:16 log_functions.go:15: Found assigned request with ID: 9 assigned to node 1
+2024/03/12 15:19:16 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:16 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 9 | State: | ASSIGNED | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:16 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:17 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:17 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:17 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:17 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:17 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:19:17 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:17 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:17 log_functions.go:15: Entry: | 9 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:17 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:17 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:17 log_functions.go:15: Entry: | 9 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:18 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:18 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:18 log_functions.go:15: Entry: | 9 | State: | ACTIVE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:18 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:18 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:18 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:20 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:20 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:20 log_functions.go:15: Entry: | 9 | State: | DONE | Calltype: HALL | Floor: 3 | Direction: DOWN | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:20 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:20 log_functions.go:15: Removed entry: | 9 | 1 | from global queue
+2024/03/12 15:19:20 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:3 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:20 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:20 log_functions.go:15: Entry: | 10 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:20 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:20 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:21 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:21 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:21 log_functions.go:15: Entry: | 10 | State: | ASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:21 log_functions.go:15: Entry: | 10 | State: | ASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:21 log_functions.go:15: Found assigned request with ID: 10 assigned to node 1
+2024/03/12 15:19:22 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:3 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:22 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:22 log_functions.go:15: Entry: | 10 | State: | ASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:22 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:22 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:23 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:23 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:23 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:23 log_functions.go:15: Entry: | 10 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:23 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:23 log_functions.go:15: Found ack (received ACTIVE)
+2024/03/12 15:19:23 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:23 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:23 log_functions.go:15: Entry: | 10 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:24 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:3 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:24 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:24 log_functions.go:15: Entry: | 10 | State: | ACTIVE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:24 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:24 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:25 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:25 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:25 log_functions.go:15: Entry: | 10 | State: | DONE | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:25 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:25 log_functions.go:15: Removed entry: | 10 | 1 | from global queue
+2024/03/12 15:19:26 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:26 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:26 log_functions.go:15: Entry: | 11 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:26 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:27 log_functions.go:15: Assigned request with ID: 11 assigned to node 1
+2024/03/12 15:19:27 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:27 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:27 log_functions.go:15: Entry: | 11 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:27 log_functions.go:15: Entry: | 11 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:27 log_functions.go:15: Found assigned request with ID: 11 assigned to node 1
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:28 log_functions.go:15: Entry: | 11 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 14.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:28 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:28 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:28 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:28 log_functions.go:15: Found ack (changes in connected nodes)
+2024/03/12 15:19:28 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:28 log_functions.go:15: Entry: | 11 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:28 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:28 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:28 log_functions.go:15: Entry: | 11 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:29 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:29 log_functions.go:15: Entry: | 13 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:29 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:29 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:29 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:29 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:30 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:-1 Floor:2 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:30 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:30 log_functions.go:15: Entry: | 11 | State: | ACTIVE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:30 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:30 log_functions.go:15: Entry: | 13 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:30 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:30 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:31 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:31 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:31 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:31 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:31 log_functions.go:15: Entry: | 11 | State: | DONE | Calltype: HALL | Floor: 1 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:31 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:31 log_functions.go:15: Removed entry: | 11 | 1 | from global queue
+2024/03/12 15:19:31 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:31 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:1 State:1}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:32 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 12 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 13 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:32 log_functions.go:15: Assigned request with ID: 12 assigned to node 1
+2024/03/12 15:19:32 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 12 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:32 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:32 log_functions.go:15: Entry: | 12 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:32 log_functions.go:15: Found assigned request with ID: 12 assigned to node 1
+2024/03/12 15:19:34 log_functions.go:15: Found assigned entry!
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | request resent ACTIVE
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 12 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:34 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:34 log_functions.go:15: Found ack (received ACTIVE)
+2024/03/12 15:19:34 log_functions.go:15: ACTIVE entry already handeled
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 12 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:34 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 12 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 13 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:34 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:1 Floor:1 State:2}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:36 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 12 | State: | ACTIVE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 13 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:36 log_functions.go:15: Node: | 1 | request resent DONE
+2024/03/12 15:19:36 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:36 log_functions.go:15: Entry: | 12 | State: | DONE | Calltype: HALL | Floor: 2 | Direction: UP | Reassigned in: 0.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:36 log_functions.go:15: MASTER found done entry waiting for sending to slave before removing
+2024/03/12 15:19:36 log_functions.go:15: Removed entry: | 12 | 1 | from global queue
+2024/03/12 15:19:37 log_functions.go:15: Node: | 1 | MASTER | updated GQ entry:
+2024/03/12 15:19:37 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Assigned request with ID: 13 assigned to node 1
+2024/03/12 15:19:38 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:38 log_functions.go:15: Found assigned request with ID: 13 assigned to node 1
+2024/03/12 15:19:38 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:38 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:38 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:40 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:40 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:42 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:42 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:44 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 9.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:44 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:46 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 7.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 14 | State: | UNASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:46 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Assignstate: 0
+2024/03/12 15:19:48 log_functions.go:15: Assigned request with ID: 14 assigned to node 1
+2024/03/12 15:19:48 log_functions.go:15: Assignstate: 1
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 14 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:48 log_functions.go:15: Getting ack from last assinged...
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 14 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:48 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:48 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 5.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 14 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:48 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:50 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 3.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 14 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 13.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:50 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Node: | 1 | MASTER | has connected nodes | 1 (Role: MASTER, ElevatorInfo: {Direction:0 Floor:2 State:0}, TimeUntilDisconnect: 4) | 
+2024/03/12 15:19:52 log_functions.go:15: Node: | 1 | MASTER | has GQ:
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 13 | State: | ASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 1.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 14 | State: | ASSIGNED | Calltype: HALL | Floor: 2 | Direction: DOWN | Reassigned in: 11.00 | Requested node: | 1 | Assigned node: | 1 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 15 | State: | UNASSIGNED | Calltype: HALL | Floor: 1 | Direction: DOWN | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 16 | State: | UNASSIGNED | Calltype: CAB | Floor: 1 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 17 | State: | UNASSIGNED | Calltype: CAB | Floor: 3 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 18 | State: | UNASSIGNED | Calltype: CAB | Floor: 0 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 19 | State: | UNASSIGNED | Calltype: HALL | Floor: 0 | Direction: UP | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:52 log_functions.go:15: Entry: | 20 | State: | UNASSIGNED | Calltype: CAB | Floor: 2 | Direction: NONE | Reassigned in: 15.00 | Requested node: | 1 | Assigned node: | 0 | 
+2024/03/12 15:19:53 log_functions.go:15: Reassigned entry: | 13 | 1 | in global queue
