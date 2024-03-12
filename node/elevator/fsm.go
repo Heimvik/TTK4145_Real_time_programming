@@ -2,25 +2,30 @@ package elevator
 
 import (
 	"fmt"
-	"time"
 )
 
 func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	for {
 		select {
 		case button := <-chans.C_buttons:
-			fmt.Print("Button event")
+			fmt.Print("Beginning button event\n")
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
+			fmt.Print("Finished button event\n")
 		case newFloor := <-chans.C_floors:
+			fmt.Print("Beginning floor event\n")
 			f_HandleFloorArrivalEvent(int8(newFloor), c_getSetElevatorInterface, chans)
+			fmt.Print("Finished floor event\n")
 		case <-chans.C_timerTimeout:
+			fmt.Print("Beginning door timeout event\n")
 			f_HandleDoorTimeoutEvent(c_getSetElevatorInterface, chans)
+			fmt.Print("Finished door timeout event\n")
 		case newRequest := <-chans.C_requestIn:
+			fmt.Print("Beginning request to elevator event\n")
 			f_HandleRequestToElevatorEvent(newRequest, c_getSetElevatorInterface, chans)
+			fmt.Print("Finished request to elevator event\n")
 		case obstructed := <-chans.C_obstr:
 			f_HandleObstructedEvent(obstructed, c_getSetElevatorInterface, chans)
 		case stop := <-chans.C_stop:
-			fmt.Println("STOP")
 			f_HandleStopEvent(stop, c_getSetElevatorInterface, chans)
 		}
 	}
@@ -46,6 +51,7 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
 		F_SetDoorOpenLamp(true)
+		fmt.Print("Sending done to node\n")
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
 		chans.C_timerStart <- true
@@ -59,7 +65,6 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 	chans.getSetElevatorInterface.C_set <- newElevator
 	if newElevator.P_info.State == IDLE {
 		chans.C_timerStop <- true
-		time.Sleep(time.Duration(DOOROPENTIME/2) * time.Millisecond) //closing door
 		F_SetDoorOpenLamp(false)
 	} else {
 		chans.C_timerStart <- true
@@ -69,7 +74,6 @@ func f_HandleDoorTimeoutEvent(c_getSetElevatorInterface chan T_GetSetElevatorInt
 //samme floor -> clearReq -> send ACTIVE -> send DONE -> open door
 //forskjellig floor -> setDir -> send active
 func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
-	fmt.Println("Handling request to elevator")
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_ReceiveRequest(newRequest, oldElevator)
@@ -83,13 +87,16 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	chans.getSetElevatorInterface.C_set <- newElevator
 
 	if cleared {
+		fmt.Print("Sending active to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
+		fmt.Print("Sending done to node\n")
 		newRequest.State = DONE
 		chans.C_requestOut <- newRequest
+		F_SetDoorOpenLamp(true)
 		chans.C_timerStart <- true
 	} else {
-		fmt.Println("Sending request to node")
+		fmt.Print("Sending active to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
 	}
@@ -115,7 +122,6 @@ func f_HandleStopEvent(stop bool, c_getSetElevatorInterface chan T_GetSetElevato
 		oldElevator = F_SetElevatorDirection(oldElevator)
 	}
 	chans.getSetElevatorInterface.C_set <- oldElevator
-	fmt.Println("DONE STOPPING")
 }
 
 func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {

@@ -12,7 +12,7 @@ func F_DoorTimer(chans T_ElevatorChannels){
 	for {
 		select {
 		case <-chans.C_timerStart:
-			timer.Reset(time.Duration(DOOROPENTIME/2) * time.Millisecond)
+			timer.Reset(time.Duration(DOOROPENTIME) * time.Millisecond)
 		case <-timer.C:
 			chans.C_timerTimeout <- true
 		case <-chans.C_timerStop:
