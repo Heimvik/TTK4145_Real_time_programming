@@ -240,17 +240,43 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 	}
 }
 
+func f_TurnOnLight(entry T_GlobalQueueEntry) {
+	if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN {
+		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), true)
+
+	} else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP {
+		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
+
+	} else if entry.Request.Calltype == elevator.CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY {
+		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
+	}
+}
+
+func f_TurnOffLight(request elevator.T_Request) {
+	if request.Calltype == elevator.HALL && request.Direction == elevator.DOWN {
+		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(request.Floor), false)
+
+	} else if request.Calltype == elevator.HALL && request.Direction == elevator.UP {
+		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(request.Floor), false)
+
+	} else if request.Calltype == elevator.CAB {
+		elevator.F_SetButtonLamp(elevator.BT_Cab, int(request.Floor), false)
+	}
+}
+
 func f_UpdateLights() {
 	globalQueue := f_GetGlobalQueue()
 	possibleRequests := f_FindPossibleRequests()
 	notpresentRequests := f_FindNotPresentRequests(globalQueue, possibleRequests)
 
 	for _, requestNotBeingServed := range notpresentRequests {
-		elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestNotBeingServed), int(requestNotBeingServed.Floor), false)
+	    f_TurnOffLight(requestNotBeingServed)
+		// elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestNotBeingServed), int(requestNotBeingServed.Floor), false)
 	}
 	for _, entryBeingServed := range globalQueue {
-		requestBeingServed := entryBeingServed.Request
-		elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestBeingServed), int(requestBeingServed.Floor), true)
+		f_TurnOnLight(entryBeingServed)
+		// requestBeingServed := entryBeingServed.Request
+		// elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestBeingServed), int(requestBeingServed.Floor), true)
 	}
 }
 

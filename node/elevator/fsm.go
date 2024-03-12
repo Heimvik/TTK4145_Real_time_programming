@@ -2,6 +2,7 @@ package elevator
 
 import (
 	"fmt"
+	"time"
 )
 
 func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels, c_elevatorWithoutErrors chan bool) {
