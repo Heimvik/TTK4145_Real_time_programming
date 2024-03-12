@@ -7,8 +7,9 @@ import (
 func f_InitNode(config T_Config) T_Node {
 	thisElevatorInfo := elevator.T_ElevatorInfo{
 		Direction: elevator.NONE,
-		Floor:     1, //-1, 1 for test purposes only!
+		Floor:     -1,
 		State:     elevator.IDLE,
+		Obstructed:     false,
 	}
 	thisNodeInfo := T_NodeInfo{
 		PRIORITY:     config.Priority,
@@ -20,7 +21,6 @@ func f_InitNode(config T_Config) T_Node {
 		P_info:         &thisElevatorInfo,
 		P_serveRequest: nil,
 		CurrentID:      0,
-		Obstructed:     false,
 		StopButton:     false,
 	}
 	thisNode := T_Node{

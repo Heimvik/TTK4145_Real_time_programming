@@ -58,7 +58,6 @@ func f_NodeOperationManager(node *T_Node) {
 		case responseChan := <-elevatorOperations.C_getSetElevator:
 			responseChan <- node.Elevator
 			node.Elevator = <-responseChan
-
 		default:
 		}
 	}
@@ -66,12 +65,12 @@ func f_NodeOperationManager(node *T_Node) {
 
 func f_GetNodeInfo() T_NodeInfo {
 	c_responseChan := make(chan T_NodeInfo)
-	nodeOperations.c_getNodeInfo <- c_responseChan 
-	nodeInfo := <-c_responseChan 
+	nodeOperations.c_getNodeInfo <- c_responseChan
+	nodeInfo := <-c_responseChan
 	return nodeInfo
 }
 func f_SetNodeInfo(nodeInfo T_NodeInfo) {
-	nodeOperations.c_setNodeInfo <- nodeInfo 
+	nodeOperations.c_setNodeInfo <- nodeInfo
 }
 
 func f_GetSetNodeInfo(c_getSetNodeInfoInterface chan T_GetSetNodeInfoInterface) {

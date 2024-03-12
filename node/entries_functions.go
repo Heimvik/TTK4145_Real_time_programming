@@ -31,13 +31,25 @@ func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) boo
 	if len(q1) != len(q2) {
 		return false
 	}
-
 	for i := 0; i < len(q1); i++ {
 		if q1[i] != q2[i] {
 			return false
 		}
 	}
 	return true
+}
+
+func f_GlobalQueueFullyObstructed(globalQueue []T_GlobalQueueEntry) bool {
+	obstructedEntries := 0
+	connectedNodes := f_GetConnectedNodes()
+
+	for _, entry := range globalQueue {
+		assignedNode := f_FindNodeInfo(entry.AssignedNode, connectedNodes)
+		if assignedNode.ElevatorInfo.Obstructed {
+			obstructedEntries += 1
+		}
+	}
+	return len(globalQueue) == obstructedEntries
 }
 
 func f_CopyGlobalQueue(globalQueue []T_GlobalQueueEntry) []T_GlobalQueueEntry {
