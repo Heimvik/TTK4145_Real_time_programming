@@ -40,6 +40,14 @@ func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) boo
 	return true
 }
 
+func f_CopyGlobalQueue(globalQueue []T_GlobalQueueEntry) []T_GlobalQueueEntry {
+	deepCopyGlobalQueue := make([]T_GlobalQueueEntry, len(globalQueue))
+	for i, entry := range globalQueue {
+		deepCopyGlobalQueue[i] = entry
+	}
+	return deepCopyGlobalQueue
+}
+
 func f_FindPossibleRequests() []elevator.T_Request {
 	possibleCalls := []elevator.T_Call{elevator.CAB, elevator.HALL}
 	possibleFloors := []int8{}
@@ -140,7 +148,7 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 	assignedEntryIndex := -1
 	for i, entry := range globalQueue {
 		chosenNode := uint8(0)
-		switch entry.Request.Calltype{
+		switch entry.Request.Calltype {
 		case elevator.HALL:
 			if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
@@ -152,7 +160,7 @@ func F_AssignNewEntry(globalQueue []T_GlobalQueueEntry, connectedNodes []T_NodeI
 				}
 			}
 		}
-		if chosenNode != 0{
+		if chosenNode != 0 {
 			entry.Request.State = elevator.ASSIGNED
 			assignedEntry = T_GlobalQueueEntry{
 				Request:           entry.Request,

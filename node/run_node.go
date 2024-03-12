@@ -495,7 +495,6 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 					f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				}
-				//f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
@@ -505,7 +504,6 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				if slaveMessage.Entry.Request.State == elevator.ACTIVE {
 					c_receivedActiveEntry <- slaveMessage.Entry
 				}
-				//f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -522,15 +520,16 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				globalQueue := ackSentGlobalQueueToSlave.ObjectToAcknowledge.([]T_GlobalQueueEntry)
 				masterMessage := T_MasterMessage{
 					Transmitter: transmitterNodeInfo,
-					GlobalQueue: globalQueue,
+					GlobalQueue: f_CopyGlobalQueue(globalQueue),
 				}
 				c_transmitMasterMessage <- masterMessage
 				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
 			case <-sendTicker.C:
+				globalQueue := f_GetGlobalQueue()
 				masterMessage := T_MasterMessage{
 					Transmitter: f_GetNodeInfo(),
-					GlobalQueue: f_GetGlobalQueue(),
+					GlobalQueue: f_CopyGlobalQueue(globalQueue),
 				}
 				c_transmitMasterMessage <- masterMessage
 				sendTicker.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
@@ -568,7 +567,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 			case masterMessage := <-c_receiveMasterMessage:
 				f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				//f_WriteLogMasterMessage(masterMessage)
+				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {

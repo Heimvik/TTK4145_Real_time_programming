@@ -168,4 +168,5 @@ Assigned request with ID: 1 assigned to node 1
 ### Solution
 Adding a channel for sending ack upon receiving messages as well (in addition to just polling data from CN)
 
-## Wont wait 3 seconds for Door open in cab request
+# Some MM dont update the gq DONE, and deletes entries
+

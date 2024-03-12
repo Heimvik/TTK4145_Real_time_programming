@@ -38,15 +38,11 @@ type T_AckObject struct {
 
 type T_MasterMessage struct {
 	Transmitter T_NodeInfo
-	//Receiver    T_NodeInfo //For checking
 	GlobalQueue []T_GlobalQueueEntry
-	Checksum    uint32
 }
 type T_SlaveMessage struct {
 	Transmitter T_NodeInfo
-	//Receiver    T_NodeInfo         //For checking
-	Entry    T_GlobalQueueEntry //find a better name?
-	Checksum uint32
+	Entry       T_GlobalQueueEntry
 }
 
 type T_AssignState int
