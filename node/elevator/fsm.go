@@ -73,14 +73,16 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
 	oldElevator := <-chans.getSetElevatorInterface.C_get
 	newElevator := F_ReceiveRequest(newRequest, oldElevator)
-	if F_shouldStop(newElevator){
+	cleared := false
+	if F_ShouldStop(newElevator){
 		newElevator = F_ClearRequest(newElevator)
+		cleared = true
 	} else {
 		newElevator = F_SetElevatorDirection(newElevator)
 	}
 	chans.getSetElevatorInterface.C_set <- newElevator
 
-	if newElevator.P_info.State == DOOROPEN {
+	if cleared {
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
 		newRequest.State = DONE
@@ -88,13 +90,11 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 		chans.C_timerStart <- true
 	} else {
 		fmt.Println("Sending request to node")
-		chans.C_requestOut <- *newElevator.P_serveRequest
+		newRequest.State = ACTIVE
+		chans.C_requestOut <- newRequest
 	}
 }
 
-func f_ShouldWait3Seconds(elevator T_Elevator) bool {
-	return elevator.P_serveRequest.State == DONE || (elevator.PrevServeReq.Calltype == HALL && elevator.PrevServeReq.Direction != elevator.P_info.Direction)	
-}
 
 func f_HandleObstructedEvent(obstructed bool, c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_ElevatorChannels) {
 	c_getSetElevatorInterface <- chans.getSetElevatorInterface
@@ -122,7 +122,7 @@ func F_FloorArrival(newFloor int8, elevator T_Elevator) T_Elevator {
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case MOVING:
-		if F_shouldStop(elevator) {
+		if F_ShouldStop(elevator) {
 			elevator = F_StopElevator(elevator)
 			elevator = F_ClearRequest(elevator)
 		}
