@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var messagesToSend int = 3
+var messagesToSend int = 20
 
 func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int) {
 	c_slaveMessageOut := make(chan T_SlaveMessage)
@@ -17,7 +17,7 @@ func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int
 		case transmitSlaveMessage := <-c_transmitSlaveMessage:
 			for i := 0; i < messagesToSend; i++ {
 				c_slaveMessageOut <- transmitSlaveMessage
-				time.Sleep(time.Duration(5) * time.Millisecond)
+				time.Sleep(time.Duration(2) * time.Millisecond)
 			}
 		}
 	}
@@ -30,7 +30,7 @@ func F_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port 
 		case transmitMasterMessage := <-c_transmitMasterMessage:
 			for i := 0; i < messagesToSend; i++ {
 				c_masterMessageOut <- transmitMasterMessage
-				time.Sleep(time.Duration(5) * time.Millisecond)
+				time.Sleep(time.Duration(2) * time.Millisecond)
 			}
 		}
 	}
