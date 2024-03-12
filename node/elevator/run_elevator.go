@@ -89,7 +89,7 @@ TODO:
 */
 
 //kan kanskje flyttes men foreløpig kan den bli
-
+/*
 func F_AcknowledgeRequests(elevatorOperations T_ElevatorOperations, chans T_ElevatorChannels) {
 	previousElevator := T_Elevator{}
 	for {
@@ -103,7 +103,7 @@ func F_AcknowledgeRequests(elevatorOperations T_ElevatorOperations, chans T_Elev
 		}
 		previousElevator = currentElevator
 	}
-}
+}*/
 
 func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int, c_elevatorWithoutErrors chan bool) {
 
