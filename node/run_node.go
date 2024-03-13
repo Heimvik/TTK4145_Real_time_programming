@@ -124,7 +124,7 @@ Returns: Nothing, but updates the list of connected nodes by removing those cons
 func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface, c_immobileNode chan uint8) {
 	allTimesAtFloorChange := make(map[uint8]time.Time)
 	previousConnectedNodes := f_GetConnectedNodes()
-	immoblieNodes := make(map[uint8]bool)
+	immobileNodes := make(map[uint8]bool)
 	for {
 		connectedNodes := f_GetConnectedNodes()
 		if f_GetNodeInfo().MSRole == MSROLE_MASTER {
@@ -143,13 +143,13 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 			for node, timeAtFloorChange := range allTimesAtFloorChange {
 				timeNow := time.Now()
 				if timeNow.Sub(timeAtFloorChange) > time.Duration(IMMOBILE_PERIOD*float64(time.Second)) && f_FindNodeInfo(node, connectedNodes).ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING {
-					immoblieNodes[node] = false
+					immobileNodes[node] = false
 				}
 			}
-			for node, isHandled := range immoblieNodes {
+			for node, isHandled := range immobileNodes {
 				if !isHandled {
 					c_immobileNode <- node
-					immoblieNodes[node] = true
+					immobileNodes[node] = true
 					allTimesAtFloorChange[node] = time.Now()
 				}
 			}

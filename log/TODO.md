@@ -5,8 +5,8 @@
 ## Node
 - [x] Constants with FIRSTWORD_SECONDWORD
 - [x] Move pricess pair to main
-- [ ] Prerequistes and description for all functions
-- [ ] Navngivning av variabler, funsjoner og filer
+- [x] Prerequistes and description for all functions
+- [x] Navngivning av variabler, funsjoner og filer
 ## Elevator
 - [x] Constants with FIRSTWORD_SECONDWORD
 - [x] Navngivning av enums.
