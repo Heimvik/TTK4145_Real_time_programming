@@ -135,6 +135,7 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 			connectedNodes = append(connectedNodes[:nodeToDisconnectIndex], connectedNodes[nodeToDisconnectIndex+1:]...)
 			F_WriteLog("Node " + strconv.Itoa(int(nodeToDisconnect.PRIORITY)) + " disconnected")
 		}
+
 		getSetConnectedNodesInterface.c_set <- connectedNodes
 
 		time.Sleep(time.Duration(LEAST_RESPONSIVE_PERIOD) * time.Microsecond)
@@ -388,6 +389,7 @@ func F_CheckIfShouldTerminate(c_shouldTerminate chan bool, c_nodeRunningWithoutE
 		default:
 			if nodeErrors > MAX_ALLOWED_NODE_ERRORS || elevatorErrors > MAX_ALLOWED_ELEVATOR_ERRORS {
 				fmt.Println("Too many errors from node or elevator")
+				time.Sleep(1 * time.Second)
 				c_shouldTerminate <- true
 			}
 		}
