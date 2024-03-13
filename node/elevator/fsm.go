@@ -179,6 +179,8 @@ func f_UpdateElevatorOnFloorArrival(newFloor int8, elevator T_Elevator) T_Elevat
 		if F_ShouldElevatorStop(elevator) {
 			elevator = F_StopElevator(elevator)
 			elevator = F_ClearRequest(elevator)
+		} else {
+			elevator = F_ChooseElevatorDirection(elevator)
 		}
 	default:
 		elevator = F_StopElevator(elevator)
