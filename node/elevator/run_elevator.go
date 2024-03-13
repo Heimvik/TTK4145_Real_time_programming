@@ -28,6 +28,7 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	go F_PollStopButton(chans.C_stop)
 	//doortimer
 	go F_DoorTimer(chans)
+	go F_EnsureElevatorDirection(chans, c_getSetElevatorInterface)
 	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans, c_elevatorWithoutErrors)
 }
