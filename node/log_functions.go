@@ -80,7 +80,7 @@ Prerequisites: A valid elevator call type.
 
 Returns: "NONE", "CAB", "HALL", or "UNKNOWN" based on the call type.
 */
-func f_CallTypeToString(callType elevator.T_Call) string {
+func f_CallTypeToString(callType elevator.T_CallType) string {
 	switch callType {
 	case 0:
 		return "NONE"
@@ -102,13 +102,13 @@ Returns: "UNASSIGNED", "ASSIGNED", "ACTIVE", "DONE", or "UNKNOWN" based on the s
 */
 func f_RequestStateToString(state elevator.T_RequestState) string {
 	switch state {
-	case elevator.UNASSIGNED:
+	case elevator.REQUESTSTATE_UNASSIGNED:
 		return "UNASSIGNED"
-	case elevator.ASSIGNED:
+	case elevator.REQUESTSTATE_ASSIGNED:
 		return "ASSIGNED"
-	case elevator.ACTIVE:
+	case elevator.REQUESTSTATE_ACTIVE:
 		return "ACTIVE"
-	case elevator.DONE:
+	case elevator.REQUESTSTATE_DONE:
 		return "DONE"
 	default:
 		return "UNKNOWN"
