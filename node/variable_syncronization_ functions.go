@@ -135,8 +135,8 @@ Returns: The current global queue.
 */
 func f_GetGlobalQueue() []T_GlobalQueueEntry {
 	c_responseChan := make(chan []T_GlobalQueueEntry)
-	nodeOperations.c_getGlobalQueue <- c_responseChan // Send the response channel to the NodeOperationManager
-	globalQueue := <-c_responseChan                   // Receive the global queue from the response channel
+	nodeOperations.c_getGlobalQueue <- c_responseChan 
+	globalQueue := <-c_responseChan                   
 	return globalQueue
 }
 
@@ -191,8 +191,8 @@ Returns: The current list of connected nodes.
 */
 func f_GetConnectedNodes() []T_NodeInfo {
 	c_responseChan := make(chan []T_NodeInfo)
-	nodeOperations.c_getConnectedNodes <- c_responseChan // Send the response channel to the NodeOperationManager
-	connectedNodes := <-c_responseChan                   // Receive the connected nodes from the response channel
+	nodeOperations.c_getConnectedNodes <- c_responseChan 
+	connectedNodes := <-c_responseChan                  
 	return connectedNodes
 }
 
