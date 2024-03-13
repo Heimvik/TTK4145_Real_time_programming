@@ -153,7 +153,7 @@ func f_FindNotPresentRequests(globalQueue []T_GlobalQueueEntry, possibleRequests
 				if request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Calltype == elevator.CALLTYPE_HALL && request.Direction == entry.Request.Direction {
 					found = true
 					break
-				} else if request.Calltype == elevator.CALLTYPE_CAB && entry.Request.Calltype == elevator.CALLTYPE_CAB {
+				} else if request.Calltype == elevator.CALLTYPE_CAB && entry.Request.Calltype == elevator.CALLTYPE_CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY{
 					found = true
 					break
 				}
