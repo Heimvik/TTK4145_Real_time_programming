@@ -2,116 +2,23 @@ package elevator
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-	"time"
 )
 
-func F_SimulateRequest(elevatorOperations T_ElevatorOperations, c_requestFromElevator chan T_Request, c_requestToElevator chan T_Request) {
-	c_getSetElevatorInterface := make(chan T_GetSetElevatorInterface)
-	getSetElevatorInterface := T_GetSetElevatorInterface{
-		C_get: make(chan T_Elevator),
-		C_set: make(chan T_Elevator),
-	}
-
-	go F_GetAndSetElevator(elevatorOperations, c_getSetElevatorInterface)
-
-	increment := uint16(0)
-	go func() {
-		for {
-			select {
-			case request := <-c_requestToElevator:
-				c_getSetElevatorInterface <- getSetElevatorInterface
-				currentElevator := <-getSetElevatorInterface.C_get
-				(*currentElevator.P_info).State = MOVING
-				getSetElevatorInterface.C_set <- currentElevator
-
-				request.State = ACTIVE
-				c_requestFromElevator <- request
-
-				time.Sleep(10 * time.Second)
-
-				c_getSetElevatorInterface <- getSetElevatorInterface
-				newElevator := <-getSetElevatorInterface.C_get
-				(*newElevator.P_info).State = IDLE
-				getSetElevatorInterface.C_set <- newElevator
-
-				request.State = DONE
-				c_requestFromElevator <- request
-			default:
-				time.Sleep(time.Duration(5000) * time.Microsecond)
-			}
-		}
-	}()
-
-	for {
-		var input string
-		fmt.Println("Enter request (C/H-floor): ")
-		fmt.Scanln(&input)
-		delimiter := "-"
-		parts := strings.Split(input, delimiter)
-		partToConvert := parts[1]
-		floor, _ := strconv.Atoi(partToConvert)
-		var returnRequest T_Request
-		if parts[0] == "C" {
-			returnRequest = T_Request{
-				Id:        increment,
-				State:     UNASSIGNED,
-				Calltype:  CAB,
-				Floor:     int8(floor),
-				Direction: UP,
-			}
-			increment += 1
-			c_requestFromElevator <- returnRequest
-		} else if parts[0] == "H" {
-			returnRequest = T_Request{
-				Id:        increment,
-				State:     UNASSIGNED,
-				Calltype:  HALL,
-				Floor:     int8(floor),
-				Direction: UP,
-			}
-			increment += 1
-			c_requestFromElevator <- returnRequest
-		}
-		time.Sleep(time.Duration(5000) * time.Microsecond)
-	}
-}
-
-//***END TEST FUNCTIONS***
-
 /*
-10.03.2024
-TODO:
-- Fikse alt av lampegreier (ÆSJ!!!)
-- Fjerne unødvendige variabler og funksjoner (ongoing)
-- Rydde opp i griseriet. Fjerne unødvendige kommentarer og kode. (going pretty good)
+Runs the elevator, initializing channels, polling sensors, managing timers, and running the finite state machine (FSM).
+
+Prerequisites: The elevatorOperations parameter must be initialized with valid elevator operations. The elevatorport parameter must be a valid port number. The c_elevatorWithoutErrors channel must be initialized for error reporting.
+
+Returns: Nothing, but continuously runs the elevator.
 */
 
-//kan kanskje flyttes men foreløpig kan den bli
-/*
-func F_AcknowledgeRequests(elevatorOperations T_ElevatorOperations, chans T_ElevatorChannels) {
-	previousElevator := T_Elevator{}
-	for {
-		currentElevator := F_GetElevator(elevatorOperations)
-		if currentElevator.P_serveRequest != nil {
-			if currentElevator.P_serveRequest.State == ACTIVE && previousElevator.P_serveRequest == nil {
-				chans.C_requestOut <- *currentElevator.P_serveRequest
-			} else if currentElevator.P_serveRequest.State == DONE && previousElevator.P_serveRequest.State == ACTIVE {
-				chans.C_requestOut <- *currentElevator.P_serveRequest
-			}
-		}
-		previousElevator = currentElevator
-	}
-}*/
-
 func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface, c_requestOut chan T_Request, c_requestIn chan T_Request, elevatorport int, c_elevatorWithoutErrors chan bool) {
-
 	F_InitDriver(fmt.Sprintf("localhost:%d", elevatorport))
 
-	F_SetMotorDirection(DOWN)
+	//force elevator to move in case of starting between floors
+	F_SetMotorDirection(ELEVATORDIRECTION_DOWN)
 
-	var chans T_ElevatorChannels = F_InitChannes(c_requestIn, c_requestOut)
+	var chans T_ElevatorChannels = F_InitChannels(c_requestIn, c_requestOut)
 	//interface for getting and setting elevator
 	go F_GetAndSetElevator(elevatorOperations, c_getSetElevatorInterface)
 	//polling sensors
@@ -123,15 +30,4 @@ func F_RunElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInte
 	go F_DoorTimer(chans)
 	//FSM
 	go F_FSM(c_getSetElevatorInterface, chans, c_elevatorWithoutErrors)
-
-	//go F_AcknowledgeRequests(elevatorOperations, chans)
 }
-
-// Kommentarer kodekvalitet:
-// - La alle ganger du skriver til c_out og c_in være lesbare her, og ikke pakk det inn i funksjon (ta ut receiveRequest og sendRequest)
-// - Lag en sentral FSM, ikke fordelt på mange funksjoner, som switcher på elevator.state, hvor alt som skal
-// 	skje i IDLE, skjer i IDLE casen, alt som skal skje i MOVING skjer i moving casen osv. SÅ heller sende den
-// 	til og fra forskjellige states her ute
-// - Prøv å generaliser (krymp) if-statements, evt lag en funksjon med conditions hvis det er nødt til å være veldig mye
-// - f_StorbokstavStorbokstav i funksjoner
-// - andre navn en "a" i caser

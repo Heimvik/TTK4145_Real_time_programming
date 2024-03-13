@@ -7,31 +7,13 @@ import (
 	"time"
 )
 
-/*
-
- */
-
 const _pollRate = 20 * time.Millisecond
 
 var _initialized bool = false
 var _numFloors int = 4
 
-// var _numButtons		int = 3
 var _mtx sync.Mutex
 var _conn net.Conn
-
-type T_ButtonType int
-
-const (
-	BT_HallUp   T_ButtonType = 0
-	BT_HallDown T_ButtonType = 1
-	BT_Cab      T_ButtonType = 2
-)
-
-type T_ButtonEvent struct {
-	Floor  int
-	Button T_ButtonType
-}
 
 func F_InitDriver(addr string) {
 	if _initialized {

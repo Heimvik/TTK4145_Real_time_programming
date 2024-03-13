@@ -7,6 +7,13 @@ import (
 	"the-elevator/node/elevator"
 )
 
+/*
+Writes a given text string to a log file.
+
+Prerequisites: File system access to create or append to the log file in the specified directory.
+
+Returns: A boolean value, true, indicating successful logging of the provided text.
+*/
 func F_WriteLog(text string) bool {
 	logFile, _ := os.OpenFile("log/debug1.log", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	defer logFile.Close()
@@ -15,6 +22,14 @@ func F_WriteLog(text string) bool {
 	log.Print(text)
 	return true
 }
+
+/*
+Converts a node role type to a string ("MASTER" or "SLAVE").
+
+Prerequisites: None.
+
+Returns: "MASTER" or "SLAVE" based on the node role.
+*/
 func f_NodeRoleToString(role T_MSNodeRole) string {
 	switch role {
 	case MSROLE_MASTER:
@@ -23,6 +38,14 @@ func f_NodeRoleToString(role T_MSNodeRole) string {
 		return "SLAVE"
 	}
 }
+
+/*
+Logs the connected nodes' information, including priority, role, elevator status, and disconnect timeout.
+
+Prerequisites: An up-to-date list of connected nodes.
+
+Returns: Nothing, but records the detailed status of all connected nodes in the log file.
+*/
 func f_WriteLogConnectedNodes(connectedNodes []T_NodeInfo) {
 	thisNode := f_GetNodeInfo()
 	logStr := fmt.Sprintf("Node: | %d | %s | has connected nodes | ", thisNode.PRIORITY, f_NodeRoleToString(thisNode.MSRole))
@@ -32,7 +55,15 @@ func f_WriteLogConnectedNodes(connectedNodes []T_NodeInfo) {
 	}
 	F_WriteLog(logStr)
 }
-func F_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
+
+/*
+Generates and logs a summary of all connected nodes, including priority, role, elevator status, and disconnect timer.
+
+Prerequisites: Updated list of connected nodes.
+
+Returns: Nothing, but logs connected nodes' status; returns nothing.
+*/
+func f_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
 	logStr := fmt.Sprintf("Entry: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %.2f | ",
 		entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), entry.Request.Floor, f_DirectionToString(entry.Request.Direction), float64(entry.TimeUntilReassign))
 	logStr += fmt.Sprintf("Requested node: | %d | ",
@@ -41,7 +72,15 @@ func F_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
 		entry.AssignedNode)
 	F_WriteLog(logStr)
 }
-func f_CallTypeToString(callType elevator.T_Call) string {
+
+/*
+Translates an elevator call type to a string representation.
+
+Prerequisites: A valid elevator call type.
+
+Returns: "NONE", "CAB", "HALL", or "UNKNOWN" based on the call type.
+*/
+func f_CallTypeToString(callType elevator.T_CallType) string {
 	switch callType {
 	case 0:
 		return "NONE"
@@ -53,21 +92,36 @@ func f_CallTypeToString(callType elevator.T_Call) string {
 		return "UNKNOWN"
 	}
 }
+
+/*
+Converts an elevator request state to its string equivalent.
+
+Prerequisites: A valid elevator request state.
+
+Returns: "UNASSIGNED", "ASSIGNED", "ACTIVE", "DONE", or "UNKNOWN" based on the state.
+*/
 func f_RequestStateToString(state elevator.T_RequestState) string {
 	switch state {
-	case elevator.UNASSIGNED:
+	case elevator.REQUESTSTATE_UNASSIGNED:
 		return "UNASSIGNED"
-	case elevator.ASSIGNED:
+	case elevator.REQUESTSTATE_ASSIGNED:
 		return "ASSIGNED"
-	case elevator.ACTIVE:
+	case elevator.REQUESTSTATE_ACTIVE:
 		return "ACTIVE"
-	case elevator.DONE:
+	case elevator.REQUESTSTATE_DONE:
 		return "DONE"
 	default:
 		return "UNKNOWN"
 	}
 }
 
+/*
+Translates an elevator direction value into a string representation.
+
+Prerequisites: A valid elevator direction value.
+
+Returns: "UP", "DOWN", "NONE", or "UNKNOWN" based on the direction.
+*/
 func f_DirectionToString(direction elevator.T_ElevatorDirection) string {
 	switch direction {
 	case 1:
@@ -80,6 +134,14 @@ func f_DirectionToString(direction elevator.T_ElevatorDirection) string {
 		return "UNKNOWN"
 	}
 }
+
+/*
+Logs detailed information about a received slave message, including request details and sender node, to track system communication and request distribution.
+
+Prerequisites: A valid slave message to log.
+
+Returns: Nothing, but logs detailed slave message information.
+*/
 func f_WriteLogSlaveMessage(slaveMessage T_SlaveMessage) {
 	entryStr := fmt.Sprintf("Entry: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %.2f | ",
 		slaveMessage.Entry.Request.Id, f_RequestStateToString(slaveMessage.Entry.Request.State), f_CallTypeToString(slaveMessage.Entry.Request.Calltype), slaveMessage.Entry.Request.Floor, f_DirectionToString(slaveMessage.Entry.Request.Direction), float64(slaveMessage.Entry.TimeUntilReassign))
@@ -92,6 +154,14 @@ func f_WriteLogSlaveMessage(slaveMessage T_SlaveMessage) {
 		int(thisNode.PRIORITY), f_NodeRoleToString(thisNode.MSRole), int(slaveMessage.Transmitter.PRIORITY), entryStr)
 	F_WriteLog(logStr)
 }
+
+/*
+Logs a received master message, documenting the sender's details and the global queue status, aiding in the synchronization and debugging of the network's state.
+
+Prerequisites: A valid master message to log.
+
+Returns: Nothing, but logs detailed master message and global queue information.
+*/
 func f_WriteLogMasterMessage(masterMessage T_MasterMessage) {
 	thisNode := f_GetNodeInfo()
 	roleStr := f_NodeRoleToString(thisNode.MSRole)

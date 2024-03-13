@@ -1,8 +1,21 @@
 # TODO list
-- [ ] Decrease sendperiod and number of messages sent each time
-- [ ] Constants with FIRSTWORD_SECONDWORD
+## Generelt
+- [ ] Dobbeltsjekk at testlista dekker alt
 - [ ] Simulate packet loss as described on [this site](https://medium.com/@adilrk/network-tools-19a12519737b).
-
+## Node
+- [x] Constants with FIRSTWORD_SECONDWORD
+- [x] Move pricess pair to main
+- [ ] Prerequistes and description for all functions
+- [ ] Navngivning av variabler, funsjoner og filer
+## Elevator
+- [x] Constants with FIRSTWORD_SECONDWORD
+- [x] Navngivning av enums.
+- [x] Navngivning av funksjoner.
+- [x] Navngivning av variabler.
+- [x] Navngivning av filer.
+- [x] Funksjonsstruktur
+- [x] Prerequistes and description for all functions
+- [ ] Legge til kilde der jeg bruker elevio.go
 # Triple Elevator System Test Cases
 
 ## Main Requirements
@@ -144,3 +157,5 @@ the language?
 - Does the code use long names (unless it’s necessary to use short ones)?
 - Does the code avoid abbreviations that save only one character?
 - Are all words abbreviated consistently?
+
+

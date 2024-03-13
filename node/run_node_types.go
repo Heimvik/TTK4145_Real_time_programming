@@ -4,18 +4,17 @@ import (
 	"the-elevator/node/elevator"
 )
 
-//common include packages:
-
 type T_PBNodeRole uint8
+type T_MSNodeRole uint8
+
 type T_Node struct {
-	NodeInfo       T_NodeInfo //role of node
+	NodeInfo       T_NodeInfo
 	PBRole         T_PBNodeRole
 	GlobalQueue    []T_GlobalQueueEntry
 	ConnectedNodes []T_NodeInfo
-	Elevator       elevator.T_Elevator //Its info needs to point at NodeInfo.ElevatorInfo
+	Elevator       elevator.T_Elevator
 }
 
-type T_MSNodeRole uint8
 type T_NodeInfo struct {
 	PRIORITY            uint8
 	MSRole              T_MSNodeRole
@@ -25,7 +24,7 @@ type T_NodeInfo struct {
 
 type T_GlobalQueueEntry struct {
 	Request           elevator.T_Request
-	RequestedNode     uint8 //PRIORITY of the one that got request
+	RequestedNode     uint8
 	AssignedNode      uint8
 	TimeUntilReassign uint8
 }
@@ -48,24 +47,24 @@ type T_SlaveMessage struct {
 type T_AssignState int
 
 type T_Config struct {
-	Ip                       string `json:"ip"`
-	SlavePort                int    `json:"slaveport"`
-	MasterPort               int    `json:"masterport"`
-	ElevatorPort             int    `json:"elevatorport"`
-	Priority                 uint8  `json:"priority"`
-	Nodes                    uint8  `json:"nodes"`
-	Floors                   int8   `json:"floors"`
-	ReassignTime             uint8  `json:"reassigntime"`
-	ConnectionTime           int    `json:"connectiontime"`
-	SendPeriod               int    `json:"sendperiod"`
-	GetSetPeriod             int    `json:"getsetperiod"`
-	AssignBreakoutPeriod     int    `json:"assignbreakoutperiod"`
-	MostResponsivePeriod     int    `json:"mostresponsiveperiod"`
-	MiddleResponsivePeriod   int    `json:"middleresponsiveperiod"`
-	LeastResponsivePeriod    int    `json:"leastresponsiveperiod"`
-	TerminationPeriod        int    `json:"terminationperiod"`
-	MaxAllowedElevatorErrors int    `json:"maxallowedelevatorerrors"`
-	MaxAllowedNodeErrors     int    `json:"maxallowednodeerrors"`
+	SlavePort                int     `json:"slaveport"`
+	MasterPort               int     `json:"masterport"`
+	ElevatorPort             int     `json:"elevatorport"`
+	Priority                 uint8   `json:"priority"`
+	Nodes                    uint8   `json:"nodes"`
+	Floors                   int8    `json:"floors"`
+	ReassignPeriod           uint8   `json:"reassignperiod"`
+	ConnectionPeriod         int     `json:"connectionperiod"`
+	ImmobilePeriod           float64 `json:"immobileperiod"`
+	SendPeriod               int     `json:"sendperiod"`
+	GetSetPeriod             int     `json:"getsetperiod"`
+	AssignBreakoutPeriod     int     `json:"assignbreakoutperiod"`
+	MostResponsivePeriod     int     `json:"mostresponsiveperiod"`
+	MiddleResponsivePeriod   int     `json:"middleresponsiveperiod"`
+	LeastResponsivePeriod    int     `json:"leastresponsiveperiod"`
+	TerminationPeriod        int     `json:"terminationperiod"`
+	MaxAllowedElevatorErrors int     `json:"maxallowedelevatorerrors"`
+	MaxAllowedNodeErrors     int     `json:"maxallowednodeerrors"`
 }
 
 const (
@@ -76,13 +75,11 @@ const (
 	PBROLE_BACKUP  T_PBNodeRole = 0
 	PBROLE_PRIMARY T_PBNodeRole = 1
 )
-
 const (
 	ASSIGNSTATE_ASSIGN     T_AssignState = 0
 	ASSIGNSTATE_WAITFORACK T_AssignState = 1
 )
 
-// NodeOperation represents an operation to be performed on T_Node
 type T_GetSetNodeInfoInterface struct {
 	c_get chan T_NodeInfo
 	c_set chan T_NodeInfo
@@ -108,25 +105,23 @@ type T_NodeOperations struct {
 	c_getConnectedNodes    chan chan []T_NodeInfo
 	c_setConnectedNodes    chan []T_NodeInfo
 	c_getSetConnectedNodes chan chan []T_NodeInfo
-	// Add more channels for other operations as needed
 }
 
-// Global Variables
 var ThisNode T_Node
 
 var FLOORS int8
-var IP string
-var REASSIGNTIME uint8
-var CONNECTIONTIME int
-var SENDPERIOD int
-var GETSETPERIOD int
-var SLAVEPORT int
-var MASTERPORT int
-var ELEVATORPORT int
-var ASSIGNBREAKOUTPERIOD int
-var MOSTRESPONSIVEPERIOD int
-var MEDIUMRESPONSIVEPERIOD int
-var LEASTRESPONSIVEPERIOD int
-var TERMINATIONPERIOD int
+var REASSIGN_PERIOD uint8
+var CONNECTION_PERIOD int
+var IMMOBILE_PERIOD float64
+var SEND_PERIOD int
+var GETSET_PERIOD int
+var SLAVE_PORT int
+var MASTER_PORT int
+var ELEVATOR_PORT int
+var ASSIGN_BREAKOUT_PERIOD int
+var MOST_RESPONSIVE_PERIOD int
+var MEDIUM_RESPONSIVE_PERIOD int
+var LEAST_RESPONSIVE_PERIOD int
+var TERMINATION_PERIOD int
 var MAX_ALLOWED_ELEVATOR_ERRORS int
 var MAX_ALLOWED_NODE_ERRORS int
