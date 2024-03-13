@@ -9,6 +9,24 @@ import (
 
 var messagesToSend int = 20
 
+func F_TransmitMasterInfo(c_transmitMasterMessage chan T_MasterMessage) {
+	globalQueue := f_GetGlobalQueue()
+	masterMessage := T_MasterMessage{
+		Transmitter: f_GetNodeInfo(),
+		GlobalQueue: f_CopyGlobalQueue(globalQueue),
+	}
+	c_transmitMasterMessage <- masterMessage
+}
+
+func F_TransmitSlaveInfo(c_transmitSlaveMessage chan T_SlaveMessage) {
+	transmitter := f_GetNodeInfo()
+	slaveMessage := T_SlaveMessage{
+		Transmitter: transmitter,
+		Entry:       T_GlobalQueueEntry{},
+	}
+	c_transmitSlaveMessage <- slaveMessage
+}
+
 func F_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int) {
 	c_slaveMessageOut := make(chan T_SlaveMessage)
 	go bcast.Transmitter(port, c_slaveMessageOut)

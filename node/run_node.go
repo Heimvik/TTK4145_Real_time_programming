@@ -271,7 +271,7 @@ func f_UpdateLights() {
 	notpresentRequests := f_FindNotPresentRequests(globalQueue, possibleRequests)
 
 	for _, requestNotBeingServed := range notpresentRequests {
-	    f_TurnOffLight(requestNotBeingServed)
+		f_TurnOffLight(requestNotBeingServed)
 		// elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestNotBeingServed), int(requestNotBeingServed.Floor), false)
 	}
 	for _, entryBeingServed := range globalQueue {
@@ -287,7 +287,6 @@ func f_ElevatorManager(c_shouldCheckIfAssigned chan bool, c_entryFromElevator ch
 	shouldCheckIfAssigned := true
 
 	go elevator.F_RunElevator(elevatorOperations, c_getSetElevatorInterface, c_requestFromElevator, c_requestToElevator, ELEVATORPORT, c_elevatorWithoutErrors)
-	//go elevator.F_SimulateRequest(elevatorOperations, c_requestFromElevator, c_requestToElevator)
 
 	thisNodeInfo := f_GetNodeInfo()
 	globalQueue := f_GetGlobalQueue()
@@ -493,7 +492,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
 				if masterMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
-					f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 				}
 
@@ -527,12 +526,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				ackSentGlobalQueueToSlave.C_Acknowledgement <- true
 
 			case <-sendTicker.C:
-				globalQueue := f_GetGlobalQueue()
-				masterMessage := T_MasterMessage{
-					Transmitter: f_GetNodeInfo(),
-					GlobalQueue: f_CopyGlobalQueue(globalQueue),
-				}
-				c_transmitMasterMessage <- masterMessage
+				F_TransmitMasterInfo(c_transmitMasterMessage)
 				sendTicker.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 
 			case <-lightsTicker.C:
@@ -559,6 +553,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				thisNodeInfo := newNodeInfo
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 				if newNodeInfo.MSRole == MSROLE_SLAVE {
+					F_TransmitMasterInfo(c_transmitMasterMessage)
 					c_nodeIsSlave <- true
 				}
 			}
@@ -566,7 +561,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 		case MSROLE_SLAVE:
 			select {
 			case masterMessage := <-c_receiveMasterMessage:
-				f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
+				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
@@ -589,12 +584,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				c_transmitSlaveMessage <- infoMessage
 
 			case <-sendTicker.C:
-				transmitter := f_GetNodeInfo()
-				aliveMessage := T_SlaveMessage{
-					Transmitter: transmitter,
-					Entry:       T_GlobalQueueEntry{},
-				}
-				c_transmitSlaveMessage <- aliveMessage
+				F_TransmitSlaveInfo(c_transmitSlaveMessage)
 				sendTicker.Reset(time.Duration(SENDPERIOD) * time.Millisecond)
 
 			case <-lightsTicker.C:
@@ -621,6 +611,7 @@ func f_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, thisNodeInfo)
 
 				if newNodeInfo.MSRole == MSROLE_MASTER {
+					F_TransmitSlaveInfo(c_transmitSlaveMessage)
 					c_nodeIsMaster <- true
 				}
 			}

@@ -1,6 +1,9 @@
 # TODO list
-## Decrease sendperiod and number of messages sent each time
-## Constants with FIRSTWORD_SECONDWORD
+- Constants with FIRSTWORD_SECONDWORD
+- Move pricess pair to main
+- Arbo/vi mekker testliste
+- Prerequistes and description for all functions
+- Navngivning av variabler, funsjoner og filer
 
 # Triple Elevator System Test Cases
 
@@ -63,4 +66,6 @@
 
 ### Stop Button
 - [ ] Test behavior of the stop button.
+
+
 

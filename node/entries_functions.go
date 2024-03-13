@@ -206,13 +206,12 @@ func f_FindEntry(entryToFind T_GlobalQueueEntry, globalQueue []T_GlobalQueueEntr
 	return T_GlobalQueueEntry{}
 }
 
-func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
+func f_UpdateGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, masterMessage T_MasterMessage) {
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, remoteEntry)
 		if remoteEntry.Request.State == elevator.DONE {
 			entriesToRemove = append(entriesToRemove, remoteEntry)
-			//f_TurnOffLight(remoteEntry)
 		}
 	}
 	if len(entriesToRemove) > 0 {
@@ -220,15 +219,6 @@ func f_UpdateGlobalQueueMM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		globalQueue := <-getSetGlobalQueueInterface.c_get
 		globalQueue = f_RemoveEntryGlobalQueue(globalQueue, entriesToRemove)
 		getSetGlobalQueueInterface.c_set <- globalQueue
-	}
-}
-
-func f_UpdateGlobalQueueSM(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, slaveMessage T_SlaveMessage, c_receivedActiveEntry chan T_GlobalQueueEntry) {
-	if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
-		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
-	}
-	if slaveMessage.Entry.Request.State == elevator.ACTIVE {
-		c_receivedActiveEntry <- slaveMessage.Entry
 	}
 }
 
