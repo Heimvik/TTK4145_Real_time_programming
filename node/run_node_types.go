@@ -47,23 +47,24 @@ type T_SlaveMessage struct {
 type T_AssignState int
 
 type T_Config struct {
-	SlavePort                int   `json:"slaveport"`
-	MasterPort               int   `json:"masterport"`
-	ElevatorPort             int   `json:"elevatorport"`
-	Priority                 uint8 `json:"priority"`
-	Nodes                    uint8 `json:"nodes"`
-	Floors                   int8  `json:"floors"`
-	ReassignPeriod           uint8 `json:"reassignperiod"`
-	ConnectionPeriod         int   `json:"connectionperiod"`
-	SendPeriod               int   `json:"sendperiod"`
-	GetSetPeriod             int   `json:"getsetperiod"`
-	AssignBreakoutPeriod     int   `json:"assignbreakoutperiod"`
-	MostResponsivePeriod     int   `json:"mostresponsiveperiod"`
-	MiddleResponsivePeriod   int   `json:"middleresponsiveperiod"`
-	LeastResponsivePeriod    int   `json:"leastresponsiveperiod"`
-	TerminationPeriod        int   `json:"terminationperiod"`
-	MaxAllowedElevatorErrors int   `json:"maxallowedelevatorerrors"`
-	MaxAllowedNodeErrors     int   `json:"maxallowednodeerrors"`
+	SlavePort                int     `json:"slaveport"`
+	MasterPort               int     `json:"masterport"`
+	ElevatorPort             int     `json:"elevatorport"`
+	Priority                 uint8   `json:"priority"`
+	Nodes                    uint8   `json:"nodes"`
+	Floors                   int8    `json:"floors"`
+	ReassignPeriod           uint8   `json:"reassignperiod"`
+	ConnectionPeriod         int     `json:"connectionperiod"`
+	ImmobilePeriod           float64 `json:"immobileperiod"`
+	SendPeriod               int     `json:"sendperiod"`
+	GetSetPeriod             int     `json:"getsetperiod"`
+	AssignBreakoutPeriod     int     `json:"assignbreakoutperiod"`
+	MostResponsivePeriod     int     `json:"mostresponsiveperiod"`
+	MiddleResponsivePeriod   int     `json:"middleresponsiveperiod"`
+	LeastResponsivePeriod    int     `json:"leastresponsiveperiod"`
+	TerminationPeriod        int     `json:"terminationperiod"`
+	MaxAllowedElevatorErrors int     `json:"maxallowedelevatorerrors"`
+	MaxAllowedNodeErrors     int     `json:"maxallowednodeerrors"`
 }
 
 const (
@@ -111,6 +112,7 @@ var ThisNode T_Node
 var FLOORS int8
 var REASSIGN_PERIOD uint8
 var CONNECTION_PERIOD int
+var IMMOBILE_PERIOD float64
 var SEND_PERIOD int
 var GETSET_PERIOD int
 var SLAVE_PORT int

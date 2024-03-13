@@ -34,6 +34,7 @@ func init() {
 	node.FLOORS = config.Floors
 	node.REASSIGN_PERIOD = config.ReassignPeriod
 	node.CONNECTION_PERIOD = config.ConnectionPeriod
+	node.IMMOBILE_PERIOD = config.ImmobilePeriod
 	node.SEND_PERIOD = config.SendPeriod
 	node.GETSET_PERIOD = config.GetSetPeriod
 	node.SLAVE_PORT = config.SlavePort

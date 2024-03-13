@@ -39,6 +39,21 @@ func F_InitNode(config T_Config) T_Node {
 }
 
 /*
+Creates and returns a deep copy of a T_NodeInfo slice, ensuring modifications do not affect the original.
+
+Prerequisites: None.
+
+Returns: A deep copy of the slice.
+*/
+func f_CopyConnectedNodes(connectedNodes []T_NodeInfo) []T_NodeInfo {
+	deepCopyConnectedNodes := make([]T_NodeInfo, len(connectedNodes))
+	for i, node := range connectedNodes {
+		deepCopyConnectedNodes[i] = node
+	}
+	return deepCopyConnectedNodes
+}
+
+/*
 Determines and assigns a new role to the current node based on the priorities of connected nodes, ensuring proper master-slave hierarchy within the network.
 
 Prerequisites: A list of currently connected nodes and their priorities.

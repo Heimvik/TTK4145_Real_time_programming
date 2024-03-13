@@ -16,21 +16,13 @@ func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_Ele
 	for {
 		select {
 		case button := <-chans.C_buttons:
-			fmt.Print("Beginning button event\n")
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
-			fmt.Print("Finished button event\n")
 		case newFloor := <-chans.C_floors:
-			fmt.Print("Beginning floor event\n")
 			f_HandleFloorArrivalEvent(int8(newFloor), c_getSetElevatorInterface, chans)
-			fmt.Print("Finished floor event\n")
 		case <-chans.C_timerTimeout:
-			fmt.Print("Beginning door timeout event\n")
 			f_HandleDoorTimeoutEvent(c_getSetElevatorInterface, chans)
-			fmt.Print("Finished door timeout event\n")
 		case newRequest := <-chans.C_requestIn:
-			fmt.Print("Beginning request to elevator event\n")
 			f_HandleRequestToElevatorEvent(newRequest, c_getSetElevatorInterface, chans)
-			fmt.Print("Finished request to elevator event\n")
 		case obstructed := <-chans.C_obstr:
 			f_HandleObstructedEvent(obstructed, c_getSetElevatorInterface, chans)
 		case stop := <-chans.C_stop:

@@ -67,7 +67,7 @@ Prerequisites: An initialized global queue for monitoring.
 
 Returns: Nothing, but sends a status signal indicating system health based on global queue activity.
 */
-func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackSentEntryToSlave chan T_AckObject, c_nodeWithoutError chan bool, c_quit chan bool) {
+func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueInterface, getSetGlobalQueueInterface T_GetSetGlobalQueueInterface, c_ackSentEntryToSlave chan T_AckObject, c_immobileNode chan uint8, c_nodeWithoutError chan bool, c_quit chan bool) {
 	checkChangesToGlobalQueue := time.NewTicker(time.Duration(TERMINATION_PERIOD) * time.Second)
 	previousGlobalQueue := f_GetGlobalQueue()
 	for {
@@ -84,18 +84,21 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 				previousGlobalQueue = currentGlobalQueue
 				checkChangesToGlobalQueue.Reset(time.Duration(TERMINATION_PERIOD) * time.Second)
 			}
+		case immobileNode := <-c_immobileNode:
+			c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
+			globalQueue := <-getSetGlobalQueueInterface.c_get
+			for entryIndex, entry := range globalQueue {
+				if entry.AssignedNode == immobileNode {
+					globalQueue = f_ReassignUnfinishedEntry(globalQueue, entry, entryIndex)
+				}
+			}
+			getSetGlobalQueueInterface.c_set <- globalQueue
 		default:
 			thisNodeInfo := f_GetNodeInfo()
 			c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
 			globalQueue := <-getSetGlobalQueueInterface.c_get
 
-			doneEntry, doneEntryIndex := T_GlobalQueueEntry{}, 0
-			for i, entry := range globalQueue {
-				if entry.TimeUntilReassign == 0 {
-					doneEntry = globalQueue[i]
-					doneEntryIndex = i
-				}
-			}
+			doneEntry, doneEntryIndex := f_FindDoneEntry(globalQueue)
 			if (doneEntry.Request.State != elevator.REQUESTSTATE_DONE && doneEntry != T_GlobalQueueEntry{}) {
 				globalQueue = f_ReassignUnfinishedEntry(globalQueue, doneEntry, doneEntryIndex)
 			}
@@ -118,11 +121,42 @@ Prerequisites: An initialized list of connected nodes with current disconnect ti
 
 Returns: Nothing, but updates the list of connected nodes by removing those considered disconnected.
 */
-func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface) {
+func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface, c_immobileNode chan uint8) {
+	allTimesAtFloorChange := make(map[uint8]time.Time)
+	previousConnectedNodes := f_GetConnectedNodes()
+	immoblieNodes := make(map[uint8]bool)
 	for {
-		c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
-		connectedNodes := <-getSetConnectedNodesInterface.c_get
+		connectedNodes := f_GetConnectedNodes()
+		if f_GetNodeInfo().MSRole == MSROLE_MASTER {
+			for _, nodeInfo := range connectedNodes {
+				previousNodeInfo := f_FindNodeInfo(nodeInfo.PRIORITY, previousConnectedNodes)
+				if (previousNodeInfo != T_NodeInfo{}) {
+					if nodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING && previousNodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_IDLE {
+						allTimesAtFloorChange[nodeInfo.PRIORITY] = time.Now()
+					}
+					if nodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING && previousNodeInfo.ElevatorInfo.Floor != nodeInfo.ElevatorInfo.Floor {
+						allTimesAtFloorChange[nodeInfo.PRIORITY] = time.Now()
+					}
+				}
+			}
+			previousConnectedNodes = f_CopyConnectedNodes(connectedNodes)
+			for node, timeAtFloorChange := range allTimesAtFloorChange {
+				timeNow := time.Now()
+				if timeNow.Sub(timeAtFloorChange) > time.Duration(IMMOBILE_PERIOD*float64(time.Second)) && f_FindNodeInfo(node, connectedNodes).ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING {
+					immoblieNodes[node] = false
+				}
+			}
+			for node, isHandled := range immoblieNodes {
+				if !isHandled {
+					c_immobileNode <- node
+					immoblieNodes[node] = true
+					allTimesAtFloorChange[node] = time.Now()
+				}
+			}
+		}
 
+		c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
+		connectedNodes = <-getSetConnectedNodesInterface.c_get
 		nodeToDisconnect, nodeToDisconnectIndex := T_NodeInfo{}, 0
 		for i, nodeInfo := range connectedNodes {
 			if nodeInfo.TimeUntilDisconnect == 0 {
@@ -138,7 +172,7 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 
 		getSetConnectedNodesInterface.c_set <- connectedNodes
 
-		time.Sleep(time.Duration(LEAST_RESPONSIVE_PERIOD) * time.Microsecond)
+		time.Sleep(time.Duration(MOST_RESPONSIVE_PERIOD) * time.Microsecond)
 	}
 }
 
@@ -479,6 +513,7 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 	c_shouldCheckIfAssigned := make(chan bool)
 
 	c_assignState := make(chan T_AssignState)
+	c_immobileNodes := make(chan uint8)
 	c_ackAssignmentSucessFull := make(chan T_AckObject)
 	c_receivedActiveEntry := make(chan T_GlobalQueueEntry)
 	c_ackSentGlobalQueueToSlave := make(chan T_AckObject)
@@ -495,12 +530,12 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 		go f_TransmitMasterMessage(c_transmitMasterMessage, MASTER_PORT)
 
 		go f_DecrementTimeUntilDisconnect(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface)
-		go f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface)
+		go f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, c_immobileNodes)
 		for {
 			select {
 			case <-c_nodeIsMaster:
 				go f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_quitMasterRoutines)
-				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_nodeRunningWithoutErrors, c_quitMasterRoutines)
+				go f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackSentGlobalQueueToSlave, c_immobileNodes, c_nodeRunningWithoutErrors, c_quitMasterRoutines)
 				go f_CheckIfShouldAssign(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, c_ackAssignmentSucessFull, c_assignState, c_elevatorRunningWithoutErrors, c_quitMasterRoutines)
 				go f_CheckAssignedNodeState(c_ackAssignmentSucessFull, c_receivedActiveEntry, c_quitMasterRoutines)
 				c_assignState <- ASSIGNSTATE_ASSIGN
