@@ -8,7 +8,7 @@ import (
 	"the-elevator/network/network_libraries/conn"
 )
 
-const bufSize = 4096 //1024
+const bufSize = 8192
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
 // it on `port`
@@ -56,8 +56,8 @@ func Receiver(port int, c_quit chan bool, chans ...interface{}) {
 	var buf [bufSize]byte
 	conn := conn.DialBroadcastUDP(port)
 	for {
-		select{
-		case <- c_quit:
+		select {
+		case <-c_quit:
 			return
 		default:
 			n, _, e := conn.ReadFrom(buf[0:])

@@ -1,9 +1,10 @@
 # TODO list
-- Constants with FIRSTWORD_SECONDWORD
-- Move pricess pair to main
-- Arbo/vi mekker testliste
-- Prerequistes and description for all functions
-- Navngivning av variabler, funsjoner og filer
+## Generelt
+- [x] Constants with FIRSTWORD_SECONDWORD
+- [x] Move pricess pair to main
+- [ ] Dobbeltsjekk at testlista dekker alt
+- [ ] Prerequistes and description for all functions
+- [ ] Navngivning av variabler, funsjoner og filer
 
 # Triple Elevator System Test Cases
 

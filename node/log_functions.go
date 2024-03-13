@@ -32,7 +32,7 @@ func f_WriteLogConnectedNodes(connectedNodes []T_NodeInfo) {
 	}
 	F_WriteLog(logStr)
 }
-func F_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
+func f_WriteLogGlobalQueueEntry(entry T_GlobalQueueEntry) {
 	logStr := fmt.Sprintf("Entry: | %d | State: | %s | Calltype: %s | Floor: %d | Direction: %s | Reassigned in: %.2f | ",
 		entry.Request.Id, f_RequestStateToString(entry.Request.State), f_CallTypeToString(entry.Request.Calltype), entry.Request.Floor, f_DirectionToString(entry.Request.Direction), float64(entry.TimeUntilReassign))
 	logStr += fmt.Sprintf("Requested node: | %d | ",
