@@ -129,3 +129,25 @@ func F_ChooseElevatorDirection(elevator T_Elevator) T_Elevator {
 	}
 	return elevator
 }
+
+/*
+Ensures the elevator is moving in the correct direction by continuously polling the elevator state and setting motordirection accordingly.
+
+Prerequisites: None
+
+Returns: Nothing, but continuously sets the motor direction based on the elevator state.
+*/
+func F_EnsureElevatorDirection(chans T_ElevatorChannels, c_getSetElevatorInterface chan T_GetSetElevatorInterface) {
+	for{
+		c_getSetElevatorInterface <- chans.getSetElevatorInterface
+		elevator := <-chans.getSetElevatorInterface.C_get
+		chans.getSetElevatorInterface.C_set <- elevator
+
+		if elevator.P_info.Direction == ELEVATORDIRECTION_DOWN {
+			F_SetMotorDirection(ELEVATORDIRECTION_DOWN)
+		} else if elevator.P_info.Direction == ELEVATORDIRECTION_UP {
+			F_SetMotorDirection(ELEVATORDIRECTION_UP)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+}
