@@ -1,11 +1,20 @@
 # TODO list
 ## Generelt
+- [ ] Dobbeltsjekk at testlista dekker alt
+## Node
 - [x] Constants with FIRSTWORD_SECONDWORD
 - [x] Move pricess pair to main
-- [ ] Dobbeltsjekk at testlista dekker alt
 - [ ] Prerequistes and description for all functions
 - [ ] Navngivning av variabler, funsjoner og filer
-
+## Elevator
+- [x] Constants with FIRSTWORD_SECONDWORD
+- [x] Navngivning av enums.
+- [x] Navngivning av funksjoner.
+- [x] Navngivning av variabler.
+- [x] Navngivning av filer.
+- [x] Funksjonsstruktur
+- [x] Prerequistes and description for all functions
+- [ ] Legge til kilde der jeg bruker elevio.go
 # Triple Elevator System Test Cases
 
 ## Main Requirements

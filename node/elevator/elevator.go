@@ -5,57 +5,14 @@ import (
 	"time"
 )
 
-type T_ElevatorState uint8
-type T_ElevatorDirection int8
+/*
+Initializes elevator channels.
 
-const (
-	IDLE     T_ElevatorState = 0
-	DOOROPEN T_ElevatorState = 1
-	MOVING   T_ElevatorState = 2
-)
+Prerequisites: None
 
-const (
-	UP   T_ElevatorDirection = 1
-	DOWN T_ElevatorDirection = -1
-	NONE T_ElevatorDirection = 0
-)
-
-//Keeping this in case of future improvements regarding secondary requirements,
-//see single-elevator/elevator.go for inspiration
-
-type T_Elevator struct {
-	CurrentID      int
-	StopButton     bool
-	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
-	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
-}
-
-type T_ElevatorInfo struct {
-	Direction  T_ElevatorDirection
-	Floor      int8 //ranges from 0-3
-	State      T_ElevatorState
-	Obstructed bool
-}
-
-type T_GetSetElevatorInterface struct {
-	C_get chan T_Elevator
-	C_set chan T_Elevator
-}
-
-type T_ElevatorChannels struct {
-	getSetElevatorInterface T_GetSetElevatorInterface
-	C_timerStart            chan bool
-	C_timerStop             chan bool
-	C_timerTimeout          chan bool
-	C_buttons               chan T_ButtonEvent
-	C_floors                chan int
-	C_obstr                 chan bool
-	C_stop                  chan bool
-	C_requestIn             chan T_Request
-	C_requestOut            chan T_Request
-}
-
-func F_InitChannes(c_requestIn chan T_Request, c_requestOut chan T_Request) T_ElevatorChannels {
+Returns: Initialized elevator channels.
+*/
+func F_InitChannels(c_requestIn chan T_Request, c_requestOut chan T_Request) T_ElevatorChannels {
 	return T_ElevatorChannels{
 		getSetElevatorInterface: T_GetSetElevatorInterface{C_get: make(chan T_Elevator), C_set: make(chan T_Elevator)},
 		C_timerStart:            make(chan bool),
@@ -70,21 +27,38 @@ func F_InitChannes(c_requestIn chan T_Request, c_requestOut chan T_Request) T_El
 	}
 }
 
-type T_ElevatorOperations struct {
-	C_getElevator    chan chan T_Elevator
-	C_setElevator    chan T_Elevator
-	C_getSetElevator chan chan T_Elevator
-}
+/*
+Retrieves the current elevator.
 
-func F_GetElevator(ops T_ElevatorOperations) T_Elevator {
+Prerequisites: The elevatorOperations parameter must be initialized with valid elevator operations.
+
+Returns: The current elevator.
+*/
+func F_GetElevator(elevatorOperations T_ElevatorOperations) T_Elevator {
 	c_responseChan := make(chan T_Elevator)
-	ops.C_getElevator <- c_responseChan // Send the response channel to the NodeOperationManager
-	elevator := <-c_responseChan        // Receive the connected nodes from the response channel
+	elevatorOperations.C_getElevator <- c_responseChan // Send the response channel to the NodeOperationManager
+	elevator := <-c_responseChan                       // Receive the connected nodes from the response channel
 	return elevator
 }
-func F_SetElevator(ops T_ElevatorOperations, elevator T_Elevator) {
-	ops.C_setElevator <- elevator // Send the connectedNodes directly to be written
+
+/*
+Sets the elevator.
+
+Prerequisites: None
+
+Returns: Nothing
+*/
+func F_SetElevator(elevatorOperations T_ElevatorOperations, elevator T_Elevator) {
+	elevatorOperations.C_setElevator <- elevator // Send the connectedNodes directly to be written
 }
+
+/*
+Retrieves and sets the elevator state concurrently.
+
+Prerequisites: The elevatorOperations parameter must be initialized with valid elevator operations.
+
+Returns: Nothing
+*/
 func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevatorInterface chan T_GetSetElevatorInterface) { //let run in a sepreate goroutine
 	for {
 	WAITFORINTERFACE:
@@ -109,32 +83,49 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 	}
 }
 
-func F_ShouldStop(elevator T_Elevator) bool {
+/*
+Determines if the elevator should stop at the current floor.
+
+Prerequisites: Elevator needs to currently have a request to serve.
+
+Returns: True if the elevator should stop; otherwise, false.
+*/
+func F_ShouldElevatorStop(elevator T_Elevator) bool {
 	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
 }
 
-// her sender jeg ut (fiks deadlock)
-// COMMENT: Enig her, funksjonen heter det den skal gjøre
+/*
+Stops the elevator.
 
-func F_SetElevatorDirection(elevator T_Elevator) T_Elevator { //ta inn requesten og ikke elevator her?
-	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
-		elevator.P_info.State = MOVING
-		elevator.P_info.Direction = DOWN
-		F_SetMotorDirection(DOWN)
-	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
-		elevator.P_info.State = MOVING
-		elevator.P_info.Direction = UP
-		F_SetMotorDirection(UP)
-	} else {
-		elevator.P_info.Direction = NONE
-		F_SetMotorDirection(NONE)
-		// elevator = F_ClearRequest(elevator)
-	}
+Prerequisites: None
+
+Returns: The stopped elevator.
+*/
+func F_StopElevator(elevator T_Elevator) T_Elevator {
+	elevator.P_info.Direction = ELEVATORDIRECTION_NONE
+	F_SetMotorDirection(ELEVATORDIRECTION_NONE)
 	return elevator
 }
 
-func F_StopElevator(elevator T_Elevator) T_Elevator {
-	elevator.P_info.Direction = NONE
-	F_SetMotorDirection(NONE)
+/*
+Chooses the direction for the elevator to move based on the requested floor.
+
+Prerequisites: None
+
+Returns: The updated elevator state.
+*/
+func F_ChooseElevatorDirection(elevator T_Elevator) T_Elevator {
+	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+		elevator.P_info.State = ELEVATORSTATE_MOVING
+		elevator.P_info.Direction = ELEVATORDIRECTION_DOWN
+		F_SetMotorDirection(ELEVATORDIRECTION_DOWN)
+	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
+		elevator.P_info.State = ELEVATORSTATE_MOVING
+		elevator.P_info.Direction = ELEVATORDIRECTION_UP
+		F_SetMotorDirection(ELEVATORDIRECTION_UP)
+	} else {
+		elevator.P_info.Direction = ELEVATORDIRECTION_NONE
+		F_SetMotorDirection(ELEVATORDIRECTION_NONE)
+	}
 	return elevator
 }
