@@ -1,7 +1,6 @@
 package elevator
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -75,7 +74,6 @@ func F_GetAndSetElevator(elevatorOperations T_ElevatorOperations, c_getSetElevat
 					c_responsChan <- newElevator
 					break WAITFORINTERFACE
 				case <-getSetTimer.C:
-					fmt.Println("Ended GetSet goroutine of elevator because of deadlock")
 					break WAITFORINTERFACE
 				}
 			}
