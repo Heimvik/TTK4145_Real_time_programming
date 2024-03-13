@@ -51,6 +51,24 @@ func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) boo
 }
 
 /*
+Searches the global queue for the first entry that has TimeUntilReassign equals 0, indicating it is done.
+
+Prerequisites: An initialized global queue with at least one entry.
+
+Returns: The first done entry found in the global queue and its index; returns an empty entry and 0 if none are found.
+*/
+func f_FindDoneEntry(globalQueue []T_GlobalQueueEntry) (T_GlobalQueueEntry, int) {
+	doneEntry, doneEntryIndex := T_GlobalQueueEntry{}, 0
+	for i, entry := range globalQueue {
+		if entry.TimeUntilReassign == 0 {
+			doneEntry = globalQueue[i]
+			doneEntryIndex = i
+		}
+	}
+	return doneEntry, doneEntryIndex
+}
+
+/*
 Determines if all entries in the global queue are obstructed, based on the elevator state of their assigned nodes.
 
 Prerequisites: The global queue and the list of connected nodes must be initialized.
@@ -397,7 +415,8 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 		globalQueue = append(globalQueue, entryToAdd)
 
 	} else if !entryIsUnique {
-		if entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign {
+		if (entryToAdd.Request.State >= globalQueue[entryIndex].Request.State || entryToAdd.TimeUntilReassign < globalQueue[entryIndex].TimeUntilReassign) ||
+			(entryToAdd.AssignedNode != globalQueue[entryIndex].AssignedNode && entryToAdd.AssignedNode != 0 && globalQueue[entryIndex].AssignedNode != 0) {
 			globalQueue[entryIndex] = entryToAdd
 		} else {
 			F_WriteLog("Disallowed backward information")

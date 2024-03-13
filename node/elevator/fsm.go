@@ -1,7 +1,6 @@
 package elevator
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -9,21 +8,13 @@ func F_FSM(c_getSetElevatorInterface chan T_GetSetElevatorInterface, chans T_Ele
 	for {
 		select {
 		case button := <-chans.C_buttons:
-			fmt.Print("Beginning button event\n")
 			f_HandleButtonEvent(button, c_getSetElevatorInterface, chans)
-			fmt.Print("Finished button event\n")
 		case newFloor := <-chans.C_floors:
-			fmt.Print("Beginning floor event\n")
 			f_HandleFloorArrivalEvent(int8(newFloor), c_getSetElevatorInterface, chans)
-			fmt.Print("Finished floor event\n")
 		case <-chans.C_timerTimeout:
-			fmt.Print("Beginning door timeout event\n")
 			f_HandleDoorTimeoutEvent(c_getSetElevatorInterface, chans)
-			fmt.Print("Finished door timeout event\n")
 		case newRequest := <-chans.C_requestIn:
-			fmt.Print("Beginning request to elevator event\n")
 			f_HandleRequestToElevatorEvent(newRequest, c_getSetElevatorInterface, chans)
-			fmt.Print("Finished request to elevator event\n")
 		case obstructed := <-chans.C_obstr:
 			f_HandleObstructedEvent(obstructed, c_getSetElevatorInterface, chans)
 		case stop := <-chans.C_stop:
@@ -55,7 +46,6 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 	//JONASCOMMENT: sjekk om logikken her kan forenkles
 	if newElevator.P_info.State == DOOROPEN { //legg inn mer direkte, som ikke er avhengig av det forrige her?
 		F_SetDoorOpenLamp(true)
-		fmt.Print("Sending done to node\n")
 		oldElevator.P_serveRequest.State = DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
 		chans.C_timerStart <- true
@@ -91,16 +81,13 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	chans.getSetElevatorInterface.C_set <- newElevator
 
 	if cleared {
-		fmt.Print("Sending active to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
-		fmt.Print("Sending done to node\n")
 		newRequest.State = DONE
 		chans.C_requestOut <- newRequest
 		F_SetDoorOpenLamp(true)
 		chans.C_timerStart <- true
 	} else {
-		fmt.Print("Sending active to node\n")
 		newRequest.State = ACTIVE
 		chans.C_requestOut <- newRequest
 	}
