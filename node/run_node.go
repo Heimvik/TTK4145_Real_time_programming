@@ -42,7 +42,7 @@ func f_CheckAssignedNodeState(c_ackAssignmentSucessFull chan T_AckObject, c_rece
 				default:
 					assignedEntry := f_FindEntry(lastAssignedEntry, f_GetGlobalQueue())
 					updatedAssignedNode := f_FindNodeInfo(lastAssignedEntry.AssignedNode, f_GetConnectedNodes())
-					if updatedAssignedNode.ElevatorInfo.State == elevator.MOVING && assignedEntry.Request.State == elevator.ACTIVE {
+					if updatedAssignedNode.ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING && assignedEntry.Request.State == elevator.REQUESTSTATE_ACTIVE {
 						ackAssignmentSucessFull.C_Acknowledgement <- true
 						F_WriteLog("Found ack (changes in connected nodes)")
 						assignBreakoutTimer.Stop()
@@ -96,12 +96,12 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 					doneEntryIndex = i
 				}
 			}
-			if (doneEntry.Request.State != elevator.DONE && doneEntry != T_GlobalQueueEntry{}) {
+			if (doneEntry.Request.State != elevator.REQUESTSTATE_DONE && doneEntry != T_GlobalQueueEntry{}) {
 				globalQueue = f_ReassignUnfinishedEntry(globalQueue, doneEntry, doneEntryIndex)
 			}
 			getSetGlobalQueueInterface.c_set <- globalQueue
 
-			if (doneEntry.Request.State == elevator.DONE && doneEntry != T_GlobalQueueEntry{}) {
+			if (doneEntry.Request.State == elevator.REQUESTSTATE_DONE && doneEntry != T_GlobalQueueEntry{}) {
 				globalQueue = f_RemoveFinishedEntry(c_ackSentEntryToSlave, globalQueue, thisNodeInfo, doneEntry, doneEntryIndex)
 				f_SetGlobalQueue(globalQueue)
 			}
@@ -159,7 +159,7 @@ func f_DecrementTimeUntilReassign(c_getSetGlobalQueueInterface chan T_GetSetGlob
 			c_getSetGlobalQueueInterface <- getSetGlobalQueueInterface
 			globalQueue := <-getSetGlobalQueueInterface.c_get
 			for i, entry := range globalQueue {
-				if entry.TimeUntilReassign > 0 && entry.Request.State != elevator.UNASSIGNED {
+				if entry.TimeUntilReassign > 0 && entry.Request.State != elevator.REQUESTSTATE_UNASSIGNED {
 					globalQueue[i].TimeUntilReassign -= 1
 				}
 			}
@@ -260,14 +260,14 @@ Prerequisites: None.
 Returns: Nothing, but updates the state of elevator call button lights to "on" for the specified request.
 */
 func f_TurnOnLight(entry T_GlobalQueueEntry) {
-	if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.DOWN {
-		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(entry.Request.Floor), true)
+	if entry.Request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Direction == elevator.ELEVATORDIRECTION_DOWN {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(entry.Request.Floor), true)
 
-	} else if entry.Request.Calltype == elevator.HALL && entry.Request.Direction == elevator.UP {
-		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(entry.Request.Floor), true)
+	} else if entry.Request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Direction == elevator.ELEVATORDIRECTION_UP {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(entry.Request.Floor), true)
 
-	} else if entry.Request.Calltype == elevator.CAB && entry.RequestedNode == f_GetNodeInfo().PRIORITY {
-		elevator.F_SetButtonLamp(elevator.BT_Cab, int(entry.Request.Floor), true)
+	} else if entry.Request.Calltype == elevator.CALLTYPE_CAB && entry.RequestedNode == f_GetNodeInfo().PRIORITY {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(entry.Request.Floor), true)
 	}
 }
 
@@ -279,14 +279,14 @@ Prerequisites: None.
 Returns: Nothing, but changes the state of the specified elevator call button light to "off".
 */
 func f_TurnOffLight(request elevator.T_Request) {
-	if request.Calltype == elevator.HALL && request.Direction == elevator.DOWN {
-		elevator.F_SetButtonLamp(elevator.BT_HallDown, int(request.Floor), false)
+	if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_DOWN {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(request.Floor), false)
 
-	} else if request.Calltype == elevator.HALL && request.Direction == elevator.UP {
-		elevator.F_SetButtonLamp(elevator.BT_HallUp, int(request.Floor), false)
+	} else if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_UP {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(request.Floor), false)
 
-	} else if request.Calltype == elevator.CAB {
-		elevator.F_SetButtonLamp(elevator.BT_Cab, int(request.Floor), false)
+	} else if request.Calltype == elevator.CALLTYPE_CAB {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(request.Floor), false)
 	}
 }
 
@@ -535,18 +535,18 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, slaveMessage.Transmitter)
-				if slaveMessage.Entry.Request.Calltype != elevator.NONECALL {
+				if slaveMessage.Entry.Request.Calltype != elevator.CALLTYPE_NONECALL {
 					f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, slaveMessage.Entry)
 				}
-				if slaveMessage.Entry.Request.State == elevator.ACTIVE {
+				if slaveMessage.Entry.Request.State == elevator.REQUESTSTATE_ACTIVE {
 					c_receivedActiveEntry <- slaveMessage.Entry
 				}
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
-				if entryFromElevator.Request.State == elevator.DONE {
+				if entryFromElevator.Request.State == elevator.REQUESTSTATE_DONE {
 					c_shouldCheckIfAssigned <- true
-				} else if entryFromElevator.Request.State == elevator.ACTIVE {
+				} else if entryFromElevator.Request.State == elevator.REQUESTSTATE_ACTIVE {
 					c_receivedActiveEntry <- entryFromElevator
 				}
 				F_WriteLog("Node: | " + strconv.Itoa(int(f_GetNodeInfo().PRIORITY)) + " | MASTER | updated GQ entry:\n")
@@ -608,7 +608,7 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
-				if entryFromElevator.Request.State == elevator.DONE {
+				if entryFromElevator.Request.State == elevator.REQUESTSTATE_DONE {
 					c_shouldCheckIfAssigned <- true
 				}
 				thisNode := f_GetNodeInfo()

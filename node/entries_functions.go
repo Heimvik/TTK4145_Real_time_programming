@@ -93,7 +93,7 @@ Prerequisites: Initialization of the system with a defined number of floors.
 Returns: An array of potential elevator requests, covering all floors and directions.
 */
 func f_FindPossibleRequests() []elevator.T_Request {
-	possibleCalls := []elevator.T_Call{elevator.CAB, elevator.HALL}
+	possibleCalls := []elevator.T_CallType{elevator.CALLTYPE_CAB, elevator.CALLTYPE_HALL}
 	possibleFloors := []int8{}
 	for i := 0; i < int(FLOORS); i++ {
 		possibleFloors = append(possibleFloors, int8(i))
@@ -102,14 +102,14 @@ func f_FindPossibleRequests() []elevator.T_Request {
 	possibleRequests := make([]elevator.T_Request, 0)
 	for _, floor := range possibleFloors {
 		for _, call := range possibleCalls {
-			if call == elevator.HALL {
+			if call == elevator.CALLTYPE_HALL {
 				for _, direction := range possibleDirections {
-					if !(floor == FLOORS-1 && direction == elevator.UP) || !(floor == 0 && direction == elevator.DOWN) {
+					if !(floor == FLOORS-1 && direction == elevator.ELEVATORDIRECTION_UP) || !(floor == 0 && direction == elevator.ELEVATORDIRECTION_DOWN) {
 						possibleRequests = append(possibleRequests, elevator.T_Request{Id: 0, State: 0, Calltype: call, Floor: floor, Direction: direction})
 					}
 				}
-			} else if call == elevator.CAB {
-				possibleRequests = append(possibleRequests, elevator.T_Request{Id: 0, State: 0, Calltype: call, Floor: floor, Direction: elevator.NONE})
+			} else if call == elevator.CALLTYPE_CAB {
+				possibleRequests = append(possibleRequests, elevator.T_Request{Id: 0, State: 0, Calltype: call, Floor: floor, Direction: elevator.ELEVATORDIRECTION_NONE})
 			}
 		}
 	}
@@ -132,10 +132,10 @@ func f_FindNotPresentRequests(globalQueue []T_GlobalQueueEntry, possibleRequests
 		found := false
 		for _, entry := range globalQueue {
 			if request.Floor == entry.Request.Floor {
-				if request.Calltype == elevator.HALL && entry.Request.Calltype == elevator.HALL && request.Direction == entry.Request.Direction {
+				if request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Calltype == elevator.CALLTYPE_HALL && request.Direction == entry.Request.Direction {
 					found = true
 					break
-				} else if request.Calltype == elevator.CAB && entry.Request.Calltype == elevator.CAB {
+				} else if request.Calltype == elevator.CALLTYPE_CAB && entry.Request.Calltype == elevator.CALLTYPE_CAB {
 					found = true
 					break
 				}
@@ -181,7 +181,7 @@ Returns: A global queue entry structured from the given request, ready for queue
 */
 func f_AssembleEntryFromRequest(receivedRequest elevator.T_Request, thisNodeInfo T_NodeInfo, assignedEntry T_GlobalQueueEntry) T_GlobalQueueEntry {
 	returnEntry := T_GlobalQueueEntry{}
-	if receivedRequest.State == elevator.DONE {
+	if receivedRequest.State == elevator.REQUESTSTATE_DONE {
 		F_WriteLog("Node: | " + strconv.Itoa(int(thisNodeInfo.PRIORITY)) + " | request resent DONE")
 		returnEntry = T_GlobalQueueEntry{
 			Request:           receivedRequest,
@@ -189,7 +189,7 @@ func f_AssembleEntryFromRequest(receivedRequest elevator.T_Request, thisNodeInfo
 			AssignedNode:      assignedEntry.AssignedNode,
 			TimeUntilReassign: 0,
 		}
-	} else if receivedRequest.State == elevator.ACTIVE {
+	} else if receivedRequest.State == elevator.REQUESTSTATE_ACTIVE {
 		F_WriteLog("Node: | " + strconv.Itoa(int(thisNodeInfo.PRIORITY)) + " | request resent ACTIVE")
 		returnEntry = T_GlobalQueueEntry{
 			Request:           receivedRequest,
@@ -197,7 +197,7 @@ func f_AssembleEntryFromRequest(receivedRequest elevator.T_Request, thisNodeInfo
 			AssignedNode:      assignedEntry.AssignedNode,
 			TimeUntilReassign: REASSIGN_PERIOD,
 		}
-	} else if receivedRequest.State == elevator.UNASSIGNED {
+	} else if receivedRequest.State == elevator.REQUESTSTATE_UNASSIGNED {
 		returnEntry = T_GlobalQueueEntry{
 			Request:           receivedRequest,
 			RequestedNode:     thisNodeInfo.PRIORITY,
@@ -223,19 +223,19 @@ func f_AssignNewEntry(globalQueue []T_GlobalQueueEntry, avalibaleNodes []T_NodeI
 	for i, entry := range globalQueue {
 		chosenNode := uint8(0)
 		switch entry.Request.Calltype {
-		case elevator.HALL:
-			if (entry.Request.State == elevator.UNASSIGNED) && len(avalibaleNodes) > 0 {
+		case elevator.CALLTYPE_HALL:
+			if (entry.Request.State == elevator.REQUESTSTATE_UNASSIGNED) && len(avalibaleNodes) > 0 {
 				chosenNode = f_ClosestElevatorNode(entry.Request.Floor, avalibaleNodes)
 			}
-		case elevator.CAB:
+		case elevator.CALLTYPE_CAB:
 			for _, avalibaleNode := range avalibaleNodes {
-				if (entry.Request.State == elevator.UNASSIGNED) && (avalibaleNode.PRIORITY == entry.RequestedNode) {
+				if (entry.Request.State == elevator.REQUESTSTATE_UNASSIGNED) && (avalibaleNode.PRIORITY == entry.RequestedNode) {
 					chosenNode = entry.RequestedNode
 				}
 			}
 		}
 		if chosenNode != 0 {
-			entry.Request.State = elevator.ASSIGNED
+			entry.Request.State = elevator.REQUESTSTATE_ASSIGNED
 			assignedEntry = T_GlobalQueueEntry{
 				Request:           entry.Request,
 				RequestedNode:     entry.RequestedNode,
@@ -258,7 +258,7 @@ Returns: The found global queue entry assigned to the current node and its index
 */
 func f_FindAssignedEntry(globalQueue []T_GlobalQueueEntry, thisNodeInfo T_NodeInfo) (T_GlobalQueueEntry, int) {
 	for i, entry := range globalQueue {
-		if entry.AssignedNode == thisNodeInfo.PRIORITY && entry.Request.State == elevator.ASSIGNED {
+		if entry.AssignedNode == thisNodeInfo.PRIORITY && entry.Request.State == elevator.REQUESTSTATE_ASSIGNED {
 			F_WriteLog("Found assigned request with ID: " + strconv.Itoa(int(entry.Request.Id)) + " assigned to node " + strconv.Itoa(int(entry.AssignedNode)))
 			return entry, i
 		}
@@ -293,7 +293,7 @@ func f_UpdateGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueueIn
 	entriesToRemove := []T_GlobalQueueEntry{}
 	for _, remoteEntry := range masterMessage.GlobalQueue {
 		f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, remoteEntry)
-		if remoteEntry.Request.State == elevator.DONE {
+		if remoteEntry.Request.State == elevator.REQUESTSTATE_DONE {
 			entriesToRemove = append(entriesToRemove, remoteEntry)
 		}
 	}
@@ -361,7 +361,7 @@ Prerequisites: An initialized global queue and an entry identified as unfinished
 Returns: The global queue with the specified entry updated for reassignment.
 */
 func f_ReassignUnfinishedEntry(globalQueue []T_GlobalQueueEntry, unFinishedEntry T_GlobalQueueEntry, unFinishedEntryIndex int) []T_GlobalQueueEntry {
-	unFinishedEntry.Request.State = elevator.UNASSIGNED
+	unFinishedEntry.Request.State = elevator.REQUESTSTATE_UNASSIGNED
 	entryToReassign := T_GlobalQueueEntry{
 		Request:           unFinishedEntry.Request,
 		RequestedNode:     unFinishedEntry.RequestedNode,
@@ -393,7 +393,7 @@ func f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 			break
 		}
 	}
-	if entryIsUnique && entryToAdd.Request.State != elevator.DONE {
+	if entryIsUnique && entryToAdd.Request.State != elevator.REQUESTSTATE_DONE {
 		globalQueue = append(globalQueue, entryToAdd)
 
 	} else if !entryIsUnique {

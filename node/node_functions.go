@@ -13,9 +13,9 @@ Returns: A fully initialized node structure ready for integration into the syste
 */
 func F_InitNode(config T_Config) T_Node {
 	thisElevatorInfo := elevator.T_ElevatorInfo{
-		Direction:  elevator.NONE,
+		Direction:  elevator.ELEVATORDIRECTION_NONE,
 		Floor:      -1,
-		State:      elevator.IDLE,
+		State:      elevator.ELEVATORSTATE_IDLE,
 		Obstructed: false,
 	}
 	thisNodeInfo := T_NodeInfo{
@@ -87,7 +87,7 @@ Returns: A list of node information structures for nodes that are idle and avail
 func f_GetAvalibaleNodes(connectedNodes []T_NodeInfo) []T_NodeInfo {
 	var avalibaleNodes []T_NodeInfo
 	for i, nodeInfo := range connectedNodes {
-		if (nodeInfo != T_NodeInfo{} && nodeInfo.ElevatorInfo.State == elevator.IDLE) {
+		if (nodeInfo != T_NodeInfo{} && nodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_IDLE) {
 			avalibaleNodes = append(avalibaleNodes, connectedNodes[i])
 		}
 	}
