@@ -12,7 +12,7 @@ type T_Node struct {
 	PBRole         T_PBNodeRole
 	GlobalQueue    []T_GlobalQueueEntry
 	ConnectedNodes []T_NodeInfo
-	Elevator       elevator.T_Elevator //Must always point to NodeInfo.ElevatorInfo
+	Elevator       elevator.T_Elevator
 }
 
 type T_NodeInfo struct {
