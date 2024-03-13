@@ -99,7 +99,7 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 			globalQueue := <-getSetGlobalQueueInterface.c_get
 
 			doneEntry, doneEntryIndex := f_FindDoneEntry(globalQueue)
-			if (doneEntry.Request.State != elevator.DONE && doneEntry != T_GlobalQueueEntry{}) {
+			if (doneEntry.Request.State != elevator.REQUESTSTATE_DONE && doneEntry != T_GlobalQueueEntry{}) {
 				globalQueue = f_ReassignUnfinishedEntry(globalQueue, doneEntry, doneEntryIndex)
 			}
 			getSetGlobalQueueInterface.c_set <- globalQueue
@@ -127,14 +127,14 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 	immoblieNodes := make(map[uint8]bool)
 	for {
 		connectedNodes := f_GetConnectedNodes()
-		if f_GetNodeInfo().MSRole == MSROLE_MASTER{
+		if f_GetNodeInfo().MSRole == MSROLE_MASTER {
 			for _, nodeInfo := range connectedNodes {
 				previousNodeInfo := f_FindNodeInfo(nodeInfo.PRIORITY, previousConnectedNodes)
 				if (previousNodeInfo != T_NodeInfo{}) {
-					if nodeInfo.ElevatorInfo.State == elevator.MOVING && previousNodeInfo.ElevatorInfo.State == elevator.IDLE {
+					if nodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING && previousNodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_IDLE {
 						allTimesAtFloorChange[nodeInfo.PRIORITY] = time.Now()
 					}
-					if nodeInfo.ElevatorInfo.State == elevator.MOVING && previousNodeInfo.ElevatorInfo.Floor != nodeInfo.ElevatorInfo.Floor {
+					if nodeInfo.ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING && previousNodeInfo.ElevatorInfo.Floor != nodeInfo.ElevatorInfo.Floor {
 						allTimesAtFloorChange[nodeInfo.PRIORITY] = time.Now()
 					}
 				}
@@ -142,7 +142,7 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 			previousConnectedNodes = f_CopyConnectedNodes(connectedNodes)
 			for node, timeAtFloorChange := range allTimesAtFloorChange {
 				timeNow := time.Now()
-				if timeNow.Sub(timeAtFloorChange) > time.Duration(IMMOBILE_PERIOD*float64(time.Second)) && f_FindNodeInfo(node, connectedNodes).ElevatorInfo.State == elevator.MOVING {
+				if timeNow.Sub(timeAtFloorChange) > time.Duration(IMMOBILE_PERIOD*float64(time.Second)) && f_FindNodeInfo(node, connectedNodes).ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING {
 					immoblieNodes[node] = false
 				}
 			}
@@ -154,7 +154,6 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 				}
 			}
 		}
-		
 
 		c_getSetConnectedNodesInterface <- getSetConnectedNodesInterface
 		connectedNodes = <-getSetConnectedNodesInterface.c_get

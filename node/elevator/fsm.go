@@ -1,6 +1,7 @@
 package elevator
 
 import (
+	"fmt"
 	"time"
 )
 
