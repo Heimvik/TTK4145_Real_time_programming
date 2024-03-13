@@ -10,23 +10,51 @@ import (
 )
 
 /*
-Initializes global configuration and logging mechanisms. Opens "log/debug1.log" for logging and "config/default.json" for configuration settings,
-then decodes the configuration into global variables. It's run automatically at the start to configure system settings like floors, port numbers,
-and operational timings based on the JSON file. Errors during file operations or JSON decoding are output to the console.
+Initializes the log with filename and overwrites any existing content.
+
+Prerequisites: None
+
+Returns: None
+*/
+func f_StartLog() {
+	logFile, err := os.OpenFile("log/debug1.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	if err != nil {
+		fmt.Println("Error opening/creating log file:", err)
+		return
+	}
+	defer logFile.Close()
+}
+
+/*
+Restarts the log every *parameter* minutes to avoid unnecessary memory consumption
+
+Prerequisites: None
+
+Returns: None, but resets log after given minutes.
+*/
+func f_RestartLogEachMinutes(minutes int) {
+	for range time.Tick(time.Duration(minutes) * time.Minute) {
+		f_StartLog()
+	}
+}
+
+/*
+Initializes global configuration and logging mechanisms.
 
 Prerequisites: "config/default.json" must exist with valid configurations. The system must have write access to the log file directory.
 
 Returns: None. Sets global variables for system configuration and initializes logging.
 */
 func init() {
-	logFile, errOpenLog := os.OpenFile("log/debug1.log", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+	f_StartLog()
+	go f_RestartLogEachMinutes(5)
+
 	configFile, errOpenConfig := os.Open("config/default.json")
 	var config node.T_Config
 	errReadConfig := json.NewDecoder(configFile).Decode(&config)
-	if errOpenLog != nil || errOpenConfig != nil || errReadConfig != nil {
+	if errOpenConfig != nil || errReadConfig != nil {
 		fmt.Println("Errors opening/reading config or log")
 	}
-	defer logFile.Close()
 	defer configFile.Close()
 
 	node.ThisNode = node.F_InitNode(config)
