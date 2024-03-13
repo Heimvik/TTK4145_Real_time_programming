@@ -168,11 +168,16 @@ func f_UpdateElevatorOnFloorArrival(newFloor int8, elevator T_Elevator) T_Elevat
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case ELEVATORSTATE_MOVING:
-		if F_ShouldElevatorStop(elevator) {
-			elevator = F_StopElevator(elevator)
-			elevator = F_ClearRequest(elevator)
+		if elevator.P_serveRequest != nil {
+			if F_ShouldElevatorStop(elevator) {
+				elevator = F_StopElevator(elevator)
+				elevator = F_ClearRequest(elevator)
+			} else {
+				elevator = F_ChooseElevatorDirection(elevator)
+			}
 		} else {
-			elevator = F_ChooseElevatorDirection(elevator)
+			elevator = F_StopElevator(elevator)
+			elevator.P_info.State = ELEVATORSTATE_IDLE
 		}
 	default:
 		elevator = F_StopElevator(elevator)
