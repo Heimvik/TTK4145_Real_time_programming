@@ -168,14 +168,16 @@ Prerequisites: None.
 Returns: Nothing, but changes the state of the specified elevator call button light to "off".
 */
 func f_TurnOffLight(request elevator.T_Request) {
-	if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_DOWN {
-		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(request.Floor), false)
+	if request.Floor >= 0 && request.Floor < FLOORS{
+		if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_DOWN {
+			elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(request.Floor), false)
 
-	} else if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_UP {
-		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(request.Floor), false)
+		} else if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_UP {
+			elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(request.Floor), false)
 
-	} else if request.Calltype == elevator.CALLTYPE_CAB {
-		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(request.Floor), false)
+		} else if request.Calltype == elevator.CALLTYPE_CAB {
+			elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(request.Floor), false)
+		}
 	}
 }
 
