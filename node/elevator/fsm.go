@@ -65,8 +65,10 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 
 	if newElevator.P_info.State == ELEVATORSTATE_DOOROPEN {
 		F_SetDoorOpenLamp(true)
-		oldElevator.P_serveRequest.State = REQUESTSTATE_DONE
-		chans.C_requestOut <- *oldElevator.P_serveRequest
+		if (oldElevator.ServeRequest != T_Request{}) {
+			oldElevator.ServeRequest.State = REQUESTSTATE_DONE
+			chans.C_requestOut <- oldElevator.ServeRequest
+		}
 		chans.C_timerStart <- true
 	}
 }
@@ -163,7 +165,7 @@ func f_UpdateElevatorOnFloorArrival(newFloor int8, elevator T_Elevator) T_Elevat
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case ELEVATORSTATE_MOVING:
-		if elevator.P_serveRequest != nil {
+		if (elevator.ServeRequest != T_Request{}) {
 			if F_ShouldElevatorStop(elevator) {
 				elevator = F_StopElevator(elevator)
 				elevator = F_ClearRequest(elevator)
@@ -176,6 +178,7 @@ func f_UpdateElevatorOnFloorArrival(newFloor int8, elevator T_Elevator) T_Elevat
 		}
 	default:
 		elevator = F_StopElevator(elevator)
+		
 	}
 	return elevator
 }

@@ -46,8 +46,8 @@ Prerequisites: None
 Returns: The updated elevator state.
 */
 func F_ReceiveRequest(req T_Request, elevator T_Elevator) T_Elevator {
-	elevator.P_serveRequest = &req
-	elevator.P_serveRequest.State = REQUESTSTATE_ACTIVE
+	elevator.ServeRequest = req
+	elevator.ServeRequest.State = REQUESTSTATE_ACTIVE
 	return elevator
 }
 
@@ -59,7 +59,7 @@ Prerequisites: None
 Returns: The updated elevator state.
 */
 func F_ClearRequest(elevator T_Elevator) T_Elevator {
-	elevator.P_serveRequest = nil
+	elevator.ServeRequest = T_Request{}
 	elevator.P_info.State = ELEVATORSTATE_DOOROPEN
 	return elevator
 }

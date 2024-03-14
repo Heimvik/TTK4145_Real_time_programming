@@ -89,7 +89,7 @@ Prerequisites: Elevator needs to currently have a request to serve.
 Returns: True if the elevator should stop; otherwise, false.
 */
 func F_ShouldElevatorStop(elevator T_Elevator) bool {
-	return (elevator.P_info.Floor == elevator.P_serveRequest.Floor)
+	return (elevator.P_info.Floor == elevator.ServeRequest.Floor)
 }
 
 /*
@@ -113,11 +113,11 @@ Prerequisites: None
 Returns: The updated elevator state.
 */
 func F_ChooseElevatorDirection(elevator T_Elevator) T_Elevator {
-	if elevator.P_serveRequest.Floor < elevator.P_info.Floor {
+	if elevator.ServeRequest.Floor < elevator.P_info.Floor {
 		elevator.P_info.State = ELEVATORSTATE_MOVING
 		elevator.P_info.Direction = ELEVATORDIRECTION_DOWN
 		F_SetMotorDirection(ELEVATORDIRECTION_DOWN)
-	} else if elevator.P_serveRequest.Floor > elevator.P_info.Floor {
+	} else if elevator.ServeRequest.Floor > elevator.P_info.Floor {
 		elevator.P_info.State = ELEVATORSTATE_MOVING
 		elevator.P_info.Direction = ELEVATORDIRECTION_UP
 		F_SetMotorDirection(ELEVATORDIRECTION_UP)

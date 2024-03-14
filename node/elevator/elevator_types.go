@@ -58,7 +58,7 @@ type T_Elevator struct {
 	CurrentID      int
 	StopButton     bool
 	P_info         *T_ElevatorInfo //MUST be pointer to info (points to info stored in ThisNode.NodeInfo.ElevatorInfo)
-	P_serveRequest *T_Request      //Pointer to the current request you are serviceing
+	ServeRequest T_Request      //Pointer to the current request you are serviceing
 }
 
 type T_ElevatorInfo struct {

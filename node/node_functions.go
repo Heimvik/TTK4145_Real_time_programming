@@ -25,10 +25,10 @@ func F_InitNode(config T_Config) T_Node {
 	}
 
 	thisElevator := elevator.T_Elevator{
-		P_info:         &thisElevatorInfo,
-		P_serveRequest: nil,
-		CurrentID:      0,
-		StopButton:     false,
+		P_info:       &thisElevatorInfo,
+		ServeRequest: elevator.T_Request{},
+		CurrentID:    0,
+		StopButton:   false,
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
@@ -138,5 +138,66 @@ func f_UpdateConnectedNodes(c_getSetConnectedNodesInterface chan T_GetSetConnect
 		currentNode.TimeUntilDisconnect = CONNECTION_PERIOD
 		oldConnectedNodes[nodeIndex] = currentNode
 		getSetConnectedNodesInterface.c_set <- oldConnectedNodes
+	}
+}
+
+/*
+Activates the corresponding elevator call button light for an entry, signaling an active request to users based on its type and direction.
+
+Prerequisites: None.
+
+Returns: Nothing, but updates the state of elevator call button lights to "on" for the specified request.
+*/
+func f_TurnOnLight(entry T_GlobalQueueEntry) {
+	if entry.Request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Direction == elevator.ELEVATORDIRECTION_DOWN {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(entry.Request.Floor), true)
+
+	} else if entry.Request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Direction == elevator.ELEVATORDIRECTION_UP {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(entry.Request.Floor), true)
+
+	} else if entry.Request.Calltype == elevator.CALLTYPE_CAB && entry.RequestedNode == f_GetNodeInfo().PRIORITY {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(entry.Request.Floor), true)
+	}
+}
+
+/*
+Deactivates the elevator call button light for a specific request, indicating the request has been addressed or is no longer active.
+
+Prerequisites: None.
+
+Returns: Nothing, but changes the state of the specified elevator call button light to "off".
+*/
+func f_TurnOffLight(request elevator.T_Request) {
+	if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_DOWN {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(request.Floor), false)
+
+	} else if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_UP {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLUP, int(request.Floor), false)
+
+	} else if request.Calltype == elevator.CALLTYPE_CAB {
+		elevator.F_SetButtonLamp(elevator.BUTTONTYPE_CAB, int(request.Floor), false)
+	}
+}
+
+/*
+Refreshes the state of all elevator call button lights based on the current global queue, turning off lights for resolved requests and on for active ones.
+
+Prerequisites: An initialized global queue with current request states.
+
+Returns: Nothing, but ensures elevator button lights accurately reflect the current request statuses.
+*/
+func f_UpdateLights() {
+	globalQueue := f_GetGlobalQueue()
+	possibleRequests := f_FindPossibleRequests()
+	notpresentRequests := f_FindNotPresentRequests(globalQueue, possibleRequests)
+
+	for _, requestNotBeingServed := range notpresentRequests {
+		f_TurnOffLight(requestNotBeingServed)
+		// elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestNotBeingServed), int(requestNotBeingServed.Floor), false)
+	}
+	for _, entryBeingServed := range globalQueue {
+		f_TurnOnLight(entryBeingServed)
+		// requestBeingServed := entryBeingServed.Request
+		// elevator.F_SetButtonLamp(elevator.F_ConvertRequestToButtonType(requestBeingServed), int(requestBeingServed.Floor), true)
 	}
 }
