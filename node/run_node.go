@@ -507,7 +507,6 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				if masterMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
 					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-					f_WriteLogMasterMessage(masterMessage)
 				}
 
 			case slaveMessage := <-c_receiveSlaveMessage:
@@ -518,7 +517,6 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				if slaveMessage.Entry.Request.State == elevator.REQUESTSTATE_ACTIVE {
 					c_receivedActiveEntry <- slaveMessage.Entry
 				}
-				f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -578,7 +576,6 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 			case masterMessage := <-c_receiveMasterMessage:
 				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
-				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
