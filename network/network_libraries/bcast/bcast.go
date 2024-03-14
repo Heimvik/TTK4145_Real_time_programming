@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"reflect"
+	"strconv"
 	"the-elevator/network/network_libraries/conn"
 )
 
@@ -12,7 +13,7 @@ const bufSize = 8192
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
 // it on `port`
-func Transmitter(port int, chans ...interface{}) {
+func Transmitter(ip string, port int, chans ...interface{}) {
 	checkArgs(chans...)
 	typeNames := make([]string, len(chans))
 	selectCases := make([]reflect.SelectCase, len(typeNames))
@@ -25,7 +26,7 @@ func Transmitter(port int, chans ...interface{}) {
 	}
 
 	conn := conn.DialBroadcastUDP(port)
-	addr, _ := net.ResolveUDPAddr("udp4", fmt.Sprintf("255.255.255.255:%d", port))
+	addr, _ := net.ResolveUDPAddr("udp4", ip+":"+strconv.Itoa(port))
 	for {
 		chosen, value, _ := reflect.Select(selectCases)
 		jsonstr, _ := json.Marshal(value.Interface())
@@ -40,7 +41,6 @@ func Transmitter(port int, chans ...interface{}) {
 				len(ttj), bufSize, string(ttj)))
 		}
 		conn.WriteTo(ttj, addr)
-
 	}
 }
 

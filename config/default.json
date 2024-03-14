@@ -14,7 +14,7 @@
   "mostresponsiveperiod":500,
   "mediumresponsiveperiod":1500,
   "leastresponsiveperiod":5000,
-  "terminationperiod":15,
+  "terminationperiod":10,
   "maxallowedelevatorerrors": 2,
-  "maxallowednodeerrors":2
+  "maxallowednodeerrors":1
 }

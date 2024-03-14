@@ -49,15 +49,19 @@ Prerequisites: An initialized channel for receiving slave messages to broadcast 
 Returns: Nothing, but broadcasts slave messages upon receiving new messages through its channel.
 */
 func f_TransmitSlaveMessage(c_transmitSlaveMessage chan T_SlaveMessage, port int) {
-	c_slaveMessageOut := make(chan T_SlaveMessage)
-	go bcast.Transmitter(port, c_slaveMessageOut)
+	c_slaveMessageNodes := make(chan T_SlaveMessage)
+	c_slaveMessageLocal := make(chan T_SlaveMessage)
+	go bcast.Transmitter("255.255.255.255", port, c_slaveMessageNodes)
+	go bcast.Transmitter("localhost", port, c_slaveMessageLocal)
 	//Source: https://github.com/TTK4145/Network-go
 	for {
 		select {
 		case transmitSlaveMessage := <-c_transmitSlaveMessage:
 			for i := 0; i < MESSAGES_TO_SEND; i++ {
-				c_slaveMessageOut <- transmitSlaveMessage
-				time.Sleep(time.Duration(3) * time.Millisecond)
+				c_slaveMessageNodes <- transmitSlaveMessage
+				time.Sleep(time.Duration(1) * time.Millisecond)
+				c_slaveMessageNodes <- transmitSlaveMessage
+				time.Sleep(time.Duration(2) * time.Millisecond)
 			}
 		}
 	}
@@ -71,15 +75,19 @@ Prerequisites: An initialized channel for receiving master messages to broadcast
 Returns: Nothing, but broadcasts master messages to slave nodes upon receiving new messages through its channel.
 */
 func f_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port int) {
-	c_masterMessageOut := make(chan T_MasterMessage)
-	go bcast.Transmitter(port, c_masterMessageOut)
+	c_masterMessageNodes := make(chan T_MasterMessage)
+	c_masterMessageLocal := make(chan T_MasterMessage)
+	go bcast.Transmitter("255.255.255.255", port, c_masterMessageNodes)
+	go bcast.Transmitter("localhost", 20056, c_masterMessageLocal)
 	//Source: https://github.com/TTK4145/Network-go
 	for {
 		select {
 		case transmitMasterMessage := <-c_transmitMasterMessage:
 			for i := 0; i < MESSAGES_TO_SEND; i++ {
-				c_masterMessageOut <- transmitMasterMessage
-				time.Sleep(time.Duration(3) * time.Millisecond)
+				c_masterMessageNodes <- transmitMasterMessage
+				time.Sleep(time.Duration(1) * time.Millisecond)
+				c_masterMessageLocal <- transmitMasterMessage
+				time.Sleep(time.Duration(2) * time.Millisecond)
 			}
 		}
 	}
