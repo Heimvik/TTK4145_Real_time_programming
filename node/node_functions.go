@@ -14,7 +14,7 @@ Returns: A fully initialized node structure ready for integration into the syste
 func F_InitNode(config T_Config) T_Node {
 	thisElevatorInfo := elevator.T_ElevatorInfo{
 		Direction:  elevator.ELEVATORDIRECTION_NONE,
-		Floor:      -1,
+		Floor:      0,
 		State:      elevator.ELEVATORSTATE_IDLE,
 		Obstructed: false,
 	}
@@ -168,7 +168,7 @@ Prerequisites: None.
 Returns: Nothing, but changes the state of the specified elevator call button light to "off".
 */
 func f_TurnOffLight(request elevator.T_Request) {
-	if request.Floor >= 0 && request.Floor < FLOORS{
+	if request.Floor >= 0 && request.Floor < FLOORS {
 		if request.Calltype == elevator.CALLTYPE_HALL && request.Direction == elevator.ELEVATORDIRECTION_DOWN {
 			elevator.F_SetButtonLamp(elevator.BUTTONTYPE_HALLDOWN, int(request.Floor), false)
 
