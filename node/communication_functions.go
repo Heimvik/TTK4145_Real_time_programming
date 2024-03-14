@@ -78,7 +78,7 @@ func f_TransmitMasterMessage(c_transmitMasterMessage chan T_MasterMessage, port 
 	c_masterMessageNodes := make(chan T_MasterMessage)
 	c_masterMessageLocal := make(chan T_MasterMessage)
 	go bcast.Transmitter("255.255.255.255", port, c_masterMessageNodes)
-	go bcast.Transmitter("localhost", 20056, c_masterMessageLocal)
+	go bcast.Transmitter("localhost", port, c_masterMessageLocal)
 	//Source: https://github.com/TTK4145/Network-go
 	for {
 		select {
