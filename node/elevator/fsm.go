@@ -1,7 +1,6 @@
 package elevator
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -66,7 +65,6 @@ func f_HandleFloorArrivalEvent(newFloor int8, c_getSetElevatorInterface chan T_G
 
 	if newElevator.P_info.State == ELEVATORSTATE_DOOROPEN {
 		F_SetDoorOpenLamp(true)
-		fmt.Print("Sending done to node\n")
 		oldElevator.P_serveRequest.State = REQUESTSTATE_DONE
 		chans.C_requestOut <- *oldElevator.P_serveRequest
 		chans.C_timerStart <- true
@@ -114,16 +112,13 @@ func f_HandleRequestToElevatorEvent(newRequest T_Request, c_getSetElevatorInterf
 	chans.getSetElevatorInterface.C_set <- newElevator
 
 	if cleared {
-		fmt.Print("Sending active to node\n")
 		newRequest.State = REQUESTSTATE_ACTIVE
 		chans.C_requestOut <- newRequest
-		fmt.Print("Sending done to node\n")
 		newRequest.State = REQUESTSTATE_DONE
 		chans.C_requestOut <- newRequest
 		F_SetDoorOpenLamp(true)
 		chans.C_timerStart <- true
 	} else {
-		fmt.Print("Sending active to node\n")
 		newRequest.State = REQUESTSTATE_ACTIVE
 		chans.C_requestOut <- newRequest
 	}
@@ -168,11 +163,16 @@ func f_UpdateElevatorOnFloorArrival(newFloor int8, elevator T_Elevator) T_Elevat
 	elevator.P_info.Floor = newFloor
 	switch elevator.P_info.State {
 	case ELEVATORSTATE_MOVING:
-		if F_ShouldElevatorStop(elevator) {
-			elevator = F_StopElevator(elevator)
-			elevator = F_ClearRequest(elevator)
+		if elevator.P_serveRequest != nil {
+			if F_ShouldElevatorStop(elevator) {
+				elevator = F_StopElevator(elevator)
+				elevator = F_ClearRequest(elevator)
+			} else {
+				elevator = F_ChooseElevatorDirection(elevator)
+			}
 		} else {
-			elevator = F_ChooseElevatorDirection(elevator)
+			elevator = F_StopElevator(elevator)
+			elevator.P_info.State = ELEVATORSTATE_IDLE
 		}
 	default:
 		elevator = F_StopElevator(elevator)

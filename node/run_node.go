@@ -77,7 +77,7 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 			return
 		case <-checkChangesToGlobalQueue.C:
 			currentGlobalQueue := f_GetGlobalQueue()
-			if f_GlobalQueueAreEqual(previousGlobalQueue, currentGlobalQueue) && len(currentGlobalQueue) != 0 && !f_GlobalQueueFullyObstructed(currentGlobalQueue) {
+			if f_GlobalQueueAreEqual(previousGlobalQueue, currentGlobalQueue) && len(currentGlobalQueue) != 0 && f_GlobalQueueShouldEmpty(currentGlobalQueue) {
 				F_WriteLog(fmt.Sprintf("No changes in globalQueue for %d seconds", TERMINATION_PERIOD))
 				c_nodeWithoutError <- false
 			} else {
@@ -124,7 +124,7 @@ Returns: Nothing, but updates the list of connected nodes by removing those cons
 func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetConnectedNodesInterface, getSetConnectedNodesInterface T_GetSetConnectedNodesInterface, c_immobileNode chan uint8) {
 	allTimesAtFloorChange := make(map[uint8]time.Time)
 	previousConnectedNodes := f_GetConnectedNodes()
-	immoblieNodes := make(map[uint8]bool)
+	immobileNodes := make(map[uint8]bool)
 	for {
 		connectedNodes := f_GetConnectedNodes()
 		if f_GetNodeInfo().MSRole == MSROLE_MASTER {
@@ -143,13 +143,13 @@ func f_CheckConnectedNodesStatus(c_getSetConnectedNodesInterface chan T_GetSetCo
 			for node, timeAtFloorChange := range allTimesAtFloorChange {
 				timeNow := time.Now()
 				if timeNow.Sub(timeAtFloorChange) > time.Duration(IMMOBILE_PERIOD*float64(time.Second)) && f_FindNodeInfo(node, connectedNodes).ElevatorInfo.State == elevator.ELEVATORSTATE_MOVING {
-					immoblieNodes[node] = false
+					immobileNodes[node] = false
 				}
 			}
-			for node, isHandled := range immoblieNodes {
+			for node, isHandled := range immobileNodes {
 				if !isHandled {
 					c_immobileNode <- node
-					immoblieNodes[node] = true
+					immobileNodes[node] = true
 					allTimesAtFloorChange[node] = time.Now()
 				}
 			}
@@ -277,10 +277,12 @@ func f_CheckIfShouldAssign(c_getSetGlobalQueueInterface chan T_GetSetGlobalQueue
 						c_elevatorWithoutError <- false
 						F_WriteLog("Assignstate: 0")
 					}
+				case <-c_quit:
+					F_WriteLog("Closed: f_CheckIfShouldAssign")
+					return
 				default:
 				}
 			}
-
 		}
 		time.Sleep(time.Duration(LEAST_RESPONSIVE_PERIOD) * time.Microsecond)
 	}
@@ -566,6 +568,7 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				if masterMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
 					f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 					f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
+					f_WriteLogMasterMessage(masterMessage)
 				}
 
 			case slaveMessage := <-c_receiveSlaveMessage:
@@ -576,6 +579,7 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 				if slaveMessage.Entry.Request.State == elevator.REQUESTSTATE_ACTIVE {
 					c_receivedActiveEntry <- slaveMessage.Entry
 				}
+				f_WriteLogSlaveMessage(slaveMessage)
 
 			case entryFromElevator := <-c_entryFromElevator:
 				f_AddEntryGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, entryFromElevator)
@@ -635,6 +639,7 @@ func F_RunPrimary(c_nodeRunningWithoutErrors chan bool, c_elevatorRunningWithout
 			case masterMessage := <-c_receiveMasterMessage:
 				f_UpdateGlobalQueue(c_getSetGlobalQueueInterface, getSetGlobalQueueInterface, masterMessage)
 				f_UpdateConnectedNodes(c_getSetConnectedNodesInterface, getSetConnectedNodesInterface, masterMessage.Transmitter)
+				f_WriteLogMasterMessage(masterMessage)
 
 			case slaveMessage := <-c_receiveSlaveMessage:
 				if slaveMessage.Transmitter.PRIORITY != f_GetNodeInfo().PRIORITY {
