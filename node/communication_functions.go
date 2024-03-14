@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var MESSAGES_TO_SEND int = 20
+var MESSAGES_TO_SEND int = 30
 
 /*
 Broadcasts the current global queue and node information as a master message to connected nodes, ensuring network-wide state consistency.

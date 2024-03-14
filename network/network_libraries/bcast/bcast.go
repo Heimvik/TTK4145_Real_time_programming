@@ -9,7 +9,7 @@ import (
 	"the-elevator/network/network_libraries/conn"
 )
 
-const bufSize = 8192
+const bufSize = 4096
 
 // Encodes received values from `chans` into type-tagged JSON, then broadcasts
 // it on `port`
