@@ -77,7 +77,7 @@ func f_CheckGlobalQueueEntryStatus(c_getSetGlobalQueueInterface chan T_GetSetGlo
 			return
 		case <-checkChangesToGlobalQueue.C:
 			currentGlobalQueue := f_GetGlobalQueue()
-			if f_GlobalQueueAreEqual(previousGlobalQueue, currentGlobalQueue) && len(currentGlobalQueue) != 0 && !f_GlobalQueueFullyObstructed(currentGlobalQueue) {
+			if f_GlobalQueueAreEqual(previousGlobalQueue, currentGlobalQueue) && len(currentGlobalQueue) != 0 && f_GlobalQueueShouldEmpty(currentGlobalQueue) {
 				F_WriteLog(fmt.Sprintf("No changes in globalQueue for %d seconds", TERMINATION_PERIOD))
 				c_nodeWithoutError <- false
 			} else {

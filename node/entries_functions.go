@@ -51,6 +51,32 @@ func f_GlobalQueueAreEqual(q1 []T_GlobalQueueEntry, q2 []T_GlobalQueueEntry) boo
 }
 
 /*
+Determines if all entries in the global queue are obstructed, based on the elevator state of their assigned nodes.
+
+Prerequisites: The global queue and the list of connected nodes must be initialized.
+
+Returns: A boolean indicating whether the entire global queue is obstructed.
+*/
+func f_GlobalQueueShouldEmpty(globalQueue []T_GlobalQueueEntry) bool {
+	obstructedNodes := 0
+	assignedToUnConNodes := 0
+	connectedNodes := f_GetConnectedNodes()
+
+	for _, entry := range globalQueue {
+		assignedNode := f_FindNodeInfo(entry.AssignedNode, connectedNodes)
+		if assignedNode.ElevatorInfo.Obstructed {
+			obstructedNodes += 1
+		}
+		if (assignedNode == T_NodeInfo{}){
+			assignedToUnConNodes += 1
+		}
+	}
+	isObstructed := (len(globalQueue) == obstructedNodes)
+	isAssignedToUnCon := (len(globalQueue) == assignedToUnConNodes)
+	return !isObstructed || !isAssignedToUnCon
+}
+
+/*
 Searches the global queue for the first entry that has TimeUntilReassign equals 0, indicating it is done.
 
 Prerequisites: An initialized global queue with at least one entry.
@@ -66,26 +92,6 @@ func f_FindDoneEntry(globalQueue []T_GlobalQueueEntry) (T_GlobalQueueEntry, int)
 		}
 	}
 	return doneEntry, doneEntryIndex
-}
-
-/*
-Determines if all entries in the global queue are obstructed, based on the elevator state of their assigned nodes.
-
-Prerequisites: The global queue and the list of connected nodes must be initialized.
-
-Returns: A boolean indicating whether the entire global queue is obstructed.
-*/
-func f_GlobalQueueFullyObstructed(globalQueue []T_GlobalQueueEntry) bool {
-	obstructedEntries := 0
-	connectedNodes := f_GetConnectedNodes()
-
-	for _, entry := range globalQueue {
-		assignedNode := f_FindNodeInfo(entry.AssignedNode, connectedNodes)
-		if assignedNode.ElevatorInfo.Obstructed {
-			obstructedEntries += 1
-		}
-	}
-	return len(globalQueue) == obstructedEntries
 }
 
 /*
