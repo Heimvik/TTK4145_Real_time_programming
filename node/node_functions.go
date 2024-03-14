@@ -25,10 +25,10 @@ func F_InitNode(config T_Config) T_Node {
 	}
 
 	thisElevator := elevator.T_Elevator{
-		P_info:         &thisElevatorInfo,
-		P_serveRequest: nil,
-		CurrentID:      0,
-		StopButton:     false,
+		P_info:       &thisElevatorInfo,
+		ServeRequest: elevator.T_Request{},
+		CurrentID:    0,
+		StopButton:   false,
 	}
 	thisNode := T_Node{
 		NodeInfo: thisNodeInfo,
