@@ -67,13 +67,13 @@ func f_GlobalQueueShouldEmpty(globalQueue []T_GlobalQueueEntry) bool {
 		if assignedNode.ElevatorInfo.Obstructed {
 			obstructedNodes += 1
 		}
-		if (assignedNode == T_NodeInfo{}){
+		if (assignedNode == T_NodeInfo{}) {
 			assignedToUnConNodes += 1
 		}
 	}
 	isObstructed := (len(globalQueue) == obstructedNodes)
 	isAssignedToUnCon := (len(globalQueue) == assignedToUnConNodes)
-	return !isObstructed || !isAssignedToUnCon
+	return !isObstructed && !isAssignedToUnCon
 }
 
 /*
@@ -159,7 +159,7 @@ func f_FindNotPresentRequests(globalQueue []T_GlobalQueueEntry, possibleRequests
 				if request.Calltype == elevator.CALLTYPE_HALL && entry.Request.Calltype == elevator.CALLTYPE_HALL && request.Direction == entry.Request.Direction {
 					found = true
 					break
-				} else if request.Calltype == elevator.CALLTYPE_CAB && entry.Request.Calltype == elevator.CALLTYPE_CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY{
+				} else if request.Calltype == elevator.CALLTYPE_CAB && entry.Request.Calltype == elevator.CALLTYPE_CAB && entry.AssignedNode == f_GetNodeInfo().PRIORITY {
 					found = true
 					break
 				}
